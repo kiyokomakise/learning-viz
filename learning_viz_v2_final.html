@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学習理解度管理｜ITビジネス・Webデザイン養成科</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Hiragino Sans', 'Meiryo', sans-serif; background: #F5F5F2; color: #2C2C2A; font-size: 14px; }
+
+/* ══ ログイン ══════════════════════════════════ */
+#loginScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.login-card { background: #fff; border-radius: 16px; border: 1px solid #E0DED6; padding: 2.5rem 2rem; width: 100%; max-width: 380px; text-align: center; }
+.login-logo { width: 56px; height: 56px; border-radius: 14px; background: #2E4057; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; margin: 0 auto 1.25rem; }
+.login-title { font-size: 18px; font-weight: 700; color: #2E4057; margin-bottom: 4px; }
+.login-sub { font-size: 12px; color: #888; margin-bottom: 1.5rem; line-height: 1.7; }
+.login-label { font-size: 12px; font-weight: 500; color: #555; text-align: left; margin-bottom: 4px; display: block; }
+.login-input { width: 100%; padding: 10px 14px; border: 1px solid #D3D1C7; border-radius: 8px; font-size: 14px; margin-bottom: 12px; outline: none; transition: border-color 0.15s; }
+.login-input:focus { border-color: #2E4057; }
+.login-btn { width: 100%; padding: 12px; background: #2E4057; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+.login-btn:hover { background: #3d5475; }
+.login-loading { font-size: 12px; color: #888; margin-top: 8px; display: none; }
+.login-err { font-size: 12px; color: #A32D2D; margin-top: 8px; display: none; }
+
+/* ══ ヘッダー ════════════════════════════════ */
+#mainScreen { display: none; min-height: 100vh; }
+.header { background: #2E4057; padding: 0 1.25rem; display: flex; align-items: center; justify-content: space-between; height: 54px; }
+.header-title { font-size: 14px; font-weight: 700; color: #fff; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.header-name { font-size: 12px; color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 99px; }
+.sync-badge { font-size: 11px; padding: 3px 8px; border-radius: 99px; background: #EAF3DE; color: #27500A; display: none; }
+.logout-btn { font-size: 12px; color: rgba(255,255,255,0.7); background: none; border: 1px solid rgba(255,255,255,0.3); border-radius: 99px; padding: 4px 10px; cursor: pointer; }
+
+/* ══ メインレイアウト ═══════════════════════ */
+.main { max-width: 900px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+
+/* ══ タブ ════════════════════════════════════ */
+.tabs { display: flex; gap: 4px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.tab { font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 99px; border: 1px solid #D3D1C7; background: transparent; color: #888; cursor: pointer; transition: all 0.15s; }
+.tab.active { background: #2E4057; color: #fff; border-color: #2E4057; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ══ カード ══════════════════════════════════ */
+.card { background: #fff; border-radius: 12px; border: 1px solid #E0DED6; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+.card-title { font-size: 14px; font-weight: 700; color: #2E4057; margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+/* ══ サマリー数値カード ══════════════════════ */
+.stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 1rem; }
+.stat-card { background: #F5F5F2; border-radius: 10px; padding: 12px; text-align: center; }
+.stat-card.hl { background: #2E4057; }
+.stat-num { font-size: 24px; font-weight: 700; color: #2E4057; line-height: 1.1; }
+.stat-card.hl .stat-num { color: #fff; }
+.stat-label { font-size: 11px; color: #888; margin-top: 3px; }
+.stat-card.hl .stat-label { color: rgba(255,255,255,0.65); }
+
+/* ══ チャートグリッド ════════════════════════ */
+.chart-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.chart-box { border: 1px solid #E0DED6; border-radius: 10px; padding: 12px; background: #fff; }
+.chart-lbl { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 8px; text-align: center; }
+
+/* ══ できている/強化リスト ══════════════════ */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.skill-row { display: flex; align-items: center; gap: 6px; padding: 6px 8px; margin-bottom: 4px; border-radius: 6px; font-size: 12px; }
+.skill-row.ok   { background: #F4FAEe; }
+.skill-row.ng   { background: #FFFAF2; border-left: 2px solid #BA7517; }
+.skill-row.mid  { background: #F0F4FF; }
+
+/* ══ スライダー ══════════════════════════════ */
+.skill-list { display: flex; flex-direction: column; gap: 10px; }
+.skill-item { border: 1px solid #E0DED6; border-radius: 10px; padding: 12px 14px; background: #fff; }
+.skill-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 4px; }
+.skill-name { font-size: 13px; font-weight: 500; color: #2C2C2A; display: flex; align-items: center; gap: 6px; flex: 1; }
+.skill-cat { font-size: 10px; padding: 2px 7px; border-radius: 99px; flex-shrink: 0; }
+.cat-word   { background: #E6F1FB; color: #0C447C; }
+.cat-excel  { background: #EAF3DE; color: #27500A; }
+.cat-web    { background: #EEEDFE; color: #3C3489; }
+.cat-design { background: #FAEEDA; color: #633806; }
+.skill-right { display: flex; align-items: center; gap: 6px; }
+.level-badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.lv-high { background: #EAF3DE; color: #27500A; }
+.lv-mid  { background: #E6F1FB; color: #0C447C; }
+.lv-low  { background: #FAEEDA; color: #633806; }
+.lv-none { background: #FCEBEB; color: #791F1F; }
+.skill-score { font-size: 14px; font-weight: 700; color: #2E4057; min-width: 36px; text-align: right; }
+.skill-slider { width: 100%; height: 6px; border-radius: 99px; outline: none; cursor: pointer; -webkit-appearance: none; margin-bottom: 4px; }
+.skill-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2E4057; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+.skill-labels { display: flex; justify-content: space-between; font-size: 10px; color: #bbb; }
+.save-all-btn { width: 100%; padding: 12px; background: #2E4057; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 1rem; transition: background 0.15s; }
+.save-all-btn:hover { background: #3d5475; }
+.save-msg-main { text-align: center; font-size: 12px; color: #3B6D11; margin-top: 8px; display: none; }
+
+/* ══ カレンダー ══════════════════════════════ */
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+.cal-head { font-size: 11px; color: #888; text-align: center; padding: 4px 0; font-weight: 500; }
+.cal-day { aspect-ratio: 1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #555; background: #F5F5F2; cursor: default; }
+.cal-day.empty   { background: transparent; }
+.cal-day.today   { border: 2px solid #2E4057; font-weight: 700; color: #2E4057; }
+.cal-day.studied     { background: #5B7FA6; color: #fff; font-weight: 600; }
+.cal-day.studied.high { background: #0C447C; }
+.cal-legend { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+.cal-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #555; }
+.cal-legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+/* ══ 月次レポート ═════════════════════════════ */
+.report-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.report-bar-name { font-size: 12px; color: #555; width: 130px; flex-shrink: 0; }
+.report-bar-bg { flex: 1; background: #E0DED6; border-radius: 99px; height: 10px; overflow: hidden; }
+.report-bar-fill { height: 100%; border-radius: 99px; transition: width 0.5s; }
+.report-bar-pct { font-size: 12px; font-weight: 700; color: #2E4057; width: 36px; text-align: right; }
+.comment-box { background: #F5F5F2; border-radius: 8px; padding: 14px 16px; font-size: 13px; color: #2C2C2A; line-height: 1.9; border-left: 3px solid #2E4057; }
+.print-btn { padding: 7px 16px; background: #fff; color: #2E4057; border: 1.5px solid #2E4057; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; margin-left: auto; }
+
+/* ══ オフラインバナー ════════════════════════ */
+.offline-banner { background: #FEF3E2; border: 1px solid #F0C070; border-radius: 8px; padding: 8px 14px; font-size: 12px; color: #633806; margin-bottom: 1rem; display: none; }
+
+@media (max-width: 560px) {
+  .stat-grid  { grid-template-columns: repeat(2,1fr); }
+  .chart-wrap { grid-template-columns: 1fr; }
+  .two-col    { grid-template-columns: 1fr; }
+}
+@media print {
+  .tabs, .header, .logout-btn, .print-btn, .save-all-btn { display: none !important; }
+  .tab-panel { display: block !important; }
+  .card { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+  ★ GAS URL設定（learning_viz用）
+  gas_learning.gsをデプロイして発行されたURLを
+  以下の '' の中に貼り付けてください
+════════════════════════════════════════ -->
+<script>
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbztlnpeiItUuFuhzZDqew6hlv_LrkFkduYNNsQzdfYbmGDcWUz3BZ7amBlkzJeLolu9/exec';
+</script>
+
+<!-- ログイン画面 -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">📊</div>
+    <div class="login-title">学習理解度管理システム</div>
+    <div class="login-sub">ITビジネス・Webデザイン養成科<br>スマホ・パソコンどちらからでも使えます</div>
+    <label class="login-label">受講生番号</label>
+    <input class="login-input" id="studentId" type="text" placeholder="例：01" maxlength="2" inputmode="numeric">
+    <label class="login-label">氏名</label>
+    <input class="login-input" id="studentName" type="text" placeholder="例：山田 太郎">
+    <button class="login-btn" onclick="doLogin()">ログイン</button>
+    <div class="login-loading" id="loginLoading">データを読み込んでいます...</div>
+    <div class="login-err" id="loginErr">受講生番号と氏名を入力してください</div>
+  </div>
+</div>
+
+<!-- メイン画面 -->
+<div id="mainScreen">
+  <div class="header">
+    <div class="header-title">学習理解度管理</div>
+    <div class="header-right">
+      <span class="sync-badge" id="syncBadge">✓ 保存済み</span>
+      <span class="header-name" id="headerName"></span>
+      <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="offline-banner" id="offlineBanner">
+      ⚠️ オフラインモードで動作中です。データはこの端末にのみ保存されます。
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('dashboard',this)">今月のサマリー</button>
+      <button class="tab" onclick="switchTab('skills',this)">理解度を記録する</button>
+      <button class="tab" onclick="switchTab('calendar',this)">学習カレンダー</button>
+      <button class="tab" onclick="switchTab('report',this)">月次レポート</button>
+    </div>
+
+    <!-- ① 今月のサマリー -->
+    <div class="tab-panel active" id="panel-dashboard">
+      <div class="card">
+        <div class="card-title">📈 今月の学習状況</div>
+        <div class="stat-grid">
+          <div class="stat-card hl">
+            <div class="stat-num" id="sumOverall">-</div>
+            <div class="stat-label">総合理解度</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="sumDays">0</div>
+            <div class="stat-label">学習記録日数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="sumStrong" style="font-size:16px">-</div>
+            <div class="stat-label">得意な科目</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="sumWeak" style="font-size:16px">-</div>
+            <div class="stat-label">重点強化科目</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🕸 科目別 理解度マップ</div>
+        <div class="chart-wrap">
+          <div class="chart-box">
+            <div class="chart-lbl">理解度レーダーチャート</div>
+            <canvas id="radarChart"></canvas>
+          </div>
+          <div class="chart-box">
+            <div class="chart-lbl">科目別 平均理解度</div>
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">✅ 習得スキル　／　🔸 強化が必要なスキル</div>
+        <div class="two-col" id="canDoList"></div>
+      </div>
+    </div>
+
+    <!-- ② 理解度を記録する -->
+    <div class="tab-panel" id="panel-skills">
+      <div class="card">
+        <div class="card-title">📝 各スキルの理解度を記録する</div>
+        <p style="font-size:12px;color:#888;margin-bottom:1rem;line-height:1.7;">
+          各項目について「今の自分の理解度」をスライダーで入力してください。<br>
+          <strong>0%</strong>＝全くわからない　<strong>50%</strong>＝なんとなくわかる　<strong>100%</strong>＝自信を持って使える
+        </p>
+        <div class="skill-list" id="skillList"></div>
+        <button class="save-all-btn" onclick="saveSkills()">理解度を保存する</button>
+        <div class="save-msg-main" id="saveMsgMain">✓ 保存しました</div>
+      </div>
+    </div>
+
+    <!-- ③ 学習カレンダー -->
+    <div class="tab-panel" id="panel-calendar">
+      <div class="card">
+        <div class="card-title">📅 <span id="calMonthLabel"></span> の学習記録</div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-legend">
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#0C447C"></div>高い理解度で記録（70%以上）</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#5B7FA6"></div>記録あり</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#F5F5F2;border:1px solid #D3D1C7"></div>記録なし</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 理解度の推移（直近20回）</div>
+        <canvas id="lineChart" height="100"></canvas>
+      </div>
+    </div>
+
+    <!-- ④ 月次レポート -->
+    <div class="tab-panel" id="panel-report">
+      <div class="card">
+        <div class="card-title">
+          📋 月次学習レポート
+          <button class="print-btn" onclick="window.print()">🖨 印刷する</button>
+        </div>
+        <div style="margin-bottom:1.25rem">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;color:#888;margin-bottom:.5rem">科目別 理解度</div>
+          <div id="reportBars"></div>
+        </div>
+        <div style="margin-bottom:1.25rem">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;color:#888;margin-bottom:.5rem">スキル習得状況（全項目）</div>
+          <div id="reportSkills"></div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;color:#888;margin-bottom:.5rem">総合コメント（アンケート記入時の参考に）</div>
+          <div class="comment-box" id="reportComment"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+//  スキル定義（Makiさんのカリキュラムに合わせて編集可）
+// ════════════════════════════════════════════════
+const SKILLS = [
+  { id:'s1',  name:'Wordの基本操作（文字入力・保存・印刷）',    cat:'word',   catLabel:'Word'    },
+  { id:'s2',  name:'Wordで文書のページ設定ができる',             cat:'word',   catLabel:'Word'    },
+  { id:'s3',  name:'Wordで表の作成・編集ができる',               cat:'word',   catLabel:'Word'    },
+  { id:'s4',  name:'Wordで差し込み印刷ができる',                 cat:'word',   catLabel:'Word'    },
+  { id:'s5',  name:'Excelの基本操作（セル入力・書式設定）',      cat:'excel',  catLabel:'Excel'   },
+  { id:'s6',  name:'ExcelでSUM・AVERAGE関数が使える',            cat:'excel',  catLabel:'Excel'   },
+  { id:'s7',  name:'ExcelでIF・VLOOKUP関数が使える',            cat:'excel',  catLabel:'Excel'   },
+  { id:'s8',  name:'Excelでグラフを作成・編集できる',            cat:'excel',  catLabel:'Excel'   },
+  { id:'s9',  name:'ExcelでピボットテーブルやDBを使える',        cat:'excel',  catLabel:'Excel'   },
+  { id:'s10', name:'HTMLの基本タグが書ける（h1・p・a・img）',    cat:'web',    catLabel:'Web'     },
+  { id:'s11', name:'CSSでデザインを指定できる',                  cat:'web',    catLabel:'Web'     },
+  { id:'s12', name:'レスポンシブデザインが理解できる',            cat:'web',    catLabel:'Web'     },
+  { id:'s13', name:'Photoshopで画像の補正・切り抜きができる',    cat:'design', catLabel:'デザイン' },
+  { id:'s14', name:'Illustratorでロゴ・イラストが作れる',        cat:'design', catLabel:'デザイン' },
+  { id:'s15', name:'デザインの基本原則（色・フォント）を理解',   cat:'design', catLabel:'デザイン' },
+];
+
+const CATS = [
+  { key:'word',   label:'Word',           color:'#0C447C', bg:'rgba(12,68,124,0.75)'   },
+  { key:'excel',  label:'Excel',          color:'#3B6D11', bg:'rgba(59,109,17,0.75)'   },
+  { key:'web',    label:'Webコーディング', color:'#7F77DD', bg:'rgba(127,119,221,0.75)' },
+  { key:'design', label:'デザイン',       color:'#BA7517', bg:'rgba(186,117,23,0.75)'  },
+];
+
+// ════════════════════════════════════════════════
+//  状態変数
+// ════════════════════════════════════════════════
+let currentUser = '';
+let currentName = '';
+let skills      = {};    // { s1: 70, s2: 50, ... }
+let studyLog    = {};    // { '2026-03-16': 72, ... }
+let isOffline   = !GAS_URL;
+let radarChart, barChart, lineChart;
+
+// ════════════════════════════════════════════════
+//  ストレージ（端末内の一時保存）
+// ════════════════════════════════════════════════
+const lsKey  = k  => 'viz_' + currentUser + '_' + k;
+const lsSave = (k,v) => { try { localStorage.setItem(lsKey(k), JSON.stringify(v)); } catch(e){} };
+const lsLoad = (k,d) => { try { const v=localStorage.getItem(lsKey(k)); return v!==null?JSON.parse(v):d; } catch(e){ return d; } };
+
+// ════════════════════════════════════════════════
+//  GAS通信：データを送信する
+// ════════════════════════════════════════════════
+async function sendToGAS(data) {
+  if (!GAS_URL) return false;
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      mode:   'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    showSyncBadge();
+    return true;
+  } catch(e) {
+    console.warn('GAS送信エラー:', e);
+    return false;
+  }
+}
+
+// GAS通信：データを取得する（ログイン時にクラウドから読み込む）
+async function loadFromGAS(studentId) {
+  if (!GAS_URL) return null;
+  try {
+    const res  = await fetch(GAS_URL + '?action=getStudent&studentId=' + studentId);
+    const data = await res.json();
+    if (data.status === 'ok' && data.skills) return data;
+    return null;
+  } catch(e) {
+    console.warn('GASデータ取得エラー:', e);
+    return null;
+  }
+}
+
+function showSyncBadge() {
+  const b = document.getElementById('syncBadge');
+  b.style.display = 'inline-block';
+  setTimeout(() => b.style.display = 'none', 2500);
+}
+
+// ════════════════════════════════════════════════
+//  ログイン
+// ════════════════════════════════════════════════
+async function doLogin() {
+  const id   = document.getElementById('studentId').value.trim();
+  const name = document.getElementById('studentName').value.trim();
+  if (!id || !name) { document.getElementById('loginErr').style.display='block'; return; }
+
+  currentUser = id.padStart(2,'0');
+  currentName = name;
+
+  // ローカルデータを先に読み込む（GAS読み込み中に表示するため）
+  skills   = lsLoad('skills',   {});
+  studyLog = lsLoad('studyLog', {});
+
+  document.getElementById('loginLoading').style.display = 'block';
+  document.getElementById('loginErr').style.display     = 'none';
+
+  // GASからクラウドデータを取得（あれば上書き）
+  if (GAS_URL) {
+    const cloudData = await loadFromGAS(currentUser);
+    if (cloudData) {
+      skills   = cloudData.skills   || skills;
+      studyLog = cloudData.studyLog || studyLog;
+      // クラウドデータをローカルにも保存（オフライン時のバックアップ）
+      lsSave('skills',   skills);
+      lsSave('studyLog', studyLog);
+    }
+  } else {
+    // GAS URLが未設定の場合はオフラインモード
+    document.getElementById('offlineBanner').style.display = 'block';
+  }
+
+  document.getElementById('loginLoading').style.display = 'none';
+  document.getElementById('loginErr').style.display     = 'none';
+  document.getElementById('loginScreen').style.display  = 'none';
+  document.getElementById('mainScreen').style.display   = 'block';
+  document.getElementById('headerName').textContent     = 'No.' + currentUser + '　' + currentName;
+
+  renderAll();
+}
+
+function doLogout() {
+  currentUser = '';
+  [radarChart, barChart, lineChart].forEach(c => { if(c) c.destroy(); });
+  radarChart = barChart = lineChart = null;
+  document.getElementById('mainScreen').style.display  = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('studentId').value   = '';
+  document.getElementById('studentName').value = '';
+  document.querySelectorAll('.tab').forEach((t,i)      => t.classList.toggle('active',i===0));
+  document.querySelectorAll('.tab-panel').forEach((p,i)=> p.classList.toggle('active',i===0));
+}
+
+// ════════════════════════════════════════════════
+//  タブ切り替え
+// ════════════════════════════════════════════════
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'calendar') renderCalendar();
+  if (id === 'report')   renderReport();
+}
+
+// ════════════════════════════════════════════════
+//  全体レンダリング
+// ════════════════════════════════════════════════
+function renderAll() {
+  renderDashboard();
+  renderSkillList();
+  renderCalendar();
+  renderReport();
+}
+
+// ════════════════════════════════════════════════
+//  ユーティリティ
+// ════════════════════════════════════════════════
+function catAvg(catKey) {
+  const items = SKILLS.filter(s=>s.cat===catKey);
+  const sum   = items.reduce((a,s)=>a+(skills[s.id]||0),0);
+  return items.length ? Math.round(sum/items.length) : 0;
+}
+
+function overallAvg() {
+  const sum = SKILLS.reduce((a,s)=>a+(skills[s.id]||0),0);
+  return SKILLS.length ? Math.round(sum/SKILLS.length) : 0;
+}
+
+function levelLabel(v) {
+  if (v>=80) return { cls:'lv-high', text:'習得済み' };
+  if (v>=60) return { cls:'lv-mid',  text:'理解中'   };
+  if (v>=30) return { cls:'lv-low',  text:'学習中'   };
+  return             { cls:'lv-none', text:'要強化'  };
+}
+
+// ════════════════════════════════════════════════
+//  ダッシュボード
+// ════════════════════════════════════════════════
+function renderDashboard() {
+  const overall = overallAvg();
+  document.getElementById('sumOverall').textContent = overall + '%';
+  document.getElementById('sumDays').textContent    = Object.keys(studyLog).length;
+
+  const catAvgs   = CATS.map(c=>({ label:c.label, avg:catAvg(c.key) }));
+  const strongest = catAvgs.reduce((a,b)=>a.avg>=b.avg?a:b);
+  const weakest   = catAvgs.reduce((a,b)=>a.avg<=b.avg?a:b);
+  document.getElementById('sumStrong').textContent = strongest.label;
+  document.getElementById('sumWeak').textContent   = weakest.label;
+
+  // レーダーチャート
+  const radarData = CATS.map(c=>catAvg(c.key));
+  if (radarChart) radarChart.destroy();
+  radarChart = new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: CATS.map(c=>c.label),
+      datasets: [{ label:'理解度', data:radarData,
+        backgroundColor:'rgba(46,64,87,0.15)', borderColor:'#2E4057', borderWidth:2,
+        pointBackgroundColor:'#2E4057', pointRadius:4 }]
+    },
+    options: {
+      responsive:true,
+      scales:{ r:{ min:0, max:100, ticks:{ stepSize:25, font:{size:10} }, pointLabels:{ font:{size:12} } } },
+      plugins:{ legend:{ display:false } }
+    }
+  });
+
+  // 棒グラフ
+  if (barChart) barChart.destroy();
+  barChart = new Chart(document.getElementById('barChart'), {
+    type:'bar',
+    data:{
+      labels: CATS.map(c=>c.label),
+      datasets:[{ data:radarData, backgroundColor:CATS.map(c=>c.bg), borderRadius:6 }]
+    },
+    options:{
+      responsive:true,
+      scales:{ y:{ min:0, max:100, ticks:{ stepSize:25 } } },
+      plugins:{ legend:{ display:false } }
+    }
+  });
+
+  // できている / 強化リスト
+  const sorted = [...SKILLS].sort((a,b)=>(skills[b.id]||0)-(skills[a.id]||0));
+  const high   = sorted.filter(s=>(skills[s.id]||0)>=70);
+  const low    = sorted.filter(s=>(skills[s.id]||0)<50);
+
+  document.getElementById('canDoList').innerHTML = `
+    <div>
+      <div style="font-size:12px;font-weight:600;color:#27500A;margin-bottom:8px;">✅ 習得できているスキル</div>
+      ${high.length ? high.map(s=>`
+        <div class="skill-row ok">
+          <span style="color:#3B6D11;font-weight:700;min-width:36px">${skills[s.id]||0}%</span>
+          <span style="flex:1">${s.name}</span>
+        </div>`).join('') : '<p style="font-size:12px;color:#888">まだ記録がありません</p>'}
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:600;color:#791F1F;margin-bottom:8px;">🔸 重点的に強化するスキル</div>
+      ${low.length ? low.map(s=>`
+        <div class="skill-row ng">
+          <span style="color:#BA7517;font-weight:700;min-width:36px">${skills[s.id]||0}%</span>
+          <span style="flex:1">${s.name}</span>
+        </div>`).join('') : '<p style="font-size:12px;color:#3B6D11">強化が必要な項目はありません 🎉</p>'}
+    </div>`;
+}
+
+// ════════════════════════════════════════════════
+//  スキルスライダー
+// ════════════════════════════════════════════════
+function renderSkillList() {
+  const container = document.getElementById('skillList');
+  container.innerHTML = '';
+  SKILLS.forEach(s => {
+    const val = skills[s.id] || 0;
+    const lv  = levelLabel(val);
+    const div = document.createElement('div');
+    div.className = 'skill-item';
+    div.innerHTML = `
+      <div class="skill-header">
+        <div class="skill-name">
+          <span class="skill-cat cat-${s.cat}">${s.catLabel}</span>${s.name}
+        </div>
+        <div class="skill-right">
+          <span class="level-badge ${lv.cls}" id="lv-${s.id}">${lv.text}</span>
+          <span class="skill-score" id="sc-${s.id}">${val}%</span>
+        </div>
+      </div>
+      <input type="range" class="skill-slider" min="0" max="100" step="5" value="${val}"
+        style="background:linear-gradient(to right,#2E4057 ${val}%,#E0DED6 ${val}%)"
+        oninput="updateSkill('${s.id}',this.value,this)" id="sl-${s.id}">
+      <div class="skill-labels">
+        <span>0% 全くわからない</span><span>50% なんとなくわかる</span><span>100% 自信あり</span>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function updateSkill(id, val, slider) {
+  val = parseInt(val);
+  skills[id] = val;
+  document.getElementById('sc-'+id).textContent = val+'%';
+  const lv = levelLabel(val);
+  const lvEl = document.getElementById('lv-'+id);
+  lvEl.className   = 'level-badge ' + lv.cls;
+  lvEl.textContent = lv.text;
+  slider.style.background = `linear-gradient(to right,#2E4057 ${val}%,#E0DED6 ${val}%)`;
+}
+
+async function saveSkills() {
+  // ① 今日の平均を学習ログに追加
+  const today = new Date().toISOString().slice(0,10);
+  studyLog[today] = overallAvg();
+
+  // ② ローカルに保存（オフラインバックアップ）
+  lsSave('skills',   skills);
+  lsSave('studyLog', studyLog);
+
+  // ③ GASへ送信（クラウド保存）
+  await sendToGAS({
+    type:        'learning',
+    studentId:   currentUser,
+    studentName: currentName,
+    skills:      skills,
+    studyLog:    studyLog,
+    overall:     overallAvg(),
+    savedAt:     new Date().toISOString(),
+  });
+
+  document.getElementById('saveMsgMain').style.display = 'block';
+  setTimeout(()=>document.getElementById('saveMsgMain').style.display='none', 2000);
+  renderAll();
+}
+
+// ════════════════════════════════════════════════
+//  カレンダー
+// ════════════════════════════════════════════════
+function renderCalendar() {
+  const now   = new Date();
+  const year  = now.getFullYear();
+  const month = now.getMonth();
+  document.getElementById('calMonthLabel').textContent = `${year}年${month+1}月`;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month+1, 0).getDate();
+  const today    = now.getDate();
+  const days     = ['日','月','火','水','木','金','土'];
+
+  let html = days.map(d=>`<div class="cal-head">${d}</div>`).join('');
+  for (let i=0; i<firstDay; i++) html += `<div class="cal-day empty"></div>`;
+  for (let d=1; d<=lastDate; d++) {
+    const ds  = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const avg = studyLog[ds];
+    let cls   = 'cal-day';
+    if (d===today) cls += ' today';
+    if (avg!==undefined) cls += avg>=70 ? ' studied high' : ' studied';
+    const title = avg!==undefined ? `title="理解度${avg}%"` : '';
+    html += `<div class="${cls}" ${title}>${d}</div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+
+  // 折れ線グラフ
+  const entries = Object.entries(studyLog).sort((a,b)=>a[0].localeCompare(b[0])).slice(-20);
+  if (lineChart) lineChart.destroy();
+  lineChart = new Chart(document.getElementById('lineChart'), {
+    type:'line',
+    data:{
+      labels: entries.map(e=>e[0].slice(5)),
+      datasets:[{
+        label:'平均理解度', data:entries.map(e=>e[1]),
+        borderColor:'#2E4057', backgroundColor:'rgba(46,64,87,0.08)',
+        tension:0.3, fill:true, pointRadius:4, pointBackgroundColor:'#2E4057'
+      }]
+    },
+    options:{
+      responsive:true,
+      scales:{ y:{ min:0, max:100, ticks:{ stepSize:25 } } },
+      plugins:{ legend:{ display:false } }
+    }
+  });
+}
+
+// ════════════════════════════════════════════════
+//  月次レポート（印刷対応）
+// ════════════════════════════════════════════════
+function renderReport() {
+  const overall = overallAvg();
+
+  // 科目別バー
+  document.getElementById('reportBars').innerHTML = CATS.map(c => {
+    const avg = catAvg(c.key);
+    return `<div class="report-bar-row">
+      <span class="report-bar-name">${c.label}</span>
+      <div class="report-bar-bg"><div class="report-bar-fill" style="width:${avg}%;background:${c.color}"></div></div>
+      <span class="report-bar-pct">${avg}%</span>
+    </div>`;
+  }).join('');
+
+  // 全スキル一覧
+  document.getElementById('reportSkills').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+      ${SKILLS.map(s=>{
+        const v=skills[s.id]||0; const lv=levelLabel(v);
+        return `<div style="display:flex;align-items:center;gap:6px;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid #E0DED6">
+          <span class="level-badge ${lv.cls}">${lv.text}</span>
+          <span style="flex:1">${s.name}</span>
+          <span style="font-weight:700;color:#2E4057">${v}%</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  // 自動コメント生成
+  const catAvgList = CATS.map(c=>({ label:c.label, avg:catAvg(c.key) }));
+  const strongest  = catAvgList.reduce((a,b)=>a.avg>=b.avg?a:b);
+  const weakest    = catAvgList.reduce((a,b)=>a.avg<=b.avg?a:b);
+  const logDays    = Object.keys(studyLog).length;
+
+  let msg = '';
+  if (overall>=75)       msg = `全体的に高い理解度を示しています（総合<strong>${overall}%</strong>）。`;
+  else if (overall>=50)  msg = `基礎的な理解が身についてきています（総合<strong>${overall}%</strong>）。`;
+  else                   msg = `現在、学習の積み上げ段階です（総合<strong>${overall}%</strong>）。焦らず確認しながら進めましょう。`;
+  msg += `特に<strong>${strongest.label}</strong>の理解度が高く、自信を持って取り組めています。`;
+  msg += `<strong>${weakest.label}</strong>については、重点的に復習するとさらに力がつきます。`;
+  msg += `これまでに<strong>${logDays}日分</strong>の学習記録があります。`;
+  msg += `<br><br><span style="font-size:11px;color:#888">【アンケート記入時の参考】このレポートを見ながら「できている項目・まだ不安な項目」を具体的に記入できます。数字を根拠にすることで、より正確な自己評価ができます。</span>`;
+
+  document.getElementById('reportComment').innerHTML = msg;
+}
+</script>
+</body>
+</html>
