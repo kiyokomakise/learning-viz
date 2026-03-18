@@ -937,9 +937,7 @@ function renderAllSubjects() {
             ${lv12>0?`　📖 ${lv12}項目習得中`:''}
           </div>
         </div>
-        ${levelOpts.length>1 ? `<div class="all-subject-cert-tags">
-          ${levelOpts.map(lv=>`<span class="all-cert-tag" style="background:${meta.color};color:#fff">${lv}</span>`).join('')}
-        </div>` : ''}
+
       </div>
       <span class="all-subject-arrow">▶</span>`;
 
