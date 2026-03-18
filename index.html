@@ -151,6 +151,23 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
 .rg-num   { font-size:24px; font-weight:700; color:#2E4057; }
 .rg-label { font-size:11px; color:#888; margin-top:2px; }
 .comment-box { background:#F5F5F2; border-radius:8px; padding:14px; font-size:13px; color:#2C2C2A; line-height:1.9; border-left:3px solid #2E4057; }
+/* ─── 達成バッジポップアップ ─── */
+.badge-popup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.8); background:#2E4057; color:#fff; border-radius:16px; padding:24px 32px; text-align:center; z-index:9999; opacity:0; transition:all 0.3s; pointer-events:none; min-width:260px; box-shadow:0 8px 32px rgba(0,0,0,0.25); }
+.badge-popup.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
+.badge-popup-icon { font-size:48px; margin-bottom:8px; }
+.badge-popup-title { font-size:18px; font-weight:700; margin-bottom:4px; }
+.badge-popup-sub { font-size:13px; opacity:.8; }
+.badge-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.3); z-index:9998; opacity:0; transition:opacity 0.3s; pointer-events:none; }
+.badge-overlay.show { opacity:1; }
+
+/* ─── 科目習熟度レベルバッジ ─── */
+.subject-level-badge { font-size:10px; font-weight:600; padding:3px 10px; border-radius:99px; white-space:nowrap; flex-shrink:0; }
+.slv-0 { background:#F1EFE8; color:#888; }
+.slv-1 { background:#FEF3E2; color:#633806; }
+.slv-2 { background:#E6F1FB; color:#0C447C; }
+.slv-3 { background:#EEEDFE; color:#3C3489; }
+.slv-4 { background:#EAF3DE; color:#27500A; }
+
 /* ─── 全科目一覧 ─── */
 .all-subject-section { margin-bottom:1rem; }
 .all-subject-head { display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:10px 10px 0 0; cursor:pointer; border:1px solid; }
@@ -925,7 +942,7 @@ function renderAllSubjects() {
   // 区切りラベル
   const divLabel = document.createElement('div');
   divLabel.style.cssText = 'font-size:12px;font-weight:600;color:#2E4057;padding:4px 2px 8px;letter-spacing:.05em';
-  divLabel.textContent = '📋 全科目 スキルチェックリスト（検定試験対策）';
+  divLabel.textContent = '📋 検定試験出題範囲';
   area.appendChild(divLabel);
 
   SUBJECTS.forEach(s => {
@@ -951,11 +968,13 @@ function renderAllSubjects() {
     head.innerHTML = `
       <div class="all-subject-head-left">
         <span class="all-subject-icon">${meta.icon}</span>
-        <div>
-          <div class="all-subject-name" style="color:${meta.color}">${s.name}</div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <div class="all-subject-name" style="color:${meta.color}">${s.name}</div>
+            <span class="subject-level-badge ${getSubjectLevel(s.id).cls}">${getSubjectLevel(s.id).label}</span>
+          </div>
           <div class="all-subject-stats" style="color:${meta.color}">
-            ✔ ${lv3}/${total}項目（${pct}%）
-            ${lv12>0?`　📖 ${lv12}項目習得中`:''}
+            ✔ ${lv3}/${total}項目（${pct}%）${lv12>0?`　📖 ${lv12}項目習得中`:''}
           </div>
         </div>
 
@@ -1030,10 +1049,14 @@ function setAllSubjectFilter(subId, level) {
 }
 
 function allSetLv(id, lv, btn) {
-  const today = new Date().toISOString().slice(0,10);
-  const prev  = skillData[id]||{};
+  const today  = new Date().toISOString().slice(0,10);
+  const prev   = skillData[id]||{};
+  const allItems = Object.values(SKILLS).flat();
+  const prevLv3  = allItems.filter(s=>getLv(s.id)===3).length;
   skillData[id] = { lv, date: lv===3 ? today : (prev.date||'') };
   lsSave('skills', skillData);
+  const newLv3 = allItems.filter(s=>getLv(s.id)===3).length;
+  checkBadge(prevLv3, newLv3);
 
   btn.closest('.all-lv-btns').querySelectorAll('.all-lv-btn').forEach((b,i)=>b.classList.toggle('active',i===lv));
 
@@ -1056,6 +1079,53 @@ function allSetLv(id, lv, btn) {
   saveToGAS();
   renderSubjectBtns();
   renderDashboard();
+}
+
+// ─── 案A：10問ごとの達成バッジ ─────────────────────────
+const BADGE_MILESTONES = [
+  { count:10,  icon:'🌱', title:'10項目達成！',   sub:'最初の10歩！この調子で続けましょう' },
+  { count:20,  icon:'📖', title:'20項目達成！',   sub:'テキストなしで20項目できます！' },
+  { count:30,  icon:'⭐', title:'30項目達成！',   sub:'30項目！確実に力がついています' },
+  { count:50,  icon:'🔥', title:'50項目達成！',   sub:'50項目突破！すごい成長です！' },
+  { count:75,  icon:'💪', title:'75項目達成！',   sub:'もう半分以上！合格が見えてきました' },
+  { count:100, icon:'🏆', title:'100項目達成！',  sub:'100項目習得！検定合格まであと少し！' },
+  { count:150, icon:'🎯', title:'150項目達成！',  sub:'圧倒的な実力です！全科目制覇へ！' },
+];
+
+let lastBadgeCount = 0;
+
+function checkBadge(prevLv3, newLv3) {
+  // 新たにlv3になった場合のみチェック
+  if (newLv3 <= prevLv3) return;
+  const milestone = BADGE_MILESTONES.slice().reverse().find(m => prevLv3 < m.count && newLv3 >= m.count);
+  if (milestone) showBadge(milestone);
+}
+
+function showBadge(milestone) {
+  document.getElementById('badgeIcon').textContent  = milestone.icon;
+  document.getElementById('badgeTitle').textContent = milestone.title;
+  document.getElementById('badgeSub').textContent   = milestone.sub;
+  document.getElementById('badgePopup').classList.add('show');
+  document.getElementById('badgeOverlay').classList.add('show');
+  setTimeout(closeBadge, 3500);
+}
+
+function closeBadge() {
+  document.getElementById('badgePopup').classList.remove('show');
+  document.getElementById('badgeOverlay').classList.remove('show');
+}
+
+// ─── 案C：科目ごとの習熟度レベル判定 ───────────────────────
+function getSubjectLevel(subId) {
+  const items = SKILLS[subId] || [];
+  if (!items.length) return { level:0, label:'未開始', cls:'slv-0' };
+  const lv3 = items.filter(i=>getLv(i.id)===3).length;
+  const pct  = Math.round(lv3/items.length*100);
+  if (pct === 0)  return { level:0, label:'未開始',       cls:'slv-0', pct };
+  if (pct < 30)   return { level:1, label:'📖 基礎段階',   cls:'slv-1', pct };
+  if (pct < 60)   return { level:2, label:'📘 理解段階',   cls:'slv-2', pct };
+  if (pct < 80)   return { level:3, label:'✨ 習熟段階',   cls:'slv-3', pct };
+  return             { level:4, label:'🏆 合格圏！',     cls:'slv-4', pct };
 }
 
 // ─── 科目アイコン定義 ────────────────────────
@@ -1217,10 +1287,14 @@ function setLevelFilter(subId, level) {
 
 // ─── ダッシュボードからレベル設定 ──────────────
 function dashSetLv(id, lv, btn) {
-  const today = new Date().toISOString().slice(0,10);
-  const prev  = skillData[id]||{};
+  const today  = new Date().toISOString().slice(0,10);
+  const prev   = skillData[id]||{};
+  const allItems = Object.values(SKILLS).flat();
+  const prevLv3  = allItems.filter(s=>getLv(s.id)===3).length;
   skillData[id] = { lv, date: lv===3 ? today : (prev.date||'') };
   lsSave('skills', skillData);
+  const newLv3 = allItems.filter(s=>getLv(s.id)===3).length;
+  checkBadge(prevLv3, newLv3);
 
   // ボタンUI更新
   btn.closest('.dash-lv-btns').querySelectorAll('.dash-lv-btn').forEach((b,i)=>b.classList.toggle('active',i===lv));
@@ -1547,6 +1621,14 @@ function renderReport() {
 }
 </script>
 
+<!-- 達成バッジポップアップ -->
+<div class="badge-overlay" id="badgeOverlay" onclick="closeBadge()"></div>
+<div class="badge-popup" id="badgePopup">
+  <div class="badge-popup-icon" id="badgeIcon">🎉</div>
+  <div class="badge-popup-title" id="badgeTitle"></div>
+  <div class="badge-popup-sub" id="badgeSub"></div>
+</div>
+
 <!-- ログイン -->
 <div id="loginScreen">
   <div class="login-card">
@@ -1595,9 +1677,9 @@ function renderReport() {
     <div class="tab-panel active" id="panel-today">
 
       <div class="card">
-        <div class="card-title">📚 今日はどの科目を確認しますか？</div>
+        <div class="card-title">📚 全科目スキルチェックリスト</div>
         <p style="font-size:12px;color:#888;margin-bottom:14px;line-height:1.7">
-          科目ボタンをタップ → チェックリストが展開されます。複数選択できます。
+          科目をタップするとチェックリストが展開されます。
         </p>
         <div class="subject-btn-grid" id="subjectBtnGrid"></div>
       </div>
