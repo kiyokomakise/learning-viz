@@ -158,6 +158,22 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
   .cert-gauges { grid-template-columns:1fr; }
   .report-grid { grid-template-columns:1fr; }
 }
+/* ─── 検定バナー ─── */
+.cert-banner { border-radius:12px; padding:14px 16px; margin-bottom:10px; border:1px solid; }
+.cert-banner-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.cert-banner-icon { font-size:22px; }
+.cert-banner-name { font-size:13px; font-weight:700; flex:1; }
+.cert-banner-date { font-size:11px; padding:3px 10px; border-radius:99px; font-weight:500; }
+.cert-banner-days { font-size:22px; font-weight:700; }
+.cert-banner-days-unit { font-size:12px; }
+.cert-gauge-wrap { margin-top:6px; }
+.cert-gauge-labels { display:flex; justify-content:space-between; margin-bottom:3px; font-size:11px; }
+.cert-gauge-bg { height:12px; border-radius:99px; overflow:hidden; background:#E0DED6; }
+.cert-gauge-fill { height:100%; border-radius:99px; transition:width 0.5s; }
+.cert-gauge-msg { font-size:11px; margin-top:5px; font-weight:500; }
+.cert-levels-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.cert-level-item { font-size:11px; padding:3px 10px; border-radius:99px; border:1px solid; }
+
 /* ─── 科目選択ボタン ─── */
 .subject-btn-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; }
 .subject-btn { border-radius:12px; padding:14px 12px; text-align:center; cursor:pointer; border:2px solid; transition:all 0.15s; background:#fff; font-family:inherit; }
@@ -349,13 +365,13 @@ const LV_LABELS = ['未学習','📖 テキストあり','△ なんとなく','
 const LV_SHORT  = ['未','📖','△','✔'];
 
 const MOTTOS = [
-  '📖 テキストを見ながらできれば今日は合格！繰り返すうちに自然とテキストなしでできるようになります。',
-  '🌱 昨日より今日、今日より明日。毎日コツコツが一番の近道です。',
-  '✨「なんとなくわかる」は大きな一歩！その感覚を大切に、もう一度やってみましょう。',
-  '💪 テキストなしでできる項目が、本当のあなたのスキルです。今日も一つ増やしましょう。',
-  '🎯 5か月後の自分を想像してください。今日の練習が、未来のあなたを作っています。',
-  '📅 1週間後の自分へ、今日の成長を届けましょう。小さな積み上げが大きな変化を生みます。',
-  '⭐ わからなくて当然。できなくて当然。それが「学ぶ」ということです。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
 ];
 
 // ════════════════════════════════════════════════
@@ -480,6 +496,62 @@ function renderAll() {
   renderDashboard();
   renderSubjectTabs();
   renderSkills(currentSubject);
+}
+
+// ─── 検定バナー描画 ─────────────────────────
+function renderCertBanners() {
+  const wrap = document.getElementById('certBanners');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  const certDefs = [
+    { id:'word',   name:'Word文書処理技能認定試験',       icon:'📝', req:['w04','w05','w06','w07','w08','w09','w10','w11','w13','w14','w17','w21','w22'], levels:['3級','2級'], color:'#0C447C', border:'#B5D4F4', bg:'#EAF6FF' },
+    { id:'excel',  name:'Excel表計算処理技能認定試験',     icon:'📊', req:['e01','e02','e03','e04','e05','e07','e08'], levels:['3級','2級'], color:'#3B6D11', border:'#A0CC70', bg:'#F4FAEe' },
+    { id:'illust', name:'Illustratorクリエイター能力認定', icon:'✏️', req:['i01','i02','i03','i04','i05','i06','i07'], levels:['スタンダード','エキスパート'], color:'#534AB7', border:'#CECBF6', bg:'#F3F2FE' },
+    { id:'photo',  name:'Photoshopクリエイター能力認定',   icon:'📷', req:['ph01','ph02','ph03','ph04','ph05','ph06'], levels:['スタンダード','エキスパート'], color:'#0F6E56', border:'#9FE1CB', bg:'#E8F9F4' },
+    { id:'web',    name:'Webクリエイター能力認定試験',      icon:'🌐', req:['wb01','wb02','wb03','wb04','wb05','wb06','wb07'], levels:['スタンダード','エキスパート'], color:'#185FA5', border:'#85B7EB', bg:'#EAF3FF' },
+  ];
+
+  certDefs.forEach(c => {
+    const ex    = getNextExam(c.id);
+    const done  = c.req.filter(id=>getLv(id)>=2).length;
+    const pct   = Math.round(done/c.req.length*100);
+    const days  = ex ? daysDiff(ex.date) : null;
+    const barColor = pct>=80 ? '#3B6D11' : pct>=50 ? '#BA7517' : c.color;
+    const msg   = pct>=80 ? '✨ 合格ライン突破！自信を持って受験できます' :
+                  pct>=50 ? '📖 あと一息！復習を続けましょう' :
+                  '🌱 コツコツ積み上げ中！毎日の練習が実力になります';
+    const daysClass = days<=7 ? 'urgent' : days<=21 ? 'soon' : 'future';
+
+    const div = document.createElement('div');
+    div.className = 'cert-banner';
+    div.style.cssText = `border-color:${c.border};background:${c.bg}`;
+    div.innerHTML = `
+      <div class="cert-banner-head">
+        <span class="cert-banner-icon">${c.icon}</span>
+        <span class="cert-banner-name" style="color:${c.color}">${c.name}</span>
+        ${days!==null ? `
+          <div style="text-align:right">
+            <div class="cert-banner-days" style="color:${barColor}">あと<span>${days}</span><span class="cert-banner-days-unit">日</span></div>
+            <div class="cert-banner-date" style="background:${c.bg};color:${c.color};border:1px solid ${c.border}">${fmtDate(ex.date)}（${['日','月','火','水','木','金','土'][ex.date.getDay()]}）</div>
+          </div>` : ''}
+      </div>
+      <div class="cert-gauge-wrap">
+        <div class="cert-gauge-labels">
+          <span style="font-size:11px;color:#555">合格予測ゲージ</span>
+          <span style="font-size:12px;font-weight:700;color:${barColor}">${pct}%</span>
+        </div>
+        <div class="cert-gauge-bg">
+          <div class="cert-gauge-fill" style="width:${pct}%;background:${barColor}"></div>
+        </div>
+        <div class="cert-gauge-msg" style="color:${barColor}">${msg}</div>
+      </div>
+      <div class="cert-levels-row">
+        ${c.levels.map(l=>`<span class="cert-level-item" style="border-color:${c.border};color:${c.color};background:${c.bg}">${l}</span>`).join('')}
+        <span style="font-size:11px;color:#888;align-self:center">対応レベル</span>
+      </div>`;
+    wrap.appendChild(div);
+  });
 }
 
 // ─── 科目アイコン定義 ────────────────────────
@@ -662,11 +734,17 @@ function renderCountdown() {
 
 // ─── 今週バナー ────────────────────────────────
 function renderThisWeekBanner() {
-  const w  = getCurrentWeek();
-  const tw = getThisWeekSubjects();
+  const w    = getCurrentWeek();
+  const tw   = getThisWeekSubjects();
+  const today = new Date();
+  const dateStr = today.getFullYear() + '.' +
+    String(today.getMonth()+1).padStart(2,'0') + '.' +
+    String(today.getDate()).padStart(2,'0');
+  const weekdays = ['日','月','火','水','木','金','土'];
+  const wdStr = weekdays[today.getDay()];
   const banner = document.getElementById('thisweekBanner');
   banner.innerHTML = `
-    <span class="tw-label">第${w}週・今週学習中の科目</span>
+    <span class="tw-label">${dateStr}（${wdStr}）　第${w}週</span>
     <div class="tw-subjects">
       ${tw.map(s=>`<span class="tw-tag">${s.name}</span>`).join('')}
     </div>`;
@@ -705,6 +783,9 @@ function renderDashboard() {
 
   // 合格予測ゲージ
   renderCertGauges();
+
+  // 検定バナー
+  renderCertBanners();
 
   // 週次進捗バー
   const wp = document.getElementById('weekProgress');
@@ -964,8 +1045,8 @@ function renderReport() {
   <div class="main">
     <div class="motto-bar" id="dailyMotto"></div>
 
-    <!-- 検定カウントダウン -->
-    <div class="countdown-wrap" id="countdownWrap"></div>
+    <!-- 検定カウントダウン（非表示） -->
+    <div class="countdown-wrap" id="countdownWrap" style="display:none"></div>
 
     <!-- 今週のバナー -->
     <div class="thisweek-banner" id="thisweekBanner"></div>
@@ -1013,6 +1094,12 @@ function renderReport() {
       <div class="card">
         <div class="card-title">📅 科目別 進捗</div>
         <div id="weekProgress"></div>
+      </div>
+
+      <!-- 検定試験バナー -->
+      <div class="card">
+        <div class="card-title">🏆 検定試験への道</div>
+        <div id="certBanners"></div>
       </div>
     </div>
 
