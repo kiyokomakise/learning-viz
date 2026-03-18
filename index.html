@@ -126,15 +126,16 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
 .cert-tags { display:flex; gap:3px; flex-wrap:wrap; }
 .cert-tag { font-size:9px; padding:1px 5px; border-radius:99px; background:#F1EFE8; color:#5F5E5A; }
 .lv-btns { display:flex; gap:4px; flex-wrap:wrap; }
-.lv-btn { font-size:10px; padding:4px 10px; border-radius:99px; border:1px solid; cursor:pointer; background:transparent; transition:all 0.1s; font-family:inherit; }
-.lv-btn-0 { border-color:#D3D1C7; color:#888; }
-.lv-btn-0.active { background:#F1EFE8; color:#5F5E5A; border-color:#B4B2A9; }
-.lv-btn-1 { border-color:#B5D4F4; color:#185FA5; }
-.lv-btn-1.active { background:#E6F1FB; color:#0C447C; border-color:#378ADD; }
-.lv-btn-2 { border-color:#FAC775; color:#854F0B; }
-.lv-btn-2.active { background:#FAEEDA; color:#633806; border-color:#EF9F27; }
-.lv-btn-3 { border-color:#A0CC70; color:#3B6D11; }
-.lv-btn-3.active { background:#EAF3DE; color:#27500A; border-color:#639922; }
+.lv-btn { font-size:11px; padding:5px 10px; border-radius:99px; border:1.5px solid #D3D1C7; color:#aaa; cursor:pointer; background:#fff; transition:all 0.1s; font-family:inherit; min-width:34px; }
+.lv-btn:not(.active):hover { border-color:#888; color:#555; }
+.lv-btn-0 { border-color:#D3D1C7; color:#aaa; }
+.lv-btn-0.active { background:#888; color:#fff; border-color:#888; font-weight:700; }
+.lv-btn-1 { border-color:#D3D1C7; color:#aaa; }
+.lv-btn-1.active { background:#378ADD; color:#fff; border-color:#378ADD; font-weight:700; }
+.lv-btn-2 { border-color:#D3D1C7; color:#aaa; }
+.lv-btn-2.active { background:#BA7517; color:#fff; border-color:#BA7517; font-weight:700; }
+.lv-btn-3 { border-color:#D3D1C7; color:#aaa; }
+.lv-btn-3.active { background:#3B6D11; color:#fff; border-color:#3B6D11; font-weight:700; }
 
 /* ─── 週次進捗バー ─── */
 .week-prog { margin-bottom:10px; }
@@ -194,11 +195,12 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
 .all-tag { font-size:9px; padding:1px 5px; border-radius:99px; background:#F1EFE8; color:#5F5E5A; }
 .all-date { font-size:10px; color:#27500A; }
 .all-lv-btns { display:flex; gap:3px; flex-shrink:0; }
-.all-lv-btn { font-size:10px; padding:3px 7px; border-radius:99px; border:1px solid #D3D1C7; color:#888; cursor:pointer; background:transparent; font-family:inherit; white-space:nowrap; }
-.alb0.active { background:#F1EFE8; color:#5F5E5A; border-color:#B4B2A9; }
-.alb1.active { background:#E6F1FB; color:#0C447C; border-color:#378ADD; }
-.alb2.active { background:#FAEEDA; color:#633806; border-color:#EF9F27; }
-.alb3.active { background:#EAF3DE; color:#27500A; border-color:#639922; }
+.all-lv-btn { font-size:11px; padding:5px 10px; border-radius:99px; border:1.5px solid #D3D1C7; color:#aaa; cursor:pointer; background:#fff; font-family:inherit; white-space:nowrap; min-width:34px; transition:all 0.1s; }
+.all-lv-btn:not(.active):hover { border-color:#888; color:#555; }
+.alb0.active { background:#888; color:#fff; border-color:#888; font-weight:700; }
+.alb1.active { background:#378ADD; color:#fff; border-color:#378ADD; font-weight:700; }
+.alb2.active { background:#BA7517; color:#fff; border-color:#BA7517; font-weight:700; }
+.alb3.active { background:#3B6D11; color:#fff; border-color:#3B6D11; font-weight:700; }
 
 /* ─── 検定ダッシュボード ─── */
 .cert-db-tabs { display:flex; gap:4px; margin-bottom:1rem; flex-wrap:wrap; }
@@ -413,87 +415,271 @@ const SKILLS = {
     { id:'w65',week:5,step:'オブジェクト（図形・画像）',name:'Excelワークシートの挿入、Excelの表・グラフの貼り付け',cert:['2級'] },
   ],
     excel: [
-    // ── 作業環境・基礎知識（3級・2級共通） ──
-    { id:'e01',week:9, step:'作業環境・基礎知識',name:'Excelの画面要素の名称と役割（セル・アクティブセル／数式バー／ステータスバー／クイックアクセスツールバー／リボン／タブ）',cert:['3級','2級'] },
-    { id:'e02',week:9, step:'作業環境・基礎知識',name:'ブックの表示：標準/改ページプレビュー/ページレイアウト',cert:['3級','2級'] },
-    { id:'e03',week:9, step:'作業環境・基礎知識',name:'表示/非表示：ルーラー、数式バー、枠線、見出し',cert:['3級','2級'] },
-    { id:'e04',week:9, step:'作業環境・基礎知識',name:'ウィンドウ枠の固定',cert:['3級','2級'] },
-    { id:'e05',week:9, step:'作業環境・基礎知識',name:'ウィンドウ：新しいウィンドウを開く、整列、分割、表示しない/再表示、ウィンドウの切り替え',cert:['2級'] },
-    { id:'e06',week:9, step:'作業環境・基礎知識',name:'Excelのオプション：基本設定、数式、詳細設定',cert:['2級'] },
-    { id:'e07',week:9, step:'作業環境・基礎知識',name:'リボンのユーザー設定、クイックアクセスツールバーのカスタマイズ',cert:['2級'] },
-    // ── 基本操作（3級・2級） ──
-    { id:'e08',week:9, step:'基本操作',name:'選択と解除：セル、セル範囲、列、行、ワークシートの選択と解除の方法',cert:['3級','2級'] },
-    { id:'e09',week:9, step:'基本操作',name:'キー操作：Enter、Tab、Delete、BackSpaceの役割、Ctrl、Alt、Shiftの基本的な役割',cert:['3級','2級'] },
-    { id:'e10',week:9, step:'基本操作',name:'セルに入力できるデータ：文字列、数値、数式、日付・時刻',cert:['3級','2級'] },
-    { id:'e11',week:9, step:'基本操作',name:'コピーと移動：貼り付けのオプション、形式を選択して貼り付け（リンク貼り付けは2級から）',cert:['3級','2級'] },
-    { id:'e12',week:9, step:'基本操作',name:'書式のコピー、貼り付け',cert:['3級','2級'] },
-    { id:'e13',week:9, step:'基本操作',name:'クリア：数式と値のクリア（Deleteキー）、すべてクリア、書式のクリア（2級から）',cert:['3級','2級'] },
-    { id:'e14',week:9, step:'基本操作',name:'フィル：各方向へのオートフィル、オートフィルオプション',cert:['3級','2級'] },
-    { id:'e15',week:9, step:'基本操作',name:'フラッシュフィル',cert:['2級'] },
-    { id:'e16',week:9, step:'基本操作',name:'検索と置換（疑問符・アスタリスクの使用を含む）',cert:['2級'] },
-    { id:'e17',week:9, step:'基本操作',name:'元に戻す、やり直し、繰り返し',cert:['3級','2級'] },
-    // ── セルの書式設定（3級・2級） ──
-    { id:'e18',week:9, step:'セルの書式設定',name:'フォント：フォント、サイズ、太字、斜体、下線、色、ふりがな',cert:['3級','2級'] },
-    { id:'e19',week:9, step:'セルの書式設定',name:'文字飾り、フォントサイズの拡大/縮小',cert:['2級'] },
-    { id:'e20',week:9, step:'セルの書式設定',name:'配置：縦位置、横位置、インデント、方向',cert:['3級','2級'] },
-    { id:'e21',week:9, step:'セルの書式設定',name:'折り返して全体を表示する、セルを結合して中央揃え、縮小して全体を表示する',cert:['3級','2級'] },
-    { id:'e22',week:9, step:'セルの書式設定',name:'表示形式：通貨表示形式、パーセントスタイル、桁区切りスタイル、小数点以下の表示桁数',cert:['3級','2級'] },
-    { id:'e23',week:9, step:'セルの書式設定',name:'ユーザー定義の表示形式',cert:['2級'] },
-    { id:'e24',week:9, step:'セルの書式設定',name:'罫線',cert:['3級','2級'] },
-    { id:'e25',week:9, step:'セルの書式設定',name:'塗りつぶし：背景色、パターンの色、パターンの種類',cert:['3級','2級'] },
-    { id:'e26',week:9, step:'セルの書式設定',name:'塗りつぶし効果',cert:['2級'] },
-    { id:'e27',week:9, step:'セルの書式設定',name:'条件付き書式：セルの強調表示ルール、上位/下位ルール、データバー、カラースケール、アイコンセット',cert:['2級'] },
-    // ── レイアウト（3級・2級） ──
-    { id:'e28',week:9, step:'レイアウト',name:'行：高さ、自動調整、挿入、削除',cert:['3級','2級'] },
-    { id:'e29',week:9, step:'レイアウト',name:'行の非表示、再表示',cert:['2級'] },
-    { id:'e30',week:9, step:'レイアウト',name:'列：幅、自動調整、挿入、削除',cert:['3級','2級'] },
-    { id:'e31',week:9, step:'レイアウト',name:'列の非表示、再表示、既定の幅',cert:['2級'] },
-    { id:'e32',week:9, step:'レイアウト',name:'ワークシート：シート名の変更、シートの挿入・移動・コピー・削除、シート見出しの色',cert:['3級','2級'] },
-    { id:'e33',week:9, step:'レイアウト',name:'シートの非表示・再表示、シートのグループ化',cert:['2級'] },
-    // ── 数式と計算（3級・2級） ──
-    { id:'e34',week:9, step:'数式と計算',name:'四則計算：セル参照による四則計算',cert:['3級','2級'] },
-    { id:'e35',week:9, step:'数式と計算',name:'オートSUM：合計、平均、数値の個数、最大値、最小値',cert:['3級','2級'] },
-    { id:'e36',week:9, step:'数式と計算',name:'相対参照と絶対参照：違い、$マークの付け方',cert:['3級','2級'] },
-    { id:'e37',week:9, step:'数式と計算',name:'計算結果と表示：表示桁数と計算結果、「####」表示の意味',cert:['3級','2級'] },
-    { id:'e38',week:9, step:'数式と計算',name:'エラー値について：「#DIV/0!」「#REF!」「#VALUE!」「#N/A」表示の意味',cert:['2級'] },
-    // ── 関数（3級） ──
-    { id:'e39',week:9, step:'関数（3級対象）',name:'SUM、ROUND、ROUNDUP、ROUNDDOWN',cert:['3級','2級'] },
-    { id:'e40',week:9, step:'関数（3級対象）',name:'AVERAGE、COUNT、COUNTA、MAX、MIN、RANK、RANK.AVG、RANK.EQ',cert:['3級','2級'] },
-    { id:'e41',week:9, step:'関数（3級対象）',name:'IF',cert:['3級','2級'] },
-    // ── 関数（2級追加） ──
-    { id:'e42',week:10,step:'関数（2級追加）',name:'AND、OR、NOT、TRUE、FALSE',cert:['2級'] },
-    { id:'e43',week:10,step:'関数（2級追加）',name:'LARGE、SMALL、AVERAGEIF、COUNTIF、AVERAGEIFS、COUNTIFS',cert:['2級'] },
-    { id:'e44',week:10,step:'関数（2級追加）',name:'日付/時刻：DATE、TODAY、NOW、WEEKDAY',cert:['2級'] },
-    { id:'e45',week:10,step:'関数（2級追加）',name:'文字列操作：MID、TEXT、REPT、LEFT、RIGHT、LEN、SEARCH',cert:['2級'] },
-    { id:'e46',week:10,step:'関数（2級追加）',name:'情報：ISBLANK、PHONETIC',cert:['2級'] },
-    { id:'e47',week:10,step:'関数（2級追加）',name:'データベース：DAVERAGE、DCOUNT、DCOUNTA、DMAX、DMIN、DSUM',cert:['2級'] },
-    { id:'e48',week:10,step:'関数（2級追加）',name:'検索/行列：INDEX、CHOOSE、VLOOKUP、HLOOKUP',cert:['2級'] },
-    // ── グラフ（3級・2級） ──
-    { id:'e49',week:11,step:'グラフ',name:'グラフの挿入：縦棒、折れ線、円、横棒、面、レーダー',cert:['3級','2級'] },
-    { id:'e50',week:11,step:'グラフ',name:'散布図、等高線、組み合わせグラフ',cert:['2級'] },
-    { id:'e51',week:11,step:'グラフ',name:'行/列の切り替え、データの選択',cert:['3級','2級'] },
-    { id:'e52',week:11,step:'グラフ',name:'データソースの編集・削除、データ系列の追加',cert:['2級'] },
-    { id:'e53',week:11,step:'グラフ',name:'グラフのレイアウト：クイックレイアウト、グラフ要素を追加',cert:['3級','2級'] },
-    { id:'e54',week:11,step:'グラフ',name:'グラフスタイル：色の変更、グラフスタイル',cert:['3級','2級'] },
-    { id:'e55',week:11,step:'グラフ',name:'グラフ要素の書式：各要素のオプション、文字のオプション',cert:['2級'] },
-    { id:'e56',week:11,step:'グラフ',name:'グラフの移動：新しいシート、オブジェクト',cert:['3級','2級'] },
-    { id:'e57',week:11,step:'グラフ',name:'スパークライン：種類、表示、スタイル、グループ',cert:['3級','2級'] },
-    // ── データベース機能（3級・2級） ──
-    { id:'e58',week:12,step:'データベース機能',name:'並べ替え',cert:['3級','2級'] },
-    { id:'e59',week:12,step:'データベース機能',name:'フィルター：列見出しの矢印を使用した抽出',cert:['3級','2級'] },
-    { id:'e60',week:12,step:'データベース機能',name:'フィルター詳細設定：フィルターオプションの設定ダイアログボックスを使用した抽出',cert:['2級'] },
-    { id:'e61',week:12,step:'データベース機能',name:'入力規則：条件の設定、入力時メッセージ、エラーメッセージ',cert:['2級'] },
-    { id:'e62',week:12,step:'データベース機能',name:'テーブルと範囲：テーブルから書式設定/範囲からテーブル作成/テーブルを範囲に変換、テーブルスタイル',cert:['2級'] },
-    { id:'e63',week:12,step:'データベース機能',name:'ピボットテーブルとピボットグラフの作成と編集',cert:['2級'] },
-    { id:'e64',week:12,step:'データベース機能',name:'アウトラインと小計：グループ化、グループ化解除、小計（集計の設定）',cert:['2級'] },
-    // ── 入出力・ページレイアウト（3級・2級） ──
-    { id:'e65',week:12,step:'入出力・ページレイアウト',name:'ページ設定：余白、印刷の向き、サイズ、印刷範囲',cert:['3級','2級'] },
-    { id:'e66',week:12,step:'入出力・ページレイアウト',name:'改ページ、背景、印刷タイトル',cert:['2級'] },
-    { id:'e67',week:12,step:'入出力・ページレイアウト',name:'ヘッダーの編集、フッターの編集',cert:['3級','2級'] },
-    { id:'e68',week:12,step:'入出力・ページレイアウト',name:'シートのオプション：枠線、見出し',cert:['3級','2級'] },
-    { id:'e69',week:12,step:'入出力・ページレイアウト',name:'Excelブック（*.xlsx）、Excel97-2003ブック（*.xls）で保存できる',cert:['3級','2級'] },
-    { id:'e70',week:12,step:'入出力・ページレイアウト',name:'その他のファイル形式（*.pdf、*.txt、*.csv、*.htm、*.html）で保存できる',cert:['2級'] },
-    { id:'e71',week:12,step:'入出力・ページレイアウト',name:'共有と保護：セルの保護（ロック・表示しない）、シートの保護、ブックの保護',cert:['2級'] },
+    // ── Excel基本操作 ──────────────────────────────────────
+    { id:'e001',week:9, step:'Excel基本操作',name:'Excelの起動ができる',cert:['3級','2級'] },
+    { id:'e002',week:9, step:'Excel基本操作',name:'Excelの画面構成がわかる',cert:['3級','2級'] },
+    { id:'e003',week:9, step:'Excel基本操作',name:'文字の入力ができる',cert:['3級','2級'] },
+    { id:'e004',week:9, step:'Excel基本操作',name:'数字の入力ができる',cert:['3級','2級'] },
+    { id:'e005',week:9, step:'Excel基本操作',name:'SUM関数が使える',cert:['3級','2級'] },
+    { id:'e006',week:9, step:'Excel基本操作',name:'オートフィルができる',cert:['3級','2級'] },
+    { id:'e007',week:9, step:'Excel基本操作',name:'練習1',cert:[] },
+    { id:'e008',week:9, step:'Excel基本操作',name:'四則演算ができる',cert:['3級','2級'] },
+    { id:'e009',week:9, step:'Excel基本操作',name:'再計算機能が使える',cert:['3級','2級'] },
+    { id:'e010',week:9, step:'Excel基本操作',name:'印刷イメージの確認ができる',cert:['3級','2級'] },
+    { id:'e011',week:9, step:'Excel基本操作',name:'ページ設定ができる',cert:['3級','2級'] },
+    { id:'e012',week:9, step:'Excel基本操作',name:'名前を付けて保存ができる',cert:['3級','2級'] },
+    { id:'e013',week:9, step:'Excel基本操作',name:'上書き保存ができる',cert:['3級','2級'] },
+    { id:'e014',week:9, step:'Excel基本操作',name:'ブックを開くことができる',cert:['3級','2級'] },
+    { id:'e015',week:9, step:'Excel基本操作',name:'新しいブックを作成できる',cert:['3級','2級'] },
+    { id:'e016',week:9, step:'Excel基本操作',name:'練習問題1',cert:[] },
+    { id:'e017',week:9, step:'Excel基本操作',name:'練習問題2',cert:[] },
+    { id:'e018',week:9, step:'Excel基本操作',name:'練習問題3',cert:[] },
+    { id:'e019',week:9, step:'Excel基本操作',name:'練習問題4',cert:[] },
+    { id:'e020',week:9, step:'Excel基本操作',name:'練習問題5',cert:[] },
+    // ── 行・列・書式設定 ──────────────────────────────────
+    { id:'e021',week:9, step:'行・列操作',name:'行の挿入ができる',cert:['3級','2級'] },
+    { id:'e022',week:9, step:'行・列操作',name:'行の削除ができる',cert:['3級','2級'] },
+    { id:'e023',week:9, step:'行・列操作',name:'列の挿入ができる',cert:['3級','2級'] },
+    { id:'e024',week:9, step:'行・列操作',name:'列の削除ができる',cert:['3級','2級'] },
+    { id:'e025',week:9, step:'行・列操作',name:'練習2',cert:[] },
+    { id:'e026',week:9, step:'行・列操作',name:'割合を求めることができる',cert:['3級','2級'] },
+    { id:'e027',week:9, step:'行・列操作',name:'AVERAGE関数が使える',cert:['3級','2級'] },
+    { id:'e028',week:9, step:'行・列操作',name:'MAX・MIN関数が使える',cert:['3級','2級'] },
+    { id:'e029',week:9, step:'行・列操作',name:'練習3',cert:[] },
+    // ── 書式設定 ──────────────────────────────────────────
+    { id:'e030',week:9, step:'書式設定',name:'桁区切りスタイルが設定できる',cert:['3級','2級'] },
+    { id:'e031',week:9, step:'書式設定',name:'通貨表示形式が設定できる',cert:['3級','2級'] },
+    { id:'e032',week:9, step:'書式設定',name:'パーセントスタイルが設定できる',cert:['3級','2級'] },
+    { id:'e033',week:9, step:'書式設定',name:'小数点以下の表示が設定できる',cert:['3級','2級'] },
+    { id:'e034',week:9, step:'書式設定',name:'表示形式の解除ができる',cert:['3級','2級'] },
+    { id:'e035',week:9, step:'書式設定',name:'表示形式の詳細設定ができる',cert:['2級'] },
+    { id:'e036',week:9, step:'書式設定',name:'文字位置の設定ができる',cert:['3級','2級'] },
+    { id:'e037',week:9, step:'書式設定',name:'列幅と行の高さの設定ができる',cert:['3級','2級'] },
+    { id:'e038',week:9, step:'書式設定',name:'数値を指定して行の高さを変更できる',cert:['3級','2級'] },
+    { id:'e039',week:9, step:'書式設定',name:'ダブルクリックによる列幅の自動調整ができる',cert:['3級','2級'] },
+    { id:'e040',week:9, step:'書式設定',name:'罫線・塗りつぶしの設定ができる',cert:['3級','2級'] },
+    { id:'e041',week:9, step:'書式設定',name:'点線を引くことができる',cert:['3級','2級'] },
+    { id:'e042',week:9, step:'書式設定',name:'二重線を引くことができる',cert:['3級','2級'] },
+    { id:'e043',week:9, step:'書式設定',name:'斜線を引くことができる',cert:['3級','2級'] },
+    { id:'e044',week:9, step:'書式設定',name:'リボンから塗りつぶしの設定ができる',cert:['3級','2級'] },
+    { id:'e045',week:9, step:'書式設定',name:'文字のフォントとサイズの設定ができる',cert:['3級','2級'] },
+    { id:'e046',week:9, step:'書式設定',name:'練習4',cert:[] },
+    { id:'e047',week:9, step:'書式設定',name:'オートコンプリートができる',cert:['3級','2級'] },
+    { id:'e048',week:9, step:'書式設定',name:'練習問題6',cert:[] },
+    { id:'e049',week:9, step:'書式設定',name:'練習問題7',cert:[] },
+    { id:'e050',week:9, step:'書式設定',name:'練習問題8',cert:[] },
+    { id:'e051',week:9, step:'書式設定',name:'練習問題9',cert:[] },
+    { id:'e052',week:9, step:'書式設定',name:'練習問題10',cert:[] },
+    { id:'e053',week:9, step:'書式設定',name:'練習問題11',cert:[] },
+    // ── データ操作 ──────────────────────────────────────
+    { id:'e054',week:9, step:'データ操作',name:'コピーができる',cert:['3級','2級'] },
+    { id:'e055',week:9, step:'データ操作',name:'移動ができる',cert:['3級','2級'] },
+    { id:'e056',week:9, step:'データ操作',name:'ショートカットメニューでの移動・コピーができる',cert:['3級','2級'] },
+    { id:'e057',week:9, step:'データ操作',name:'ショートカットキー一覧表がわかる',cert:['3級','2級'] },
+    { id:'e058',week:9, step:'データ操作',name:'練習問題12',cert:[] },
+    { id:'e059',week:9, step:'データ操作',name:'ユーザー定義の設定ができる',cert:['2級'] },
+    { id:'e060',week:9, step:'データ操作',name:'記号を使った入力ができる',cert:['2級'] },
+    { id:'e061',week:9, step:'データ操作',name:'ウィンドウ枠の固定ができる',cert:['3級','2級'] },
+    { id:'e062',week:9, step:'データ操作',name:'表示モードの切り替えができる',cert:['3級','2級'] },
+    { id:'e063',week:9, step:'データ操作',name:'改ページプレビューができる',cert:['3級','2級'] },
+    { id:'e064',week:9, step:'データ操作',name:'検索ができる',cert:['3級','2級'] },
+    { id:'e065',week:9, step:'データ操作',name:'置換ができる',cert:['2級'] },
+    { id:'e066',week:9, step:'データ操作',name:'練習問題13',cert:[] },
+    { id:'e067',week:9, step:'データ操作',name:'練習問題14',cert:[] },
+    { id:'e068',week:9, step:'データ操作',name:'練習問題15',cert:[] },
+    { id:'e069',week:9, step:'データ操作',name:'セルの書式設定での文字配置ができる',cert:['3級','2級'] },
+    { id:'e070',week:9, step:'データ操作',name:'セル内の縦書きができる',cert:['3級','2級'] },
+    { id:'e071',week:9, step:'データ操作',name:'セルの書式設定での文字方向の設定ができる',cert:['3級','2級'] },
+    // ── グラフ ─────────────────────────────────────────
+    { id:'e072',week:11,step:'グラフ',name:'グラフタイトルを設定ができる',cert:['3級','2級'] },
+    { id:'e073',week:11,step:'グラフ',name:'グラフの移動とサイズ変更ができる',cert:['3級','2級'] },
+    { id:'e074',week:11,step:'グラフ',name:'グラフ内のフォントサイズを変えることができる',cert:['3級','2級'] },
+    { id:'e075',week:11,step:'グラフ',name:'練習1（グラフ）',cert:[] },
+    { id:'e076',week:11,step:'グラフ',name:'軸ラベルを表示できる',cert:['3級','2級'] },
+    { id:'e077',week:11,step:'グラフ',name:'目盛間隔を変更できる',cert:['3級','2級'] },
+    { id:'e078',week:11,step:'グラフ',name:'グラフのデータ範囲を変更できる',cert:['3級','2級'] },
+    { id:'e079',week:11,step:'グラフ',name:'グラフを変更できる',cert:['3級','2級'] },
+    { id:'e080',week:11,step:'グラフ',name:'グラフの色の変更できる',cert:['3級','2級'] },
+    { id:'e081',week:11,step:'グラフ',name:'グラフスタイルの変更できる',cert:['3級','2級'] },
+    { id:'e082',week:11,step:'グラフ',name:'折れ線グラフの構成要素の名称がわかる',cert:['3級','2級'] },
+    { id:'e083',week:11,step:'グラフ',name:'主なグラフの種類とポイントがわかる',cert:['3級','2級'] },
+    { id:'e084',week:11,step:'グラフ',name:'練習2（グラフ）',cert:[] },
+    { id:'e085',week:11,step:'グラフ',name:'練習3（グラフ）',cert:[] },
+    { id:'e086',week:11,step:'グラフ',name:'練習4（グラフ）',cert:[] },
+    { id:'e087',week:11,step:'グラフ',name:'練習5（グラフ）',cert:[] },
+    { id:'e088',week:11,step:'グラフ',name:'基礎問題1',cert:[] },
+    { id:'e089',week:11,step:'グラフ',name:'離れたセル範囲のグラフの作成ができる',cert:['3級','2級'] },
+    { id:'e090',week:11,step:'グラフ',name:'凡例の編集ができる',cert:['3級','2級'] },
+    { id:'e091',week:11,step:'グラフ',name:'凡例の色を設定ができる',cert:['3級','2級'] },
+    { id:'e092',week:11,step:'グラフ',name:'基礎問題2',cert:[] },
+    { id:'e093',week:11,step:'グラフ',name:'基礎問題3',cert:[] },
+    { id:'e094',week:11,step:'グラフ',name:'複合グラフの作成ができる',cert:['2級'] },
+    { id:'e095',week:11,step:'グラフ',name:'基礎問題4',cert:[] },
+    { id:'e096',week:11,step:'グラフ',name:'基礎問題5',cert:[] },
+    // ── データベース機能 ───────────────────────────────────
+    { id:'e097',week:12,step:'データベース機能',name:'並べ替えができる',cert:['3級','2級'] },
+    { id:'e098',week:12,step:'データベース機能',name:'複数キーによる並べ替えができる',cert:['2級'] },
+    { id:'e099',week:12,step:'データベース機能',name:'練習6',cert:[] },
+    { id:'e100',week:12,step:'データベース機能',name:'フィルターでのデータ抽出ができる',cert:['3級','2級'] },
+    { id:'e101',week:12,step:'データベース機能',name:'数値フィルターでのデータ抽出ができる',cert:['2級'] },
+    { id:'e102',week:12,step:'データベース機能',name:'テキストフィルターでのデータ抽出ができる',cert:['2級'] },
+    { id:'e103',week:12,step:'データベース機能',name:'フィルターの解除ができる',cert:['3級','2級'] },
+    { id:'e104',week:12,step:'データベース機能',name:'複数条件での抽出ができる',cert:['2級'] },
+    { id:'e105',week:12,step:'データベース機能',name:'ワイルドカードがわかる',cert:['2級'] },
+    { id:'e106',week:12,step:'データベース機能',name:'練習7',cert:[] },
+    { id:'e107',week:12,step:'データベース機能',name:'テーブルスタイルの変更ができる',cert:['2級'] },
+    { id:'e108',week:12,step:'データベース機能',name:'集計行の表示ができる',cert:['2級'] },
+    { id:'e109',week:12,step:'データベース機能',name:'テーブルとスタイルの解除ができる',cert:['2級'] },
+    { id:'e110',week:12,step:'データベース機能',name:'練習8',cert:[] },
+    { id:'e111',week:12,step:'データベース機能',name:'スパークラインの種類の変更ができる',cert:['3級','2級'] },
+    { id:'e112',week:12,step:'データベース機能',name:'スパークラインのスタイルの変更ができる',cert:['3級','2級'] },
+    { id:'e113',week:12,step:'データベース機能',name:'スパークラインの色・マーカーの色が設定できる',cert:['3級','2級'] },
+    { id:'e114',week:12,step:'データベース機能',name:'スパークラインの削除ができる',cert:['3級','2級'] },
+    { id:'e115',week:12,step:'データベース機能',name:'練習9',cert:[] },
+    // ── 関数・計算（応用） ─────────────────────────────────
+    { id:'e116',week:10,step:'関数・計算（応用）',name:'ROUND関数が使える',cert:['3級','2級'] },
+    { id:'e117',week:10,step:'関数・計算（応用）',name:'ROUNDUP・ROUNDDOWN関数が使える',cert:['3級','2級'] },
+    { id:'e118',week:10,step:'関数・計算（応用）',name:'練習1（関数応用）',cert:[] },
+    { id:'e119',week:10,step:'関数・計算（応用）',name:'構成比を求めることができる',cert:['3級','2級'] },
+    { id:'e120',week:10,step:'関数・計算（応用）',name:'練習2-1',cert:[] },
+    { id:'e121',week:10,step:'関数・計算（応用）',name:'練習2-2',cert:[] },
+    { id:'e122',week:10,step:'関数・計算（応用）',name:'相対参照・絶対参照・複合参照が使える',cert:['3級','2級'] },
+    { id:'e123',week:10,step:'関数・計算（応用）',name:'練習3（参照）',cert:[] },
+    { id:'e124',week:10,step:'関数・計算（応用）',name:'練習問題1',cert:[] },
+    { id:'e125',week:10,step:'関数・計算（応用）',name:'練習問題2',cert:[] },
+    { id:'e126',week:10,step:'関数・計算（応用）',name:'折り返して全体を表示できる',cert:['3級','2級'] },
+    { id:'e127',week:10,step:'関数・計算（応用）',name:'表のコピー・貼り付けができる',cert:['3級','2級'] },
+    { id:'e128',week:10,step:'関数・計算（応用）',name:'練習4（参照）',cert:[] },
+    { id:'e129',week:10,step:'関数・計算（応用）',name:'RANK.EQ関数が使える',cert:['3級','2級'] },
+    { id:'e130',week:10,step:'関数・計算（応用）',name:'練習5-1',cert:[] },
+    { id:'e131',week:10,step:'関数・計算（応用）',name:'練習5-2',cert:[] },
+    { id:'e132',week:10,step:'関数・計算（応用）',name:'RANK.AVG関数が使える',cert:['3級','2級'] },
+    { id:'e133',week:10,step:'関数・計算（応用）',name:'練習5-3',cert:[] },
+    { id:'e134',week:10,step:'関数・計算（応用）',name:'TODAY関数が使える',cert:['2級'] },
+    { id:'e135',week:10,step:'関数・計算（応用）',name:'NOW関数が使える',cert:['2級'] },
+    { id:'e136',week:10,step:'関数・計算（応用）',name:'WEEKDAY関数が使える',cert:['2級'] },
+    { id:'e137',week:10,step:'関数・計算（応用）',name:'日付の表示形式が設定できる',cert:['2級'] },
+    { id:'e138',week:10,step:'関数・計算（応用）',name:'練習6（日付）',cert:[] },
+    { id:'e139',week:10,step:'関数・計算（応用）',name:'練習問題3',cert:[] },
+    { id:'e140',week:10,step:'関数・計算（応用）',name:'練習問題4',cert:[] },
+    { id:'e141',week:10,step:'関数・計算（応用）',name:'COUNT・COUNTA関数が使える',cert:['3級','2級'] },
+    { id:'e142',week:10,step:'関数・計算（応用）',name:'練習7',cert:[] },
+    { id:'e143',week:10,step:'関数・計算（応用）',name:'練習8',cert:[] },
+    { id:'e144',week:10,step:'関数・計算（応用）',name:'ヘッダー・フッターの表示ができる',cert:['3級','2級'] },
+    { id:'e145',week:10,step:'関数・計算（応用）',name:'ヘッダー・フッターの要素が設定できる',cert:['3級','2級'] },
+    { id:'e146',week:10,step:'関数・計算（応用）',name:'練習問題5',cert:[] },
+    { id:'e147',week:10,step:'関数・計算（応用）',name:'練習問題6',cert:[] },
+    // ── IF関数・条件分岐 ──────────────────────────────────
+    { id:'e148',week:10,step:'IF関数・条件分岐',name:'IF関数が使える',cert:['3級','2級'] },
+    { id:'e149',week:10,step:'IF関数・条件分岐',name:'練習問題1（IF）',cert:[] },
+    { id:'e150',week:10,step:'IF関数・条件分岐',name:'複雑な条件の設定ができる',cert:['2級'] },
+    { id:'e151',week:10,step:'IF関数・条件分岐',name:'練習1-1（IF複雑）',cert:[] },
+    { id:'e152',week:10,step:'IF関数・条件分岐',name:'練習1-2（IF複雑）',cert:[] },
+    { id:'e153',week:10,step:'IF関数・条件分岐',name:'練習2（IF）',cert:[] },
+    { id:'e154',week:10,step:'IF関数・条件分岐',name:'PHONETIC関数が使える',cert:['2級'] },
+    { id:'e155',week:10,step:'IF関数・条件分岐',name:'ふりがなをひらがなにすることができる',cert:['2級'] },
+    { id:'e156',week:10,step:'IF関数・条件分岐',name:'文字の上にふりがなをつけることができる',cert:['2級'] },
+    { id:'e157',week:10,step:'IF関数・条件分岐',name:'練習問題2',cert:[] },
+    { id:'e158',week:10,step:'IF関数・条件分岐',name:'練習問題3',cert:[] },
+    { id:'e159',week:10,step:'IF関数・条件分岐',name:'練習問題4',cert:[] },
+    { id:'e160',week:10,step:'IF関数・条件分岐',name:'図形の挿入ができる',cert:['3級','2級'] },
+    { id:'e161',week:10,step:'IF関数・条件分岐',name:'表示形式の定義ができる',cert:['2級'] },
+    { id:'e162',week:10,step:'IF関数・条件分岐',name:'練習3（IF）',cert:[] },
+    { id:'e163',week:10,step:'IF関数・条件分岐',name:'練習問題5',cert:[] },
+    { id:'e164',week:10,step:'IF関数・条件分岐',name:'セルの強調表示ルールが設定できる',cert:['2級'] },
+    { id:'e165',week:10,step:'IF関数・条件分岐',name:'ルールの管理ができる',cert:['2級'] },
+    { id:'e166',week:10,step:'IF関数・条件分岐',name:'時間給の計算の仕方がわかる',cert:['2級'] },
+    { id:'e167',week:10,step:'IF関数・条件分岐',name:'練習問題6',cert:[] },
+    { id:'e168',week:10,step:'IF関数・条件分岐',name:'COUNTIF関数が使える',cert:['2級'] },
+    { id:'e169',week:10,step:'IF関数・条件分岐',name:'SUMIF関数が使える',cert:['2級'] },
+    { id:'e170',week:10,step:'IF関数・条件分岐',name:'練習5（COUNTIF・SUMIF）',cert:[] },
+    { id:'e171',week:10,step:'IF関数・条件分岐',name:'練習問題7',cert:[] },
+    { id:'e172',week:10,step:'IF関数・条件分岐',name:'MOD関数が使える',cert:['2級'] },
+    { id:'e173',week:10,step:'IF関数・条件分岐',name:'練習問題9',cert:[] },
+    { id:'e174',week:10,step:'IF関数・条件分岐',name:'TRUNC関数が使える',cert:['2級'] },
+    { id:'e175',week:10,step:'IF関数・条件分岐',name:'練習問題10',cert:[] },
+    { id:'e176',week:10,step:'IF関数・条件分岐',name:'IFS関数が使える',cert:['2級'] },
+    { id:'e177',week:10,step:'IF関数・条件分岐',name:'SWITCH関数が使える',cert:['2級'] },
+    { id:'e178',week:10,step:'IF関数・条件分岐',name:'練習問題11',cert:[] },
+    { id:'e179',week:10,step:'IF関数・条件分岐',name:'練習問題12',cert:[] },
+    { id:'e180',week:10,step:'IF関数・条件分岐',name:'MAXIFS関数が使える',cert:['2級'] },
+    { id:'e181',week:10,step:'IF関数・条件分岐',name:'MINIFS関数が使える',cert:['2級'] },
+    { id:'e182',week:10,step:'IF関数・条件分岐',name:'CONCAT関数が使える',cert:['2級'] },
+    { id:'e183',week:10,step:'IF関数・条件分岐',name:'TEXTJOIN関数が使える',cert:['2級'] },
+    // ── ピボットテーブル・シート操作 ──────────────────────
+    { id:'e184',week:12,step:'ピボットテーブル・シート操作',name:'フィールドのグループ化ができる',cert:['2級'] },
+    { id:'e185',week:12,step:'ピボットテーブル・シート操作',name:'データの更新ができる',cert:['2級'] },
+    { id:'e186',week:12,step:'ピボットテーブル・シート操作',name:'行ラベルの追加ができる',cert:['2級'] },
+    { id:'e187',week:12,step:'ピボットテーブル・シート操作',name:'ピボットテーブルスタイルの設定ができる',cert:['2級'] },
+    { id:'e188',week:12,step:'ピボットテーブル・シート操作',name:'練習1（ピボット）',cert:[] },
+    { id:'e189',week:12,step:'ピボットテーブル・シート操作',name:'ピボットグラフの作成ができる',cert:['2級'] },
+    { id:'e190',week:12,step:'ピボットテーブル・シート操作',name:'練習2（ピボット）',cert:[] },
+    { id:'e191',week:12,step:'ピボットテーブル・シート操作',name:'練習3（ピボット）',cert:[] },
+    { id:'e192',week:12,step:'ピボットテーブル・シート操作',name:'練習問題1（ピボット）',cert:[] },
+    { id:'e193',week:12,step:'ピボットテーブル・シート操作',name:'練習問題2（ピボット）',cert:[] },
+    { id:'e194',week:12,step:'ピボットテーブル・シート操作',name:'練習問題3（ピボット）',cert:[] },
+    { id:'e195',week:12,step:'ピボットテーブル・シート操作',name:'シート名の変更ができる',cert:['3級','2級'] },
+    { id:'e196',week:12,step:'ピボットテーブル・シート操作',name:'ワークシートの挿入ができる',cert:['3級','2級'] },
+    { id:'e197',week:12,step:'ピボットテーブル・シート操作',name:'ワークシートの削除ができる',cert:['3級','2級'] },
+    { id:'e198',week:12,step:'ピボットテーブル・シート操作',name:'練習4（シート）',cert:[] },
+    { id:'e199',week:12,step:'ピボットテーブル・シート操作',name:'ワークシートの移動ができる',cert:['3級','2級'] },
+    { id:'e200',week:12,step:'ピボットテーブル・シート操作',name:'ワークシートのコピーができる',cert:['3級','2級'] },
+    { id:'e201',week:12,step:'ピボットテーブル・シート操作',name:'シート見出しの色の設定ができる',cert:['3級','2級'] },
+    { id:'e202',week:12,step:'ピボットテーブル・シート操作',name:'串刺し集計ができる',cert:['2級'] },
+    { id:'e203',week:12,step:'ピボットテーブル・シート操作',name:'練習問題4',cert:[] },
+    // ── 高度なデータ操作 ──────────────────────────────────
+    { id:'e204',week:12,step:'高度なデータ操作',name:'フィルターオプションの設定ができる',cert:['2級'] },
+    { id:'e205',week:12,step:'高度なデータ操作',name:'練習5（フィルター詳細）',cert:[] },
+    { id:'e206',week:12,step:'高度なデータ操作',name:'集計ができる',cert:['2級'] },
+    { id:'e207',week:12,step:'高度なデータ操作',name:'集計の解除ができる',cert:['2級'] },
+    { id:'e208',week:12,step:'高度なデータ操作',name:'練習6（集計）',cert:[] },
+    { id:'e209',week:12,step:'高度なデータ操作',name:'アウトラインの記号がわかる',cert:['2級'] },
+    { id:'e210',week:12,step:'高度なデータ操作',name:'アウトラインの作成ができる',cert:['2級'] },
+    { id:'e211',week:12,step:'高度なデータ操作',name:'アウトラインの解除ができる',cert:['2級'] },
+    { id:'e212',week:12,step:'高度なデータ操作',name:'練習問題5',cert:[] },
+    { id:'e213',week:12,step:'高度なデータ操作',name:'可視セルのコピーができる',cert:['2級'] },
+    { id:'e214',week:12,step:'高度なデータ操作',name:'ユーザー設定リストでの並べ替えができる',cert:['2級'] },
+    { id:'e215',week:12,step:'高度なデータ操作',name:'練習問題6',cert:[] },
+    { id:'e216',week:12,step:'高度なデータ操作',name:'半角カタカナの設定ができる',cert:['2級'] },
+    { id:'e217',week:12,step:'高度なデータ操作',name:'リストから選択できる',cert:['2級'] },
+    { id:'e218',week:12,step:'高度なデータ操作',name:'エラーメッセージを表示できる',cert:['2級'] },
+    { id:'e219',week:12,step:'高度なデータ操作',name:'重複データを入力できないように設定できる',cert:['2級'] },
+    { id:'e220',week:12,step:'高度なデータ操作',name:'練習7（入力規則）',cert:[] },
+    // ── コメント・SmartArt ────────────────────────────────
+    { id:'e221',week:12,step:'コメント・SmartArt',name:'コメントの挿入ができる',cert:['2級'] },
+    { id:'e222',week:12,step:'コメント・SmartArt',name:'コメントの編集ができる',cert:['2級'] },
+    { id:'e223',week:12,step:'コメント・SmartArt',name:'コメントの削除ができる',cert:['2級'] },
+    { id:'e224',week:12,step:'コメント・SmartArt',name:'コメントの表示・非表示ができる',cert:['2級'] },
+    { id:'e225',week:12,step:'コメント・SmartArt',name:'SmartArtの挿入ができる',cert:['2級'] },
+    { id:'e226',week:12,step:'コメント・SmartArt',name:'ボックス（部下）の追加ができる',cert:['2級'] },
+    { id:'e227',week:12,step:'コメント・SmartArt',name:'スタイルの設定ができる',cert:['2級'] },
+    { id:'e228',week:12,step:'コメント・SmartArt',name:'ロゴマークの作成ができる',cert:['2級'] },
+    { id:'e229',week:12,step:'コメント・SmartArt',name:'練習1（SmartArt）',cert:[] },
+    { id:'e230',week:12,step:'コメント・SmartArt',name:'練習問題1（SmartArt）',cert:[] },
+    { id:'e231',week:12,step:'コメント・SmartArt',name:'練習問題2（SmartArt）',cert:[] },
+    // ── VLOOKUP・検索関数 ─────────────────────────────────
+    { id:'e232',week:10,step:'VLOOKUP・検索関数',name:'VLOOKUP関数が使える',cert:['2級'] },
+    { id:'e233',week:10,step:'VLOOKUP・検索関数',name:'引数「検索方法」が指定できる',cert:['2級'] },
+    { id:'e234',week:10,step:'VLOOKUP・検索関数',name:'IFERRORが使える',cert:['2級'] },
+    { id:'e235',week:10,step:'VLOOKUP・検索関数',name:'HLOOKUP関数が使える',cert:['2級'] },
+    { id:'e236',week:10,step:'VLOOKUP・検索関数',name:'見積書でVLOOKUP関数を使うことができる',cert:['2級'] },
+    { id:'e237',week:10,step:'VLOOKUP・検索関数',name:'練習2（VLOOKUP）',cert:[] },
+    { id:'e238',week:10,step:'VLOOKUP・検索関数',name:'練習3（VLOOKUP）',cert:[] },
+    { id:'e239',week:10,step:'VLOOKUP・検索関数',name:'練習問題3（VLOOKUP）',cert:[] },
+    { id:'e240',week:10,step:'VLOOKUP・検索関数',name:'練習問題4（VLOOKUP）',cert:[] },
+    { id:'e241',week:10,step:'VLOOKUP・検索関数',name:'練習4（VLOOKUP）',cert:[] },
+    { id:'e242',week:10,step:'VLOOKUP・検索関数',name:'LEFT関数が使える',cert:['2級'] },
+    { id:'e243',week:10,step:'VLOOKUP・検索関数',name:'RIGHT関数が使える',cert:['2級'] },
+    { id:'e244',week:10,step:'VLOOKUP・検索関数',name:'練習5（文字列関数）',cert:[] },
+    { id:'e245',week:10,step:'VLOOKUP・検索関数',name:'INDEX関数が使える',cert:['2級'] },
+    { id:'e246',week:10,step:'VLOOKUP・検索関数',name:'MATCH関数が使える',cert:['2級'] },
+    { id:'e247',week:10,step:'VLOOKUP・検索関数',name:'練習問題10',cert:[] },
+    { id:'e248',week:10,step:'VLOOKUP・検索関数',name:'練習問題11',cert:[] },
+    { id:'e249',week:10,step:'VLOOKUP・検索関数',name:'練習問題12',cert:[] },
+    { id:'e250',week:10,step:'VLOOKUP・検索関数',name:'CHOOSE関数が使える',cert:['2級'] },
+    { id:'e251',week:10,step:'VLOOKUP・検索関数',name:'練習問題13',cert:[] },
+    { id:'e252',week:10,step:'VLOOKUP・検索関数',name:'ゴールシークが使える',cert:['2級'] },
+    { id:'e253',week:10,step:'VLOOKUP・検索関数',name:'練習問題14',cert:[] },
   ],
     pp: [
     { id:'p01',week:17,step:'PowerPoint基本',name:'スライドの作成・文字入力・書式設定ができる',cert:['スタンダード'] },
@@ -969,12 +1155,12 @@ function renderAllSubjects() {
       <div class="all-subject-head-left">
         <span class="all-subject-icon">${meta.icon}</span>
         <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div class="all-subject-name" style="color:${meta.color}">${s.name}</div>
-            <span class="subject-level-badge ${getSubjectLevel(s.id).cls}">${getSubjectLevel(s.id).label}</span>
           </div>
-          <div class="all-subject-stats" style="color:${meta.color}">
-            ✔ ${lv3}/${total}項目（${pct}%）${lv12>0?`　📖 ${lv12}項目習得中`:''}
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
+            <span style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:99px;background:${{'slv-0':'#F1EFE8','slv-1':'#FEF3E2','slv-2':'#E6F1FB','slv-3':'#EEEDFE','slv-4':'#EAF3DE'}[getSubjectLevel(s.id).cls]};color:${{'slv-0':'#888','slv-1':'#633806','slv-2':'#0C447C','slv-3':'#3C3489','slv-4':'#27500A'}[getSubjectLevel(s.id).cls]}">${getSubjectLevel(s.id).label}</span>
+            <span class="all-subject-stats" style="color:${meta.color}">✔ ${lv3}/${total}項目（${pct}%）${lv12>0?`　📖 ${lv12}項目習得中`:''}</span>
           </div>
         </div>
 
