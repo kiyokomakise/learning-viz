@@ -1,254 +1,1953 @@
-// ════════════════════════════════════════════════════════════════
-//  学習成長記録システム v2 — Google Apps Script
-//  ITビジネス・Webデザイン養成科
-//
-//  【更新手順】
-//  1. スプレッドシートを開く
-//  2. 拡張機能 → Apps Script
-//  3. このコードを全部貼り付けて保存（Ctrl+S）
-//  4. デプロイ → 新しいデプロイ（または既存を管理）
-//     ※既存のURLを使い続ける場合：「デプロイを管理」→「編集」→バージョン「新しいバージョン」→デプロイ
-//  5. URLは変わらないので再設定不要
-// ════════════════════════════════════════════════════════════════
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学習成長記録｜ITビジネス・Webデザイン養成科</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; color:#2C2C2A; font-size:14px; }
 
-const SHEET_SKILLS  = '理解度データ';
-const SHEET_LOG     = '学習ログ';
-const SHEET_SUMMARY = '集計サマリー';
+/* ─── ログイン ─── */
+#loginScreen { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1rem; }
+.login-card { background:#fff; border-radius:16px; border:1px solid #E0DED6; padding:2.5rem 2rem; width:100%; max-width:400px; }
+.login-logo { width:60px; height:60px; border-radius:14px; background:#2E4057; display:flex; align-items:center; justify-content:center; font-size:26px; color:#fff; margin:0 auto 1rem; }
+.login-title { font-size:18px; font-weight:700; color:#2E4057; text-align:center; margin-bottom:4px; }
+.login-sub { font-size:12px; color:#888; text-align:center; margin-bottom:1.5rem; line-height:1.7; }
+.login-label { font-size:12px; font-weight:500; color:#555; margin-bottom:4px; display:block; }
+.login-input { width:100%; padding:10px 14px; border:1px solid #D3D1C7; border-radius:8px; font-size:14px; margin-bottom:12px; outline:none; }
+.login-input:focus { border-color:#2E4057; }
+.login-btn { width:100%; padding:12px; background:#2E4057; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; }
+.login-motto { margin-top:1.25rem; background:#F0F4F8; border-radius:10px; padding:12px 14px; font-size:12px; color:#2E4057; line-height:1.9; text-align:center; border-left:3px solid #2E4057; }
 
-// ── 受信（受講生からのデータ保存）──────────────────────────────
-function doPost(e) {
-  try {
-    const data = JSON.parse(e.postData.contents);
-    const ss   = SpreadsheetApp.getActiveSpreadsheet();
+/* ─── ヘッダー ─── */
+#mainScreen { display:none; min-height:100vh; }
+.header { background:#2E4057; padding:0 1.25rem; display:flex; align-items:center; justify-content:space-between; height:54px; }
+.header-title { font-size:14px; font-weight:700; color:#fff; }
+.header-right { display:flex; align-items:center; gap:8px; }
+.header-name { font-size:12px; color:rgba(255,255,255,0.8); }
+.logout-btn { font-size:12px; color:rgba(255,255,255,0.7); background:none; border:1px solid rgba(255,255,255,0.3); border-radius:99px; padding:4px 10px; cursor:pointer; }
 
-    // learning / learning2 / learning3 すべて対応
-    if (data.type === 'learning' || data.type === 'learning2' || data.type === 'learning3') {
-      saveLearningData(ss, data);
-    }
+.main { max-width:880px; margin:0 auto; padding:1.25rem 1rem 3rem; }
 
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: 'ok' }))
-      .setMimeType(ContentService.MimeType.JSON);
+/* ─── カウントダウンバナー ─── */
+.countdown-wrap { display:flex; gap:8px; margin-bottom:1rem; overflow-x:auto; padding-bottom:4px; }
+.cd-card { border-radius:10px; padding:10px 14px; flex-shrink:0; border:1px solid; min-width:140px; }
+.cd-card.urgent  { background:#FCEBEB; border-color:#F09595; }
+.cd-card.soon    { background:#FEF3E2; border-color:#FAC775; }
+.cd-card.future  { background:#EAF3DE; border-color:#A0CC70; }
+.cd-subject { font-size:10px; font-weight:500; margin-bottom:2px; }
+.cd-card.urgent .cd-subject  { color:#791F1F; }
+.cd-card.soon   .cd-subject  { color:#633806; }
+.cd-card.future .cd-subject  { color:#27500A; }
+.cd-days { font-size:20px; font-weight:700; }
+.cd-card.urgent .cd-days { color:#A32D2D; }
+.cd-card.soon   .cd-days { color:#BA7517; }
+.cd-card.future .cd-days { color:#3B6D11; }
+.cd-label { font-size:10px; color:#888; }
+.cd-date  { font-size:10px; font-weight:500; }
+.cd-card.urgent .cd-date { color:#A32D2D; }
+.cd-card.soon   .cd-date { color:#BA7517; }
+.cd-card.future .cd-date { color:#3B6D11; }
 
-  } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: 'error', message: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
+/* ─── 今週バナー ─── */
+.thisweek-banner { background:#2E4057; color:#fff; border-radius:10px; padding:10px 16px; margin-bottom:1rem; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px; }
+.tw-label { font-size:11px; opacity:0.7; }
+.tw-subjects { display:flex; gap:6px; flex-wrap:wrap; }
+.tw-tag { font-size:11px; font-weight:500; padding:3px 10px; border-radius:99px; background:rgba(255,255,255,0.15); }
+
+/* ─── タブ ─── */
+.tabs { display:flex; gap:4px; margin-bottom:1.25rem; flex-wrap:wrap; }
+.tab { font-size:12px; font-weight:500; padding:7px 14px; border-radius:99px; border:1px solid #D3D1C7; background:transparent; color:#888; cursor:pointer; }
+.tab.active { background:#2E4057; color:#fff; border-color:#2E4057; }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* ─── カード ─── */
+.card { background:#fff; border-radius:12px; border:1px solid #E0DED6; padding:1.25rem 1.5rem; margin-bottom:1rem; }
+.card-title { font-size:14px; font-weight:700; color:#2E4057; margin-bottom:1rem; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+
+/* ─── 成長タイムライン ─── */
+.timeline { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:1rem; }
+.tl-card { border-radius:10px; padding:12px 10px; text-align:center; border:1px solid; }
+.tl-1w { background:#F0F4F8; border-color:#B5D4F4; }
+.tl-1m { background:#EAF3DE; border-color:#A0CC70; }
+.tl-3m { background:#EEEDFE; border-color:#CECBF6; }
+.tl-5m { background:#FEF3E2; border-color:#FAC775; }
+.tl-label { font-size:10px; font-weight:500; margin-bottom:4px; }
+.tl-1w .tl-label { color:#185FA5; }
+.tl-1m .tl-label { color:#27500A; }
+.tl-3m .tl-label { color:#3C3489; }
+.tl-5m .tl-label { color:#633806; }
+.tl-num { font-size:22px; font-weight:700; }
+.tl-1w .tl-num { color:#0C447C; }
+.tl-1m .tl-num { color:#3B6D11; }
+.tl-3m .tl-num { color:#534AB7; }
+.tl-5m .tl-num { color:#BA7517; }
+.tl-unit { font-size:10px; color:#888; }
+
+/* ─── 合格予測ゲージ ─── */
+.cert-gauges { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+.cg { border:1px solid #E0DED6; border-radius:10px; padding:12px; background:#fff; }
+.cg-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.cg-name { font-size:12px; font-weight:500; color:#2E4057; }
+.cg-pct  { font-size:14px; font-weight:700; }
+.cg-date { font-size:10px; color:#888; margin-bottom:6px; }
+.cg-bar-bg { background:#E0DED6; border-radius:99px; height:10px; overflow:hidden; margin-bottom:4px; }
+.cg-bar { height:100%; border-radius:99px; transition:width 0.5s; }
+.cg-msg { font-size:10px; line-height:1.6; }
+.cg-levels { display:flex; gap:4px; margin-top:4px; flex-wrap:wrap; }
+.cg-lv { font-size:9px; padding:1px 7px; border-radius:99px; }
+
+/* ─── スキルリスト ─── */
+.subject-tabs { display:flex; gap:4px; margin-bottom:1rem; flex-wrap:wrap; }
+.subject-tab { font-size:11px; font-weight:500; padding:5px 12px; border-radius:99px; border:1px solid #D3D1C7; background:transparent; color:#888; cursor:pointer; }
+.subject-tab.active   { background:#2E4057; color:#fff; border-color:#2E4057; }
+.subject-tab.thisweek { border-color:#BA7517; color:#633806; background:#FEF3E2; }
+.subject-tab.thisweek.active { background:#2E4057; color:#fff; border-color:#2E4057; }
+
+.skill-group { margin-bottom:1rem; }
+.skill-group-head { display:flex; align-items:center; gap:8px; padding:8px 12px; background:#F5F5F2; border-radius:8px 8px 0 0; cursor:pointer; border:1px solid #E0DED6; }
+.skill-group-name { font-size:13px; font-weight:600; color:#2E4057; flex:1; }
+.skill-group-prog { font-size:11px; color:#888; }
+.skill-group-arrow { font-size:11px; color:#888; transition:transform 0.15s; }
+.skill-items { border:1px solid #E0DED6; border-top:none; border-radius:0 0 8px 8px; }
+.skill-item { padding:10px 12px; border-bottom:1px solid #F0EEE8; background:#fff; }
+.skill-item:last-child { border-bottom:none; border-radius:0 0 8px 8px; }
+.skill-item-head { display:flex; align-items:flex-start; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
+.skill-item-name { font-size:12px; color:#2C2C2A; flex:1; min-width:0; line-height:1.5; }
+.skill-date { font-size:10px; color:#27500A; background:#EAF3DE; padding:1px 7px; border-radius:99px; }
+.lv-badge { font-size:10px; font-weight:500; padding:2px 8px; border-radius:99px; white-space:nowrap; flex-shrink:0; }
+.lv0 { background:#F1EFE8; color:#5F5E5A; }
+.lv1 { background:#E6F1FB; color:#0C447C; }
+.lv2 { background:#FAEEDA; color:#633806; }
+.lv3 { background:#EAF3DE; color:#27500A; }
+.cert-tags { display:flex; gap:3px; flex-wrap:wrap; }
+.cert-tag { font-size:9px; padding:1px 5px; border-radius:99px; background:#F1EFE8; color:#5F5E5A; }
+.lv-btns { display:flex; gap:4px; flex-wrap:wrap; }
+.lv-btn { font-size:11px; padding:5px 10px; border-radius:99px; border:1.5px solid #D3D1C7; color:#aaa; cursor:pointer; background:#fff; transition:all 0.1s; font-family:inherit; min-width:34px; }
+.lv-btn:not(.active):hover { border-color:#888; color:#555; }
+.lv-btn-0 { border-color:#D3D1C7; color:#aaa; }
+.lv-btn-0.active { background:#888; color:#fff; border-color:#888; font-weight:700; }
+.lv-btn-1 { border-color:#D3D1C7; color:#aaa; }
+.lv-btn-1.active { background:#378ADD; color:#fff; border-color:#378ADD; font-weight:700; }
+.lv-btn-2 { border-color:#D3D1C7; color:#aaa; }
+.lv-btn-2.active { background:#BA7517; color:#fff; border-color:#BA7517; font-weight:700; }
+.lv-btn-3 { border-color:#D3D1C7; color:#aaa; }
+.lv-btn-3.active { background:#3B6D11; color:#fff; border-color:#3B6D11; font-weight:700; }
+
+/* ─── 週次進捗バー ─── */
+.week-prog { margin-bottom:10px; }
+.week-prog-head { display:flex; justify-content:space-between; margin-bottom:4px; }
+.week-prog-label { font-size:12px; color:#555; }
+.week-prog-pct   { font-size:12px; font-weight:700; color:#2E4057; }
+.week-prog-bar   { background:#E0DED6; border-radius:99px; height:8px; position:relative; overflow:hidden; }
+.prog-fill-mid   { height:100%; border-radius:99px; background:#FAEEDA; position:absolute; top:0; left:0; }
+.prog-fill-done  { height:100%; border-radius:99px; background:#2E4057; position:absolute; top:0; left:0; }
+
+/* ─── 月次レポート ─── */
+.report-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:1rem; }
+.rg-card { border:1px solid #E0DED6; border-radius:10px; padding:12px; text-align:center; background:#F9F9F6; }
+.rg-num   { font-size:24px; font-weight:700; color:#2E4057; }
+.rg-label { font-size:11px; color:#888; margin-top:2px; }
+.comment-box { background:#F5F5F2; border-radius:8px; padding:14px; font-size:13px; color:#2C2C2A; line-height:1.9; border-left:3px solid #2E4057; }
+/* ─── 達成バッジポップアップ ─── */
+.badge-popup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.8); background:#2E4057; color:#fff; border-radius:16px; padding:24px 32px; text-align:center; z-index:9999; opacity:0; transition:all 0.3s; pointer-events:none; min-width:260px; box-shadow:0 8px 32px rgba(0,0,0,0.25); }
+.badge-popup.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
+.badge-popup-icon { font-size:48px; margin-bottom:8px; }
+.badge-popup-title { font-size:18px; font-weight:700; margin-bottom:4px; }
+.badge-popup-sub { font-size:13px; opacity:.8; }
+.badge-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.3); z-index:9998; opacity:0; transition:opacity 0.3s; pointer-events:none; }
+.badge-overlay.show { opacity:1; }
+
+/* ─── 科目習熟度レベルバッジ ─── */
+.subject-level-badge { font-size:10px; font-weight:600; padding:3px 10px; border-radius:99px; white-space:nowrap; flex-shrink:0; }
+.slv-0 { background:#F1EFE8; color:#888; }
+.slv-1 { background:#FEF3E2; color:#633806; }
+.slv-2 { background:#E6F1FB; color:#0C447C; }
+.slv-3 { background:#EEEDFE; color:#3C3489; }
+.slv-4 { background:#EAF3DE; color:#27500A; }
+
+/* ─── 全科目一覧 ─── */
+.all-subject-section { margin-bottom:1rem; }
+.all-subject-head { display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:10px 10px 0 0; cursor:pointer; border:1px solid; }
+.all-subject-head-left { display:flex; align-items:center; gap:8px; flex:1; }
+.all-subject-icon { font-size:22px; }
+.all-subject-name { font-size:14px; font-weight:700; }
+.all-subject-stats { font-size:11px; opacity:.85; }
+.all-subject-cert-tags { display:flex; gap:4px; flex-wrap:wrap; }
+.all-cert-tag { font-size:9px; padding:2px 7px; border-radius:99px; opacity:.9; }
+.all-subject-arrow { font-size:12px; transition:transform .15s; }
+.all-subject-arrow.open { transform:rotate(90deg); }
+.all-subject-body { border:1px solid; border-top:none; border-radius:0 0 10px 10px; overflow:hidden; }
+
+.all-lv-filter { display:flex; gap:4px; padding:8px 12px; background:rgba(0,0,0,0.04); flex-wrap:wrap; align-items:center; border-bottom:1px solid rgba(0,0,0,0.06); }
+.all-lv-filter-label { font-size:10px; font-weight:500; opacity:.7; }
+.alf-btn { font-size:10px; padding:3px 10px; border-radius:99px; border:1px solid; cursor:pointer; font-family:inherit; background:transparent; }
+
+.all-step-head { font-size:11px; font-weight:600; padding:6px 14px; background:rgba(0,0,0,0.03); border-bottom:1px solid rgba(0,0,0,0.05); letter-spacing:.04em; }
+.all-item { display:flex; align-items:flex-start; gap:8px; padding:9px 12px; border-bottom:1px solid rgba(0,0,0,0.05); background:#fff; }
+.all-item:last-child { border-bottom:none; }
+.all-item-left { flex:1; min-width:0; }
+.all-item-name { font-size:12px; color:#2C2C2A; line-height:1.5; }
+.all-item-tags { display:flex; gap:3px; flex-wrap:wrap; margin-top:3px; }
+.all-tag { font-size:9px; padding:1px 5px; border-radius:99px; background:#F1EFE8; color:#5F5E5A; }
+.all-date { font-size:10px; color:#27500A; }
+.all-lv-btns { display:flex; gap:3px; flex-shrink:0; }
+.all-lv-btn { font-size:11px; padding:5px 10px; border-radius:99px; border:1.5px solid #D3D1C7; color:#aaa; cursor:pointer; background:#fff; font-family:inherit; white-space:nowrap; min-width:34px; transition:all 0.1s; }
+.all-lv-btn:not(.active):hover { border-color:#888; color:#555; }
+.alb0.active { background:#888; color:#fff; border-color:#888; font-weight:700; }
+.alb1.active { background:#378ADD; color:#fff; border-color:#378ADD; font-weight:700; }
+.alb2.active { background:#BA7517; color:#fff; border-color:#BA7517; font-weight:700; }
+.alb3.active { background:#3B6D11; color:#fff; border-color:#3B6D11; font-weight:700; }
+
+/* ─── 検定ダッシュボード ─── */
+.cert-db-tabs { display:flex; gap:4px; margin-bottom:1rem; flex-wrap:wrap; }
+.cdt { font-size:11px; font-weight:500; padding:5px 12px; border-radius:99px; border:1px solid #D3D1C7; background:transparent; color:#888; cursor:pointer; }
+.cdt.active { background:#2E4057; color:#fff; border-color:#2E4057; }
+.cdb-panel { display:none; }
+.cdb-panel.active { display:block; }
+.cdb-card { background:#fff; border-radius:12px; border:1px solid #E0DED6; overflow:hidden; margin-bottom:1rem; }
+.cdb-head { padding:14px 18px; display:flex; align-items:center; gap:12px; }
+.cdb-icon { font-size:28px; }
+.cdb-name { font-size:15px; font-weight:700; }
+.cdb-org  { font-size:11px; margin-top:2px; }
+.cdb-body { padding:0 16px 16px; }
+.cdb-lv-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0; }
+.cdb-lv { border-radius:10px; padding:12px 14px; border:1px solid; }
+.cdb-lv-name { font-size:12px; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.cdb-lv-badge { font-size:10px; padding:2px 8px; border-radius:99px; }
+.cdb-row { display:flex; gap:6px; margin-bottom:5px; font-size:12px; }
+.cdb-label { color:#888; flex-shrink:0; width:68px; }
+.cdb-val { color:#2C2C2A; font-weight:500; flex:1; line-height:1.5; }
+.cdb-bar-wrap { margin-top:8px; }
+.cdb-bar-lbl { display:flex; justify-content:space-between; font-size:11px; color:#888; margin-bottom:3px; }
+.cdb-bar-bg { background:#E0DED6; border-radius:99px; height:6px; overflow:hidden; }
+.cdb-bar-fill { height:100%; border-radius:99px; }
+.cdb-tips { background:#F5F5F2; border-radius:8px; padding:10px 14px; margin-top:4px; }
+.cdb-tips-title { font-size:12px; font-weight:600; color:#2E4057; margin-bottom:6px; }
+.cdb-tip { display:flex; gap:7px; margin-bottom:4px; font-size:12px; line-height:1.6; }
+.cdb-tip-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+.cdb-links { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+.cdb-link { font-size:11px; padding:5px 12px; border-radius:99px; border:1px solid #D3D1C7; color:#555; text-decoration:none; background:#F5F5F2; }
+@media(max-width:480px){ .cdb-lv-grid{grid-template-columns:1fr;} }
+
+.motto-bar { background:#F0F4F8; border-radius:8px; padding:10px 14px; font-size:12px; color:#2E4057; line-height:1.7; margin-bottom:1rem; border-left:3px solid #2E4057; }
+
+@media (max-width:520px) {
+  .timeline { grid-template-columns:repeat(2,1fr); }
+  .cert-gauges { grid-template-columns:1fr; }
+  .report-grid { grid-template-columns:1fr; }
+}
+/* ─── 検定バナー ─── */
+.cert-banner { border-radius:12px; padding:14px 16px; margin-bottom:10px; border:1px solid; }
+.cert-banner-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.cert-banner-icon { font-size:22px; }
+.cert-banner-name { font-size:13px; font-weight:700; flex:1; }
+.cert-banner-date { font-size:11px; padding:3px 10px; border-radius:99px; font-weight:500; }
+.cert-banner-days { font-size:22px; font-weight:700; }
+.cert-banner-days-unit { font-size:12px; }
+.cert-gauge-wrap { margin-top:6px; }
+.cert-gauge-labels { display:flex; justify-content:space-between; margin-bottom:3px; font-size:11px; }
+.cert-gauge-bg { height:12px; border-radius:99px; overflow:hidden; background:#E0DED6; }
+.cert-gauge-fill { height:100%; border-radius:99px; transition:width 0.5s; }
+.cert-gauge-msg { font-size:11px; margin-top:5px; font-weight:500; }
+.cert-levels-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.cert-level-item { font-size:11px; padding:3px 10px; border-radius:99px; border:1px solid; }
+
+/* ─── 科目選択ボタン ─── */
+.subject-btn-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:8px; }
+.subject-btn { border-radius:12px; padding:14px 12px; text-align:center; cursor:pointer; border:2px solid; transition:all 0.15s; background:#fff; font-family:inherit; }
+.subject-btn .sb-icon { font-size:24px; margin-bottom:6px; display:block; }
+.subject-btn .sb-name { font-size:13px; font-weight:600; display:block; margin-bottom:4px; }
+.subject-btn .sb-prog { font-size:11px; display:block; }
+.subject-btn .sb-exam { font-size:10px; margin-top:4px; display:block; }
+.subject-btn.thisweek { border-width:2px; }
+.subject-btn.selected { color:#fff !important; }
+.subject-btn.selected .sb-prog { color:rgba(255,255,255,0.8) !important; }
+.subject-btn.selected .sb-exam { color:rgba(255,255,255,0.7) !important; }
+
+/* ─── ダッシュボード内スキルエリア ─── */
+.dash-skill-card { background:#fff; border-radius:12px; border:1px solid #E0DED6; margin-bottom:1rem; overflow:hidden; }
+.dash-skill-head { padding:12px 16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.dash-skill-title { font-size:14px; font-weight:700; flex:1; }
+.dash-skill-close { font-size:12px; padding:4px 12px; border:1px solid; border-radius:99px; cursor:pointer; background:transparent; font-family:inherit; }
+.dash-skill-body { padding:0 12px 12px; }
+.dash-step-label { font-size:11px; font-weight:600; color:#888; padding:8px 4px 4px; letter-spacing:0.05em; }
+.dash-item { display:flex; align-items:flex-start; gap:8px; padding:8px 10px; border-radius:8px; border:1px solid #E0DED6; margin-bottom:4px; background:#fff; }
+.dash-item-left { display:flex; flex-direction:column; gap:4px; flex:1; min-width:0; }
+.dash-item-name { font-size:12px; color:#2C2C2A; line-height:1.5; }
+.dash-item-certs { display:flex; gap:3px; flex-wrap:wrap; }
+.dash-cert { font-size:9px; padding:1px 5px; border-radius:99px; background:#F1EFE8; color:#5F5E5A; }
+.dash-lv-btns { display:flex; gap:3px; flex-wrap:wrap; flex-shrink:0; }
+.dash-lv-btn { font-size:10px; padding:3px 8px; border-radius:99px; border:1px solid; cursor:pointer; background:transparent; font-family:inherit; white-space:nowrap; }
+.dlb0 { border-color:#D3D1C7; color:#888; }
+.dlb0.active { background:#F1EFE8; color:#5F5E5A; border-color:#B4B2A9; }
+.dlb1 { border-color:#B5D4F4; color:#185FA5; }
+.dlb1.active { background:#E6F1FB; color:#0C447C; border-color:#378ADD; }
+.dlb2 { border-color:#FAC775; color:#854F0B; }
+.dlb2.active { background:#FAEEDA; color:#633806; border-color:#EF9F27; }
+.dlb3 { border-color:#A0CC70; color:#3B6D11; }
+.dlb3.active { background:#EAF3DE; color:#27500A; border-color:#639922; }
+.lv-hint { font-size:11px; color:#888; margin-bottom:8px; padding:6px 8px; background:#F9F9F6; border-radius:6px; }
+
+@media (max-width:400px) {
+  .subject-btn-grid { grid-template-columns:repeat(2,1fr); }
+}
+
+@media print {
+  .tabs,.header,.logout-btn { display:none!important; }
+  .tab-panel { display:block!important; }
+}
+</style>
+</head>
+<body>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwK5tTUHTPLmGR_zjDpcexVUmqF5j-qfTb9HzE9EHkVJRIcHXnx67NyDVSvabTnzt9S/exec';
+
+// ════════════════════════════════════════════════
+//  訓練スケジュール定義（令和8年度）
+// ════════════════════════════════════════════════
+const TRAIN_START = new Date('2026-04-07'); // 令和8年4月7日
+
+// 各科目の授業期間（週番号で定義、1始まり）
+const SUBJECT_WEEKS = {
+  word:    { start:1,  end:9  },
+  excel:   { start:9,  end:18 },
+  pp:      { start:17, end:18 },
+  illust:  { start:2,  end:20 }, // W2-7, W10-12 ※全期間で対応
+  photo:   { start:7,  end:20 }, // W7-14, W18-19
+  web:     { start:14, end:20 },
+  manner:  { start:1,  end:20 },
+};
+
+// 検定試験日程（実際のスケジュールから）
+const EXAMS = [
+  // Word
+  { subject:'word',   name:'Word 2・3級',       dates:['2026-05-07','2026-05-28','2026-06-04','2026-06-18','2026-06-25','2026-07-09','2026-07-30','2026-08-20'] },
+  // Excel
+  { subject:'excel',  name:'Excel 2・3級',       dates:['2026-06-04','2026-06-18','2026-06-25','2026-07-09','2026-07-30','2026-08-20'] },
+  // Illustrator
+  { subject:'illust', name:'Illustratorクリエイター', dates:['2026-05-01','2026-05-14','2026-05-21','2026-06-04','2026-07-09','2026-07-30','2026-08-27'] },
+  // Photoshop
+  { subject:'photo',  name:'Photoshopクリエイター',  dates:['2026-06-18','2026-07-09','2026-07-30','2026-08-27'] },
+  // Web
+  { subject:'web',    name:'Webクリエイター',         dates:['2026-08-06','2026-08-20','2026-08-27'] },
+];
+
+// ────── スキル定義 ──────────────────────────────
+const SKILLS = {
+  word: [
+    // ── 作業環境（3級・2級共通） ──
+    { id:'w01',week:1,step:'作業環境・基礎知識',name:'Wordの画面要素の名称と役割（ドキュメント・文書／スクロールバー／ステータスバー／クイックアクセスツールバー／リボン）',cert:['3級','2級'] },
+    { id:'w02',week:1,step:'作業環境・基礎知識',name:'各タブ（ファイル・ホーム・挿入・デザイン・レイアウト・参考資料・差し込み文書・校閲・表示）の役割',cert:['3級','2級'] },
+    { id:'w03',week:1,step:'作業環境・基礎知識',name:'文書の表示形式：印刷レイアウト、閲覧モード、Webレイアウト、アウトライン、下書き',cert:['3級','2級'] },
+    { id:'w04',week:1,step:'作業環境・基礎知識',name:'表示/非表示：ルーラー、グリッド線、ナビゲーションウィンドウ',cert:['3級','2級'] },
+    { id:'w05',week:1,step:'作業環境・基礎知識',name:'ズーム（拡大・縮小）ができる',cert:['3級','2級'] },
+    { id:'w06',week:1,step:'作業環境・基礎知識',name:'ウィンドウ：新しいウィンドウを開く、整列、分割、ウィンドウの切り替え',cert:['2級'] },
+    { id:'w07',week:1,step:'作業環境・基礎知識',name:'Wordのオプション：基本設定、表示、文章校正（オートコレクト機能含む）、文字体裁、詳細設定',cert:['2級'] },
+    { id:'w08',week:1,step:'作業環境・基礎知識',name:'リボンのユーザー設定、クイックアクセスツールバーのカスタマイズ',cert:['2級'] },
+    // ── 文字書式（3級・2級） ──
+    { id:'w09',week:2,step:'文字書式',name:'フォントの種類とサイズ：日本語用のフォント、英数字用のフォント、フォントサイズ',cert:['3級','2級'] },
+    { id:'w10',week:2,step:'文字書式',name:'スタイル：太字、斜体',cert:['3級','2級'] },
+    { id:'w11',week:2,step:'文字書式',name:'フォントの色',cert:['3級','2級'] },
+    { id:'w12',week:2,step:'文字書式',name:'下線',cert:['3級','2級'] },
+    { id:'w13',week:2,step:'文字書式',name:'文字の効果：文字の効果の設定、文字の塗りつぶし、文字の輪郭、影、反射、光彩、ぼかし、3-D書式',cert:['3級','2級'] },
+    { id:'w14',week:2,step:'文字書式',name:'文字飾り：取り消し線、二重取り消し線、隠し文字、上付き、下付き、小型英大文字、すべて大文字',cert:['2級'] },
+    { id:'w15',week:2,step:'文字書式',name:'文字幅と間隔：倍率、文字間隔、位置、カーニング',cert:['2級'] },
+    { id:'w16',week:2,step:'文字書式',name:'拡張書式：ルビ、囲い文字、縦中横、組み文字、割注、文字の均等割り付け',cert:['2級'] },
+    { id:'w17',week:2,step:'文字書式',name:'書式のコピー/貼り付け、書式のクリア',cert:['3級','2級'] },
+    // ── 段落書式（3級・2級） ──
+    { id:'w18',week:3,step:'段落書式',name:'配置：左揃え、中央揃え、右揃え、両端揃え、均等割り付け',cert:['3級','2級'] },
+    { id:'w19',week:3,step:'段落書式',name:'インデント：左右のインデント、字下げ、ぶら下げ',cert:['3級','2級'] },
+    { id:'w20',week:3,step:'段落書式',name:'間隔：段落前後の間隔、行間',cert:['3級','2級'] },
+    { id:'w21',week:3,step:'段落書式',name:'体裁：改行時の処理、文字幅と間隔',cert:['3級','2級'] },
+    { id:'w22',week:3,step:'段落書式',name:'タブとリーダー',cert:['2級'] },
+    { id:'w23',week:3,step:'段落書式',name:'段組みの設定と解除：種類、段数、段の幅と間隔、設定対象',cert:['2級'] },
+    { id:'w24',week:3,step:'段落書式',name:'箇条書き',cert:['3級','2級'] },
+    { id:'w25',week:3,step:'段落書式',name:'段落番号',cert:['3級','2級'] },
+    // ── ファイル・印刷（3級・2級） ──
+    { id:'w26',week:2,step:'ファイル・印刷',name:'新規作成、開く、閉じる、上書き保存、名前を付けて保存',cert:['3級','2級'] },
+    { id:'w27',week:2,step:'ファイル・印刷',name:'Word文書（*.docx）、Word97-2003文書（*.doc）で保存できる',cert:['3級','2級'] },
+    { id:'w28',week:2,step:'ファイル・印刷',name:'PDF（*.pdf）、Webページ（*.htm）、リッチテキスト形式（*.rtf）、書式なし（*.txt）で保存できる',cert:['2級'] },
+    { id:'w29',week:2,step:'ファイル・印刷',name:'印刷設定、印刷プレビュー',cert:['3級','2級'] },
+    // ── ページ設定・デザイン（3級・2級） ──
+    { id:'w30',week:2,step:'ページ設定・デザイン',name:'ページ設定：用紙サイズ、余白、文字数と行数、印刷の向き、ヘッダーとフッターの用紙の端からの距離',cert:['3級','2級'] },
+    { id:'w31',week:2,step:'ページ設定・デザイン',name:'ヘッダー、フッター、ページ番号',cert:['3級','2級'] },
+    { id:'w32',week:4,step:'ページ設定・デザイン',name:'テーマ：テーマ、配色、フォント、効果',cert:['2級'] },
+    { id:'w33',week:4,step:'ページ設定・デザイン',name:'ページの背景：透かし、ページの色、ページ罫線',cert:['3級','2級'] },
+    // ── 文書編集（3級・2級） ──
+    { id:'w34',week:2,step:'文書編集',name:'選択と解除：文字、行、段落、文書全体の選択',cert:['3級','2級'] },
+    { id:'w35',week:2,step:'文書編集',name:'キー操作：Enter、Delete、BackSpaceの役割、Ctrl、Alt、Shiftの基本的な役割',cert:['3級','2級'] },
+    { id:'w36',week:2,step:'文書編集',name:'文字列の削除、切り取り、コピー、貼り付け、挿入',cert:['3級','2級'] },
+    { id:'w37',week:2,step:'文書編集',name:'元に戻す、やり直し、繰り返し',cert:['3級','2級'] },
+    { id:'w38',week:3,step:'文書編集',name:'検索、置換、ジャンプ',cert:['2級'] },
+    { id:'w39',week:3,step:'文書編集',name:'改ページの挿入と削除、セクション区切り',cert:['2級'] },
+    { id:'w40',week:3,step:'文書編集',name:'ページ区切り：段区切り、文字列の折り返し',cert:['2級'] },
+    { id:'w41',week:4,step:'文書編集',name:'スペルチェックと文章校正、文字カウント、スマート検索、表記ゆれチェック',cert:['2級'] },
+    { id:'w42',week:4,step:'文書編集',name:'スタイルの作成と変更、スタイルの適用',cert:['2級'] },
+    // ── 罫線と表（3級・2級） ──
+    { id:'w43',week:3,step:'罫線と表',name:'表の作成（マス目指定・数値指定）、文字列を表にする、表の解除',cert:['3級','2級'] },
+    { id:'w44',week:3,step:'罫線と表',name:'表のデザイン：セルの塗りつぶし、罫線のスタイル・ペンの色・太さ',cert:['3級','2級'] },
+    { id:'w45',week:3,step:'罫線と表',name:'表のレイアウト：罫線を引く・削除、行・列の挿入',cert:['3級','2級'] },
+    { id:'w46',week:3,step:'罫線と表',name:'行の高さ、列の幅、セルのサイズ調整',cert:['3級','2級'] },
+    { id:'w47',week:3,step:'罫線と表',name:'セルの結合/分割',cert:['3級','2級'] },
+    { id:'w48',week:3,step:'罫線と表',name:'セル内の文字列の配置、文字の方向',cert:['3級','2級'] },
+    { id:'w49',week:3,step:'罫線と表',name:'表のスタイル：クイックスタイルからの設定',cert:['3級','2級'] },
+    { id:'w50',week:4,step:'罫線と表',name:'表の配置と文字列の折り返し、表のオプション',cert:['2級'] },
+    { id:'w51',week:4,step:'罫線と表',name:'表内で計算式（MAX、MIN、AVERAGE、SUM）を使う',cert:['2級'] },
+    // ── オブジェクト（3級・2級） ──
+    { id:'w52',week:5,step:'オブジェクト（図形・画像）',name:'図形の作成：最近使用した図形、線、四角形、基本図形、ブロック矢印、フローチャート、吹き出し等',cert:['3級','2級'] },
+    { id:'w53',week:5,step:'オブジェクト（図形・画像）',name:'テキストボックス：横書きテキストボックス、縦書きテキストボックス',cert:['3級','2級'] },
+    { id:'w54',week:5,step:'オブジェクト（図形・画像）',name:'図形のスタイル：クイックスタイル、図形の塗りつぶし、図形の枠線、図形の効果',cert:['3級','2級'] },
+    { id:'w55',week:5,step:'オブジェクト（図形・画像）',name:'図形のサイズ変更・移動、数値を指定したサイズ変更、回転/反転',cert:['3級','2級'] },
+    { id:'w56',week:5,step:'オブジェクト（図形・画像）',name:'前面へ移動/背面へ移動、配置/整列',cert:['3級','2級'] },
+    { id:'w57',week:5,step:'オブジェクト（図形・画像）',name:'グループ化、グループ解除、再グループ化',cert:['3級','2級'] },
+    { id:'w58',week:5,step:'オブジェクト（図形・画像）',name:'図形の変更、頂点の編集（2級）',cert:['2級'] },
+    { id:'w59',week:5,step:'オブジェクト（図形・画像）',name:'画像の挿入、文字列の折り返しの設定、位置',cert:['3級','2級'] },
+    { id:'w60',week:5,step:'オブジェクト（図形・画像）',name:'図のスタイル：クイックスタイル、図の枠線、図の効果',cert:['3級','2級'] },
+    { id:'w61',week:5,step:'オブジェクト（図形・画像）',name:'修整、色、アート効果、図の圧縮、図の変更、図のリセット',cert:['2級'] },
+    { id:'w62',week:5,step:'オブジェクト（図形・画像）',name:'サイズ変更（図のトリミングを含む）',cert:['3級','2級'] },
+    { id:'w63',week:5,step:'オブジェクト（図形・画像）',name:'ワードアートの挿入とスタイル変更',cert:['2級'] },
+    { id:'w64',week:5,step:'オブジェクト（図形・画像）',name:'オブジェクトの選択（3級）・表示/非表示（2級）',cert:['3級','2級'] },
+    { id:'w65',week:5,step:'オブジェクト（図形・画像）',name:'Excelワークシートの挿入、Excelの表・グラフの貼り付け',cert:['2級'] },
+  ],
+    excel: [
+    // ── Excel基本操作 ──────────────────────────────────────
+    { id:'e001',week:9, step:'Excel基本操作',name:'Excelの起動ができる',cert:['3級','2級'] },
+    { id:'e002',week:9, step:'Excel基本操作',name:'Excelの画面構成がわかる',cert:['3級','2級'] },
+    { id:'e003',week:9, step:'Excel基本操作',name:'文字の入力ができる',cert:['3級','2級'] },
+    { id:'e004',week:9, step:'Excel基本操作',name:'数字の入力ができる',cert:['3級','2級'] },
+    { id:'e005',week:9, step:'Excel基本操作',name:'SUM関数が使える',cert:['3級','2級'] },
+    { id:'e006',week:9, step:'Excel基本操作',name:'オートフィルができる',cert:['3級','2級'] },
+    { id:'e007',week:9, step:'Excel基本操作',name:'練習1',cert:[] },
+    { id:'e008',week:9, step:'Excel基本操作',name:'四則演算ができる',cert:['3級','2級'] },
+    { id:'e009',week:9, step:'Excel基本操作',name:'再計算機能が使える',cert:['3級','2級'] },
+    { id:'e010',week:9, step:'Excel基本操作',name:'印刷イメージの確認ができる',cert:['3級','2級'] },
+    { id:'e011',week:9, step:'Excel基本操作',name:'ページ設定ができる',cert:['3級','2級'] },
+    { id:'e012',week:9, step:'Excel基本操作',name:'名前を付けて保存ができる',cert:['3級','2級'] },
+    { id:'e013',week:9, step:'Excel基本操作',name:'上書き保存ができる',cert:['3級','2級'] },
+    { id:'e014',week:9, step:'Excel基本操作',name:'ブックを開くことができる',cert:['3級','2級'] },
+    { id:'e015',week:9, step:'Excel基本操作',name:'新しいブックを作成できる',cert:['3級','2級'] },
+    { id:'e016',week:9, step:'Excel基本操作',name:'練習問題1',cert:[] },
+    { id:'e017',week:9, step:'Excel基本操作',name:'練習問題2',cert:[] },
+    { id:'e018',week:9, step:'Excel基本操作',name:'練習問題3',cert:[] },
+    { id:'e019',week:9, step:'Excel基本操作',name:'練習問題4',cert:[] },
+    { id:'e020',week:9, step:'Excel基本操作',name:'練習問題5',cert:[] },
+    // ── 行・列・書式設定 ──────────────────────────────────
+    { id:'e021',week:9, step:'行・列操作',name:'行の挿入ができる',cert:['3級','2級'] },
+    { id:'e022',week:9, step:'行・列操作',name:'行の削除ができる',cert:['3級','2級'] },
+    { id:'e023',week:9, step:'行・列操作',name:'列の挿入ができる',cert:['3級','2級'] },
+    { id:'e024',week:9, step:'行・列操作',name:'列の削除ができる',cert:['3級','2級'] },
+    { id:'e025',week:9, step:'行・列操作',name:'練習2',cert:[] },
+    { id:'e026',week:9, step:'行・列操作',name:'割合を求めることができる',cert:['3級','2級'] },
+    { id:'e027',week:9, step:'行・列操作',name:'AVERAGE関数が使える',cert:['3級','2級'] },
+    { id:'e028',week:9, step:'行・列操作',name:'MAX・MIN関数が使える',cert:['3級','2級'] },
+    { id:'e029',week:9, step:'行・列操作',name:'練習3',cert:[] },
+    // ── 書式設定 ──────────────────────────────────────────
+    { id:'e030',week:9, step:'書式設定',name:'桁区切りスタイルが設定できる',cert:['3級','2級'] },
+    { id:'e031',week:9, step:'書式設定',name:'通貨表示形式が設定できる',cert:['3級','2級'] },
+    { id:'e032',week:9, step:'書式設定',name:'パーセントスタイルが設定できる',cert:['3級','2級'] },
+    { id:'e033',week:9, step:'書式設定',name:'小数点以下の表示が設定できる',cert:['3級','2級'] },
+    { id:'e034',week:9, step:'書式設定',name:'表示形式の解除ができる',cert:['3級','2級'] },
+    { id:'e035',week:9, step:'書式設定',name:'表示形式の詳細設定ができる',cert:['2級'] },
+    { id:'e036',week:9, step:'書式設定',name:'文字位置の設定ができる',cert:['3級','2級'] },
+    { id:'e037',week:9, step:'書式設定',name:'列幅と行の高さの設定ができる',cert:['3級','2級'] },
+    { id:'e038',week:9, step:'書式設定',name:'数値を指定して行の高さを変更できる',cert:['3級','2級'] },
+    { id:'e039',week:9, step:'書式設定',name:'ダブルクリックによる列幅の自動調整ができる',cert:['3級','2級'] },
+    { id:'e040',week:9, step:'書式設定',name:'罫線・塗りつぶしの設定ができる',cert:['3級','2級'] },
+    { id:'e041',week:9, step:'書式設定',name:'点線を引くことができる',cert:['3級','2級'] },
+    { id:'e042',week:9, step:'書式設定',name:'二重線を引くことができる',cert:['3級','2級'] },
+    { id:'e043',week:9, step:'書式設定',name:'斜線を引くことができる',cert:['3級','2級'] },
+    { id:'e044',week:9, step:'書式設定',name:'リボンから塗りつぶしの設定ができる',cert:['3級','2級'] },
+    { id:'e045',week:9, step:'書式設定',name:'文字のフォントとサイズの設定ができる',cert:['3級','2級'] },
+    { id:'e046',week:9, step:'書式設定',name:'練習4',cert:[] },
+    { id:'e047',week:9, step:'書式設定',name:'オートコンプリートができる',cert:['3級','2級'] },
+    { id:'e048',week:9, step:'書式設定',name:'練習問題6',cert:[] },
+    { id:'e049',week:9, step:'書式設定',name:'練習問題7',cert:[] },
+    { id:'e050',week:9, step:'書式設定',name:'練習問題8',cert:[] },
+    { id:'e051',week:9, step:'書式設定',name:'練習問題9',cert:[] },
+    { id:'e052',week:9, step:'書式設定',name:'練習問題10',cert:[] },
+    { id:'e053',week:9, step:'書式設定',name:'練習問題11',cert:[] },
+    // ── データ操作 ──────────────────────────────────────
+    { id:'e054',week:9, step:'データ操作',name:'コピーができる',cert:['3級','2級'] },
+    { id:'e055',week:9, step:'データ操作',name:'移動ができる',cert:['3級','2級'] },
+    { id:'e056',week:9, step:'データ操作',name:'ショートカットメニューでの移動・コピーができる',cert:['3級','2級'] },
+    { id:'e057',week:9, step:'データ操作',name:'ショートカットキー一覧表がわかる',cert:['3級','2級'] },
+    { id:'e058',week:9, step:'データ操作',name:'練習問題12',cert:[] },
+    { id:'e059',week:9, step:'データ操作',name:'ユーザー定義の設定ができる',cert:['2級'] },
+    { id:'e060',week:9, step:'データ操作',name:'記号を使った入力ができる',cert:['2級'] },
+    { id:'e061',week:9, step:'データ操作',name:'ウィンドウ枠の固定ができる',cert:['3級','2級'] },
+    { id:'e062',week:9, step:'データ操作',name:'表示モードの切り替えができる',cert:['3級','2級'] },
+    { id:'e063',week:9, step:'データ操作',name:'改ページプレビューができる',cert:['3級','2級'] },
+    { id:'e064',week:9, step:'データ操作',name:'検索ができる',cert:['3級','2級'] },
+    { id:'e065',week:9, step:'データ操作',name:'置換ができる',cert:['2級'] },
+    { id:'e066',week:9, step:'データ操作',name:'練習問題13',cert:[] },
+    { id:'e067',week:9, step:'データ操作',name:'練習問題14',cert:[] },
+    { id:'e068',week:9, step:'データ操作',name:'練習問題15',cert:[] },
+    { id:'e069',week:9, step:'データ操作',name:'セルの書式設定での文字配置ができる',cert:['3級','2級'] },
+    { id:'e070',week:9, step:'データ操作',name:'セル内の縦書きができる',cert:['3級','2級'] },
+    { id:'e071',week:9, step:'データ操作',name:'セルの書式設定での文字方向の設定ができる',cert:['3級','2級'] },
+    // ── グラフ ─────────────────────────────────────────
+    { id:'e072',week:11,step:'グラフ',name:'グラフタイトルを設定ができる',cert:['3級','2級'] },
+    { id:'e073',week:11,step:'グラフ',name:'グラフの移動とサイズ変更ができる',cert:['3級','2級'] },
+    { id:'e074',week:11,step:'グラフ',name:'グラフ内のフォントサイズを変えることができる',cert:['3級','2級'] },
+    { id:'e075',week:11,step:'グラフ',name:'練習1（グラフ）',cert:[] },
+    { id:'e076',week:11,step:'グラフ',name:'軸ラベルを表示できる',cert:['3級','2級'] },
+    { id:'e077',week:11,step:'グラフ',name:'目盛間隔を変更できる',cert:['3級','2級'] },
+    { id:'e078',week:11,step:'グラフ',name:'グラフのデータ範囲を変更できる',cert:['3級','2級'] },
+    { id:'e079',week:11,step:'グラフ',name:'グラフを変更できる',cert:['3級','2級'] },
+    { id:'e080',week:11,step:'グラフ',name:'グラフの色の変更できる',cert:['3級','2級'] },
+    { id:'e081',week:11,step:'グラフ',name:'グラフスタイルの変更できる',cert:['3級','2級'] },
+    { id:'e082',week:11,step:'グラフ',name:'折れ線グラフの構成要素の名称がわかる',cert:['3級','2級'] },
+    { id:'e083',week:11,step:'グラフ',name:'主なグラフの種類とポイントがわかる',cert:['3級','2級'] },
+    { id:'e084',week:11,step:'グラフ',name:'練習2（グラフ）',cert:[] },
+    { id:'e085',week:11,step:'グラフ',name:'練習3（グラフ）',cert:[] },
+    { id:'e086',week:11,step:'グラフ',name:'練習4（グラフ）',cert:[] },
+    { id:'e087',week:11,step:'グラフ',name:'練習5（グラフ）',cert:[] },
+    { id:'e088',week:11,step:'グラフ',name:'基礎問題1',cert:[] },
+    { id:'e089',week:11,step:'グラフ',name:'離れたセル範囲のグラフの作成ができる',cert:['3級','2級'] },
+    { id:'e090',week:11,step:'グラフ',name:'凡例の編集ができる',cert:['3級','2級'] },
+    { id:'e091',week:11,step:'グラフ',name:'凡例の色を設定ができる',cert:['3級','2級'] },
+    { id:'e092',week:11,step:'グラフ',name:'基礎問題2',cert:[] },
+    { id:'e093',week:11,step:'グラフ',name:'基礎問題3',cert:[] },
+    { id:'e094',week:11,step:'グラフ',name:'複合グラフの作成ができる',cert:['2級'] },
+    { id:'e095',week:11,step:'グラフ',name:'基礎問題4',cert:[] },
+    { id:'e096',week:11,step:'グラフ',name:'基礎問題5',cert:[] },
+    // ── データベース機能 ───────────────────────────────────
+    { id:'e097',week:12,step:'データベース機能',name:'並べ替えができる',cert:['3級','2級'] },
+    { id:'e098',week:12,step:'データベース機能',name:'複数キーによる並べ替えができる',cert:['2級'] },
+    { id:'e099',week:12,step:'データベース機能',name:'練習6',cert:[] },
+    { id:'e100',week:12,step:'データベース機能',name:'フィルターでのデータ抽出ができる',cert:['3級','2級'] },
+    { id:'e101',week:12,step:'データベース機能',name:'数値フィルターでのデータ抽出ができる',cert:['2級'] },
+    { id:'e102',week:12,step:'データベース機能',name:'テキストフィルターでのデータ抽出ができる',cert:['2級'] },
+    { id:'e103',week:12,step:'データベース機能',name:'フィルターの解除ができる',cert:['3級','2級'] },
+    { id:'e104',week:12,step:'データベース機能',name:'複数条件での抽出ができる',cert:['2級'] },
+    { id:'e105',week:12,step:'データベース機能',name:'ワイルドカードがわかる',cert:['2級'] },
+    { id:'e106',week:12,step:'データベース機能',name:'練習7',cert:[] },
+    { id:'e107',week:12,step:'データベース機能',name:'テーブルスタイルの変更ができる',cert:['2級'] },
+    { id:'e108',week:12,step:'データベース機能',name:'集計行の表示ができる',cert:['2級'] },
+    { id:'e109',week:12,step:'データベース機能',name:'テーブルとスタイルの解除ができる',cert:['2級'] },
+    { id:'e110',week:12,step:'データベース機能',name:'練習8',cert:[] },
+    { id:'e111',week:12,step:'データベース機能',name:'スパークラインの種類の変更ができる',cert:['3級','2級'] },
+    { id:'e112',week:12,step:'データベース機能',name:'スパークラインのスタイルの変更ができる',cert:['3級','2級'] },
+    { id:'e113',week:12,step:'データベース機能',name:'スパークラインの色・マーカーの色が設定できる',cert:['3級','2級'] },
+    { id:'e114',week:12,step:'データベース機能',name:'スパークラインの削除ができる',cert:['3級','2級'] },
+    { id:'e115',week:12,step:'データベース機能',name:'練習9',cert:[] },
+    // ── 関数・計算（応用） ─────────────────────────────────
+    { id:'e116',week:10,step:'関数・計算（応用）',name:'ROUND関数が使える',cert:['3級','2級'] },
+    { id:'e117',week:10,step:'関数・計算（応用）',name:'ROUNDUP・ROUNDDOWN関数が使える',cert:['3級','2級'] },
+    { id:'e118',week:10,step:'関数・計算（応用）',name:'練習1（関数応用）',cert:[] },
+    { id:'e119',week:10,step:'関数・計算（応用）',name:'構成比を求めることができる',cert:['3級','2級'] },
+    { id:'e120',week:10,step:'関数・計算（応用）',name:'練習2-1',cert:[] },
+    { id:'e121',week:10,step:'関数・計算（応用）',name:'練習2-2',cert:[] },
+    { id:'e122',week:10,step:'関数・計算（応用）',name:'相対参照・絶対参照・複合参照が使える',cert:['3級','2級'] },
+    { id:'e123',week:10,step:'関数・計算（応用）',name:'練習3（参照）',cert:[] },
+    { id:'e124',week:10,step:'関数・計算（応用）',name:'練習問題1',cert:[] },
+    { id:'e125',week:10,step:'関数・計算（応用）',name:'練習問題2',cert:[] },
+    { id:'e126',week:10,step:'関数・計算（応用）',name:'折り返して全体を表示できる',cert:['3級','2級'] },
+    { id:'e127',week:10,step:'関数・計算（応用）',name:'表のコピー・貼り付けができる',cert:['3級','2級'] },
+    { id:'e128',week:10,step:'関数・計算（応用）',name:'練習4（参照）',cert:[] },
+    { id:'e129',week:10,step:'関数・計算（応用）',name:'RANK.EQ関数が使える',cert:['3級','2級'] },
+    { id:'e130',week:10,step:'関数・計算（応用）',name:'練習5-1',cert:[] },
+    { id:'e131',week:10,step:'関数・計算（応用）',name:'練習5-2',cert:[] },
+    { id:'e132',week:10,step:'関数・計算（応用）',name:'RANK.AVG関数が使える',cert:['3級','2級'] },
+    { id:'e133',week:10,step:'関数・計算（応用）',name:'練習5-3',cert:[] },
+    { id:'e134',week:10,step:'関数・計算（応用）',name:'TODAY関数が使える',cert:['2級'] },
+    { id:'e135',week:10,step:'関数・計算（応用）',name:'NOW関数が使える',cert:['2級'] },
+    { id:'e136',week:10,step:'関数・計算（応用）',name:'WEEKDAY関数が使える',cert:['2級'] },
+    { id:'e137',week:10,step:'関数・計算（応用）',name:'日付の表示形式が設定できる',cert:['2級'] },
+    { id:'e138',week:10,step:'関数・計算（応用）',name:'練習6（日付）',cert:[] },
+    { id:'e139',week:10,step:'関数・計算（応用）',name:'練習問題3',cert:[] },
+    { id:'e140',week:10,step:'関数・計算（応用）',name:'練習問題4',cert:[] },
+    { id:'e141',week:10,step:'関数・計算（応用）',name:'COUNT・COUNTA関数が使える',cert:['3級','2級'] },
+    { id:'e142',week:10,step:'関数・計算（応用）',name:'練習7',cert:[] },
+    { id:'e143',week:10,step:'関数・計算（応用）',name:'練習8',cert:[] },
+    { id:'e144',week:10,step:'関数・計算（応用）',name:'ヘッダー・フッターの表示ができる',cert:['3級','2級'] },
+    { id:'e145',week:10,step:'関数・計算（応用）',name:'ヘッダー・フッターの要素が設定できる',cert:['3級','2級'] },
+    { id:'e146',week:10,step:'関数・計算（応用）',name:'練習問題5',cert:[] },
+    { id:'e147',week:10,step:'関数・計算（応用）',name:'練習問題6',cert:[] },
+    // ── IF関数・条件分岐 ──────────────────────────────────
+    { id:'e148',week:10,step:'IF関数・条件分岐',name:'IF関数が使える',cert:['3級','2級'] },
+    { id:'e149',week:10,step:'IF関数・条件分岐',name:'練習問題1（IF）',cert:[] },
+    { id:'e150',week:10,step:'IF関数・条件分岐',name:'複雑な条件の設定ができる',cert:['2級'] },
+    { id:'e151',week:10,step:'IF関数・条件分岐',name:'練習1-1（IF複雑）',cert:[] },
+    { id:'e152',week:10,step:'IF関数・条件分岐',name:'練習1-2（IF複雑）',cert:[] },
+    { id:'e153',week:10,step:'IF関数・条件分岐',name:'練習2（IF）',cert:[] },
+    { id:'e154',week:10,step:'IF関数・条件分岐',name:'PHONETIC関数が使える',cert:['2級'] },
+    { id:'e155',week:10,step:'IF関数・条件分岐',name:'ふりがなをひらがなにすることができる',cert:['2級'] },
+    { id:'e156',week:10,step:'IF関数・条件分岐',name:'文字の上にふりがなをつけることができる',cert:['2級'] },
+    { id:'e157',week:10,step:'IF関数・条件分岐',name:'練習問題2',cert:[] },
+    { id:'e158',week:10,step:'IF関数・条件分岐',name:'練習問題3',cert:[] },
+    { id:'e159',week:10,step:'IF関数・条件分岐',name:'練習問題4',cert:[] },
+    { id:'e160',week:10,step:'IF関数・条件分岐',name:'図形の挿入ができる',cert:['3級','2級'] },
+    { id:'e161',week:10,step:'IF関数・条件分岐',name:'表示形式の定義ができる',cert:['2級'] },
+    { id:'e162',week:10,step:'IF関数・条件分岐',name:'練習3（IF）',cert:[] },
+    { id:'e163',week:10,step:'IF関数・条件分岐',name:'練習問題5',cert:[] },
+    { id:'e164',week:10,step:'IF関数・条件分岐',name:'セルの強調表示ルールが設定できる',cert:['2級'] },
+    { id:'e165',week:10,step:'IF関数・条件分岐',name:'ルールの管理ができる',cert:['2級'] },
+    { id:'e166',week:10,step:'IF関数・条件分岐',name:'時間給の計算の仕方がわかる',cert:['2級'] },
+    { id:'e167',week:10,step:'IF関数・条件分岐',name:'練習問題6',cert:[] },
+    { id:'e168',week:10,step:'IF関数・条件分岐',name:'COUNTIF関数が使える',cert:['2級'] },
+    { id:'e169',week:10,step:'IF関数・条件分岐',name:'SUMIF関数が使える',cert:['2級'] },
+    { id:'e170',week:10,step:'IF関数・条件分岐',name:'練習5（COUNTIF・SUMIF）',cert:[] },
+    { id:'e171',week:10,step:'IF関数・条件分岐',name:'練習問題7',cert:[] },
+    { id:'e172',week:10,step:'IF関数・条件分岐',name:'MOD関数が使える',cert:['2級'] },
+    { id:'e173',week:10,step:'IF関数・条件分岐',name:'練習問題9',cert:[] },
+    { id:'e174',week:10,step:'IF関数・条件分岐',name:'TRUNC関数が使える',cert:['2級'] },
+    { id:'e175',week:10,step:'IF関数・条件分岐',name:'練習問題10',cert:[] },
+    { id:'e176',week:10,step:'IF関数・条件分岐',name:'IFS関数が使える',cert:['2級'] },
+    { id:'e177',week:10,step:'IF関数・条件分岐',name:'SWITCH関数が使える',cert:['2級'] },
+    { id:'e178',week:10,step:'IF関数・条件分岐',name:'練習問題11',cert:[] },
+    { id:'e179',week:10,step:'IF関数・条件分岐',name:'練習問題12',cert:[] },
+    { id:'e180',week:10,step:'IF関数・条件分岐',name:'MAXIFS関数が使える',cert:['2級'] },
+    { id:'e181',week:10,step:'IF関数・条件分岐',name:'MINIFS関数が使える',cert:['2級'] },
+    { id:'e182',week:10,step:'IF関数・条件分岐',name:'CONCAT関数が使える',cert:['2級'] },
+    { id:'e183',week:10,step:'IF関数・条件分岐',name:'TEXTJOIN関数が使える',cert:['2級'] },
+    // ── ピボットテーブル・シート操作 ──────────────────────
+    { id:'e184',week:12,step:'ピボットテーブル・シート操作',name:'フィールドのグループ化ができる',cert:['2級'] },
+    { id:'e185',week:12,step:'ピボットテーブル・シート操作',name:'データの更新ができる',cert:['2級'] },
+    { id:'e186',week:12,step:'ピボットテーブル・シート操作',name:'行ラベルの追加ができる',cert:['2級'] },
+    { id:'e187',week:12,step:'ピボットテーブル・シート操作',name:'ピボットテーブルスタイルの設定ができる',cert:['2級'] },
+    { id:'e188',week:12,step:'ピボットテーブル・シート操作',name:'練習1（ピボット）',cert:[] },
+    { id:'e189',week:12,step:'ピボットテーブル・シート操作',name:'ピボットグラフの作成ができる',cert:['2級'] },
+    { id:'e190',week:12,step:'ピボットテーブル・シート操作',name:'練習2（ピボット）',cert:[] },
+    { id:'e191',week:12,step:'ピボットテーブル・シート操作',name:'練習3（ピボット）',cert:[] },
+    { id:'e192',week:12,step:'ピボットテーブル・シート操作',name:'練習問題1（ピボット）',cert:[] },
+    { id:'e193',week:12,step:'ピボットテーブル・シート操作',name:'練習問題2（ピボット）',cert:[] },
+    { id:'e194',week:12,step:'ピボットテーブル・シート操作',name:'練習問題3（ピボット）',cert:[] },
+    { id:'e195',week:12,step:'ピボットテーブル・シート操作',name:'シート名の変更ができる',cert:['3級','2級'] },
+    { id:'e196',week:12,step:'ピボットテーブル・シート操作',name:'ワークシートの挿入ができる',cert:['3級','2級'] },
+    { id:'e197',week:12,step:'ピボットテーブル・シート操作',name:'ワークシートの削除ができる',cert:['3級','2級'] },
+    { id:'e198',week:12,step:'ピボットテーブル・シート操作',name:'練習4（シート）',cert:[] },
+    { id:'e199',week:12,step:'ピボットテーブル・シート操作',name:'ワークシートの移動ができる',cert:['3級','2級'] },
+    { id:'e200',week:12,step:'ピボットテーブル・シート操作',name:'ワークシートのコピーができる',cert:['3級','2級'] },
+    { id:'e201',week:12,step:'ピボットテーブル・シート操作',name:'シート見出しの色の設定ができる',cert:['3級','2級'] },
+    { id:'e202',week:12,step:'ピボットテーブル・シート操作',name:'串刺し集計ができる',cert:['2級'] },
+    { id:'e203',week:12,step:'ピボットテーブル・シート操作',name:'練習問題4',cert:[] },
+    // ── 高度なデータ操作 ──────────────────────────────────
+    { id:'e204',week:12,step:'高度なデータ操作',name:'フィルターオプションの設定ができる',cert:['2級'] },
+    { id:'e205',week:12,step:'高度なデータ操作',name:'練習5（フィルター詳細）',cert:[] },
+    { id:'e206',week:12,step:'高度なデータ操作',name:'集計ができる',cert:['2級'] },
+    { id:'e207',week:12,step:'高度なデータ操作',name:'集計の解除ができる',cert:['2級'] },
+    { id:'e208',week:12,step:'高度なデータ操作',name:'練習6（集計）',cert:[] },
+    { id:'e209',week:12,step:'高度なデータ操作',name:'アウトラインの記号がわかる',cert:['2級'] },
+    { id:'e210',week:12,step:'高度なデータ操作',name:'アウトラインの作成ができる',cert:['2級'] },
+    { id:'e211',week:12,step:'高度なデータ操作',name:'アウトラインの解除ができる',cert:['2級'] },
+    { id:'e212',week:12,step:'高度なデータ操作',name:'練習問題5',cert:[] },
+    { id:'e213',week:12,step:'高度なデータ操作',name:'可視セルのコピーができる',cert:['2級'] },
+    { id:'e214',week:12,step:'高度なデータ操作',name:'ユーザー設定リストでの並べ替えができる',cert:['2級'] },
+    { id:'e215',week:12,step:'高度なデータ操作',name:'練習問題6',cert:[] },
+    { id:'e216',week:12,step:'高度なデータ操作',name:'半角カタカナの設定ができる',cert:['2級'] },
+    { id:'e217',week:12,step:'高度なデータ操作',name:'リストから選択できる',cert:['2級'] },
+    { id:'e218',week:12,step:'高度なデータ操作',name:'エラーメッセージを表示できる',cert:['2級'] },
+    { id:'e219',week:12,step:'高度なデータ操作',name:'重複データを入力できないように設定できる',cert:['2級'] },
+    { id:'e220',week:12,step:'高度なデータ操作',name:'練習7（入力規則）',cert:[] },
+    // ── コメント・SmartArt ────────────────────────────────
+    { id:'e221',week:12,step:'コメント・SmartArt',name:'コメントの挿入ができる',cert:['2級'] },
+    { id:'e222',week:12,step:'コメント・SmartArt',name:'コメントの編集ができる',cert:['2級'] },
+    { id:'e223',week:12,step:'コメント・SmartArt',name:'コメントの削除ができる',cert:['2級'] },
+    { id:'e224',week:12,step:'コメント・SmartArt',name:'コメントの表示・非表示ができる',cert:['2級'] },
+    { id:'e225',week:12,step:'コメント・SmartArt',name:'SmartArtの挿入ができる',cert:['2級'] },
+    { id:'e226',week:12,step:'コメント・SmartArt',name:'ボックス（部下）の追加ができる',cert:['2級'] },
+    { id:'e227',week:12,step:'コメント・SmartArt',name:'スタイルの設定ができる',cert:['2級'] },
+    { id:'e228',week:12,step:'コメント・SmartArt',name:'ロゴマークの作成ができる',cert:['2級'] },
+    { id:'e229',week:12,step:'コメント・SmartArt',name:'練習1（SmartArt）',cert:[] },
+    { id:'e230',week:12,step:'コメント・SmartArt',name:'練習問題1（SmartArt）',cert:[] },
+    { id:'e231',week:12,step:'コメント・SmartArt',name:'練習問題2（SmartArt）',cert:[] },
+    // ── VLOOKUP・検索関数 ─────────────────────────────────
+    { id:'e232',week:10,step:'VLOOKUP・検索関数',name:'VLOOKUP関数が使える',cert:['2級'] },
+    { id:'e233',week:10,step:'VLOOKUP・検索関数',name:'引数「検索方法」が指定できる',cert:['2級'] },
+    { id:'e234',week:10,step:'VLOOKUP・検索関数',name:'IFERRORが使える',cert:['2級'] },
+    { id:'e235',week:10,step:'VLOOKUP・検索関数',name:'HLOOKUP関数が使える',cert:['2級'] },
+    { id:'e236',week:10,step:'VLOOKUP・検索関数',name:'見積書でVLOOKUP関数を使うことができる',cert:['2級'] },
+    { id:'e237',week:10,step:'VLOOKUP・検索関数',name:'練習2（VLOOKUP）',cert:[] },
+    { id:'e238',week:10,step:'VLOOKUP・検索関数',name:'練習3（VLOOKUP）',cert:[] },
+    { id:'e239',week:10,step:'VLOOKUP・検索関数',name:'練習問題3（VLOOKUP）',cert:[] },
+    { id:'e240',week:10,step:'VLOOKUP・検索関数',name:'練習問題4（VLOOKUP）',cert:[] },
+    { id:'e241',week:10,step:'VLOOKUP・検索関数',name:'練習4（VLOOKUP）',cert:[] },
+    { id:'e242',week:10,step:'VLOOKUP・検索関数',name:'LEFT関数が使える',cert:['2級'] },
+    { id:'e243',week:10,step:'VLOOKUP・検索関数',name:'RIGHT関数が使える',cert:['2級'] },
+    { id:'e244',week:10,step:'VLOOKUP・検索関数',name:'練習5（文字列関数）',cert:[] },
+    { id:'e245',week:10,step:'VLOOKUP・検索関数',name:'INDEX関数が使える',cert:['2級'] },
+    { id:'e246',week:10,step:'VLOOKUP・検索関数',name:'MATCH関数が使える',cert:['2級'] },
+    { id:'e247',week:10,step:'VLOOKUP・検索関数',name:'練習問題10',cert:[] },
+    { id:'e248',week:10,step:'VLOOKUP・検索関数',name:'練習問題11',cert:[] },
+    { id:'e249',week:10,step:'VLOOKUP・検索関数',name:'練習問題12',cert:[] },
+    { id:'e250',week:10,step:'VLOOKUP・検索関数',name:'CHOOSE関数が使える',cert:['2級'] },
+    { id:'e251',week:10,step:'VLOOKUP・検索関数',name:'練習問題13',cert:[] },
+    { id:'e252',week:10,step:'VLOOKUP・検索関数',name:'ゴールシークが使える',cert:['2級'] },
+    { id:'e253',week:10,step:'VLOOKUP・検索関数',name:'練習問題14',cert:[] },
+  ],
+    pp: [
+    { id:'p01',week:17,step:'PowerPoint基本',name:'スライドの作成・文字入力・書式設定ができる',cert:['スタンダード'] },
+    { id:'p02',week:17,step:'PowerPoint基本',name:'テーマ・配色・フォントの適用ができる',cert:['スタンダード'] },
+    { id:'p03',week:17,step:'PowerPoint基本',name:'画像・図形・SmartArtの挿入ができる',cert:['スタンダード'] },
+    { id:'p04',week:17,step:'PowerPoint基本',name:'表・グラフの挿入・編集ができる',cert:['スタンダード'] },
+    { id:'p05',week:17,step:'PowerPoint応用',name:'スライドのレイアウト・マスターが使える',cert:['スタンダード'] },
+    { id:'p06',week:18,step:'PowerPoint応用',name:'画面切り替え効果が設定できる',cert:['スタンダード'] },
+    { id:'p07',week:18,step:'PowerPoint応用',name:'アニメーションが設定できる',cert:['スタンダード'] },
+    { id:'p08',week:18,step:'PowerPoint応用',name:'スライドショーの設定・実行ができる',cert:['スタンダード'] },
+    { id:'p09',week:18,step:'PowerPoint応用',name:'発表者ツール・スライド印刷ができる',cert:['スタンダード'] },
+  ],
+  illust: [
+    // ── スタンダード（基本操作） ──────────────
+    { id:'i01',week:2, step:'Illustrator基本操作',name:'Illustratorが起動でき画面構成がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'i02',week:2, step:'Illustrator基本操作',name:'新規ドキュメントの作成・保存ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i03',week:2, step:'Illustrator基本操作',name:'選択ツール・ダイレクト選択ツールを使い分けられる',cert:['スタンダード','エキスパート'] },
+    { id:'i04',week:2, step:'Illustrator基本操作',name:'基本図形（長方形・楕円・多角形）が作成できる',cert:['スタンダード','エキスパート'] },
+    { id:'i05',week:2, step:'Illustrator基本操作',name:'オブジェクトの移動・拡大縮小・回転・反転ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i06',week:3, step:'Illustratorカラー',name:'塗りと線の色設定ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i07',week:3, step:'Illustratorカラー',name:'グラデーションの設定ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i08',week:3, step:'Illustratorカラー',name:'スウォッチ・カラーパネルを活用できる',cert:['スタンダード','エキスパート'] },
+    { id:'i09',week:3, step:'Illustratorテキスト',name:'文字ツールでテキストを入力・編集できる',cert:['スタンダード','エキスパート'] },
+    { id:'i10',week:3, step:'Illustratorテキスト',name:'フォント・サイズ・字間・行間の設定ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i11',week:4, step:'Illustratorオブジェクト整理',name:'整列・分布（左右・上下揃え）ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i12',week:4, step:'Illustratorオブジェクト整理',name:'前面・背面の順序変更ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i13',week:4, step:'Illustratorオブジェクト整理',name:'グループ化・解除ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i14',week:4, step:'Illustratorオブジェクト整理',name:'レイヤーの作成・管理ができる',cert:['スタンダード','エキスパート'] },
+    // ── エキスパート（応用） ──────────────
+    { id:'i15',week:5, step:'Illustratorパス（エキスパート）',name:'ペンツールでパスを描ける',cert:['エキスパート'] },
+    { id:'i16',week:5, step:'Illustratorパス（エキスパート）',name:'アンカーポイントの追加・削除・変換ができる',cert:['エキスパート'] },
+    { id:'i17',week:5, step:'Illustratorパス（エキスパート）',name:'パスファインダーで図形を合成・分割できる',cert:['エキスパート'] },
+    { id:'i18',week:6, step:'Illustratorパス（エキスパート）',name:'クリッピングマスクが使える',cert:['エキスパート'] },
+    { id:'i19',week:6, step:'Illustratorパス（エキスパート）',name:'アピアランスパネルを使った効果設定ができる',cert:['エキスパート'] },
+    { id:'i20',week:7, step:'Illustrator入稿・知識（エキスパート）',name:'画像の埋め込み・配置ができる',cert:['エキスパート'] },
+    { id:'i21',week:7, step:'Illustrator入稿・知識（エキスパート）',name:'印刷用PDFとして書き出せる',cert:['エキスパート'] },
+    { id:'i22',week:7, step:'Illustrator入稿・知識（エキスパート）',name:'DTP・印刷の基礎知識がわかる（解像度・色分解等）',cert:['エキスパート'] },
+    { id:'i23',week:7, step:'Illustrator入稿・知識（エキスパート）',name:'Webデザインの基礎知識がわかる',cert:['エキスパート'] },
+  ],
+  photo: [
+    // ── スタンダード（基本操作） ──────────────
+    { id:'ph01',week:7, step:'Photoshop基本操作',name:'Photoshopが起動でき画面構成がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'ph02',week:7, step:'Photoshop基本操作',name:'新規ドキュメントの作成・保存ができる',cert:['スタンダード','エキスパート'] },
+    { id:'ph03',week:7, step:'Photoshop基本操作',name:'画像の切り抜き（トリミング）ができる',cert:['スタンダード','エキスパート'] },
+    { id:'ph04',week:7, step:'Photoshop基本操作',name:'明るさ・コントラスト・色調補正ができる',cert:['スタンダード','エキスパート'] },
+    { id:'ph05',week:8, step:'Photoshop基本操作',name:'選択ツール（矩形・なげなわ・クイック）を使える',cert:['スタンダード','エキスパート'] },
+    { id:'ph06',week:8, step:'Photoshop基本操作',name:'塗りつぶし・グラデーションツールが使える',cert:['スタンダード','エキスパート'] },
+    { id:'ph07',week:8, step:'Photoshop基本操作',name:'文字ツールでテキストを入力・編集できる',cert:['スタンダード','エキスパート'] },
+    { id:'ph08',week:8, step:'Photoshop基本操作',name:'ブラシ・消しゴムツールが使える',cert:['スタンダード','エキスパート'] },
+    // ── エキスパート（応用） ──────────────
+    { id:'ph09',week:9, step:'Photoshopレイヤー（エキスパート）',name:'レイヤーの概念がわかり作成・管理ができる',cert:['エキスパート'] },
+    { id:'ph10',week:9, step:'Photoshopレイヤー（エキスパート）',name:'レイヤーマスクが使える',cert:['エキスパート'] },
+    { id:'ph11',week:9, step:'Photoshopレイヤー（エキスパート）',name:'描画モード（乗算・スクリーン等）が使える',cert:['エキスパート'] },
+    { id:'ph12',week:9, step:'Photoshopレイヤー（エキスパート）',name:'調整レイヤーを使った非破壊編集ができる',cert:['エキスパート'] },
+    { id:'ph13',week:11,step:'Photoshop応用（エキスパート）',name:'フィルター・アート効果が使える',cert:['エキスパート'] },
+    { id:'ph14',week:11,step:'Photoshop応用（エキスパート）',name:'スマートオブジェクトが使える',cert:['エキスパート'] },
+    { id:'ph15',week:12,step:'Photoshop応用（エキスパート）',name:'クリッピングマスクが使える',cert:['エキスパート'] },
+    { id:'ph16',week:14,step:'Photoshop書き出し（エキスパート）',name:'Web用の適切な形式（JPEG・PNG・GIF）で書き出せる',cert:['エキスパート'] },
+    { id:'ph17',week:14,step:'Photoshop書き出し（エキスパート）',name:'解像度・カラーモード（RGB・CMYK）の知識がわかる',cert:['エキスパート'] },
+  ],
+  web: [
+    // ── スタンダード（HTML・CSS基本） ──────────────
+    { id:'wb01',week:14,step:'HTML基本（スタンダード）',name:'HTMLの基本構造（DOCTYPE・html・head・body）がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'wb02',week:14,step:'HTML基本（スタンダード）',name:'見出し（h1〜h6）・段落（p）タグが使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb03',week:14,step:'HTML基本（スタンダード）',name:'リスト（ul・ol・li）タグが使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb04',week:14,step:'HTML基本（スタンダード）',name:'リンク（a href）・画像（img）タグが使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb05',week:14,step:'HTML基本（スタンダード）',name:'テーブル（table・tr・th・td）タグが使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb06',week:14,step:'HTML基本（スタンダード）',name:'div・span・セマンティックタグ（header・nav等）が使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb07',week:15,step:'CSS基本（スタンダード）',name:'CSSの基本構文（セレクタ・プロパティ・値）がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'wb08',week:15,step:'CSS基本（スタンダード）',name:'フォント・色・背景のスタイルが設定できる',cert:['スタンダード','エキスパート'] },
+    { id:'wb09',week:15,step:'CSS基本（スタンダード）',name:'ボックスモデル（margin・padding・border）がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'wb10',week:15,step:'CSS基本（スタンダード）',name:'class・idセレクタの使い方がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'wb11',week:16,step:'CSSレイアウト（スタンダード）',name:'displayプロパティ（block・inline・flex）が使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb12',week:16,step:'CSSレイアウト（スタンダード）',name:'floatを使ったレイアウトができる',cert:['スタンダード'] },
+    // ── エキスパート（応用） ──────────────
+    { id:'wb13',week:17,step:'CSSレイアウト（エキスパート）',name:'Flexboxを使ったレイアウトができる',cert:['エキスパート'] },
+    { id:'wb14',week:17,step:'CSSレイアウト（エキスパート）',name:'positionプロパティ（relative・absolute）が使える',cert:['エキスパート'] },
+    { id:'wb15',week:17,step:'レスポンシブ（エキスパート）',name:'メディアクエリを使ったレスポンシブデザインができる',cert:['エキスパート'] },
+    { id:'wb16',week:17,step:'レスポンシブ（エキスパート）',name:'viewport設定がわかる',cert:['エキスパート'] },
+    { id:'wb17',week:18,step:'Web知識・JavaScript（エキスパート）',name:'JavaScriptの読み込み・基本構文がわかる',cert:['エキスパート'] },
+    { id:'wb18',week:18,step:'Web知識・JavaScript（エキスパート）',name:'デザインカンプ（Webデザインの設計図）が読める',cert:['エキスパート'] },
+    { id:'wb19',week:19,step:'Web知識・JavaScript（エキスパート）',name:'ユニバーサルデザイン・アクセシビリティの知識がある',cert:['エキスパート'] },
+    { id:'wb20',week:19,step:'Web知識・JavaScript（エキスパート）',name:'色彩・レイアウトのWebデザイン知識がある',cert:['エキスパート'] },
+  ],
+  manner: [
+    { id:'m01',week:1,step:'ビジネスマナー',name:'名刺交換のマナーがわかる',cert:[] },
+    { id:'m02',week:1,step:'ビジネスマナー',name:'電話応対の基本ができる',cert:[] },
+    { id:'m03',week:2,step:'ビジネスマナー',name:'ビジネスメールが書ける',cert:[] },
+    { id:'m04',week:2,step:'ビジネスマナー',name:'報告・連絡・相談（報連相）の意味がわかる',cert:[] },
+    { id:'m05',week:2,step:'ビジネスマナー',name:'敬語（尊敬語・謙譲語・丁寧語）が使える',cert:[] },
+    { id:'m06',week:3,step:'就職支援',name:'自己分析・強みの言語化ができている',cert:[] },
+    { id:'m07',week:4,step:'就職支援',name:'履歴書の書き方がわかる',cert:[] },
+    { id:'m08',week:8,step:'就職支援',name:'職務経歴書が作成できる',cert:[] },
+    { id:'m09',week:14,step:'就職支援',name:'面接対策（志望動機・自己PR）ができている',cert:[] },
+    { id:'m10',week:17,step:'就職支援',name:'求人票の見方・応募書類の準備ができている',cert:[] },
+  ],
+};
+
+const SUBJECTS = [
+  { id:'word',   name:'Word',         color:'#0C447C' },
+  { id:'excel',  name:'Excel',        color:'#3B6D11' },
+  { id:'pp',     name:'PowerPoint',   color:'#993C1D' },
+  { id:'illust', name:'Illustrator',  color:'#534AB7' },
+  { id:'photo',  name:'Photoshop',    color:'#0F6E56' },
+  { id:'web',    name:'Web',          color:'#185FA5' },
+  { id:'manner', name:'ビジマナ・就職',color:'#72243E' },
+];
+
+const LV_LABELS = ['未学習','📖 テキストあり','△ なんとなく','✔ テキストなし'];
+const LV_SHORT  = ['未','📖','△','✔'];
+
+const MOTTOS = [
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+  '👣 今日も一歩一歩確実に階段を上っていきましょう。',
+];
+
+// ════════════════════════════════════════════════
+//  状態
+// ════════════════════════════════════════════════
+let currentUser = '';
+let currentName = '';
+let skillData   = {};
+let logHistory  = [];
+let currentSubject = 'word';
+let radarChart, lineChart;
+
+const lsKey  = k  => 'lmsv3_'+currentUser+'_'+k;
+const lsSave = (k,v) => { try { localStorage.setItem(lsKey(k), JSON.stringify(v)); } catch(e){} };
+const lsLoad = (k,d) => { try { const v=localStorage.getItem(lsKey(k)); return v!==null?JSON.parse(v):d; } catch(e){return d;} };
+
+// ─── 現在の訓練週を計算 ───────────────────────
+function getCurrentWeek() {
+  const today = new Date();
+  const diff  = Math.floor((today - TRAIN_START) / 86400000);
+  return Math.max(1, Math.min(20, Math.floor(diff/7) + 1));
+}
+
+// ─── 今週学習中の科目リスト ─────────────────────
+function getThisWeekSubjects() {
+  const w = getCurrentWeek();
+  return SUBJECTS.filter(s => {
+    const sw = SUBJECT_WEEKS[s.id];
+    return sw && w >= sw.start && w <= sw.end;
+  });
+}
+
+// ─── 次の検定日を取得 ──────────────────────────
+function getNextExam(subject) {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const ex = EXAMS.find(e=>e.subject===subject);
+  if (!ex) return null;
+  for (const d of ex.dates) {
+    const dt = new Date(d);
+    if (dt >= today) return { date:dt, name:ex.name };
+  }
+  return null;
+}
+
+function daysDiff(d) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.round((d - today) / 86400000);
+}
+
+function fmtDate(d) {
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
+
+// ════════════════════════════════════════════════
+//  ログイン
+// ════════════════════════════════════════════════
+async function doLogin() {
+  const id   = document.getElementById('sid').value.trim();
+  const name = document.getElementById('sname').value.trim();
+  if (!id || !name) return;
+  currentUser = id.padStart(2,'0');
+  currentName = name;
+  skillData   = lsLoad('skills',  {});
+  logHistory  = lsLoad('history', []);
+
+  if (GAS_URL) {
+    try {
+      const res  = await fetch(GAS_URL+'?action=getStudent&studentId='+currentUser);
+      const data = await res.json();
+      if (data.status==='ok' && data.skillData) {
+        skillData  = data.skillData;
+        logHistory = data.history || [];
+        lsSave('skills',  skillData);
+        lsSave('history', logHistory);
+      }
+    } catch(e){}
+  }
+
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainScreen').style.display  = 'block';
+  document.getElementById('headerName').textContent    = 'No.'+currentUser+'　'+currentName;
+  document.getElementById('dailyMotto').textContent    = MOTTOS[new Date().getDay()];
+
+  // 今週の科目で自動フォーカス
+  const tw = getThisWeekSubjects();
+  if (tw.length > 0) currentSubject = tw[0].id;
+
+  renderAll();
+}
+
+function doLogout() {
+  currentUser = '';
+  [radarChart, lineChart].forEach(c=>{ if(c) c.destroy(); });
+  radarChart = lineChart = null;
+  document.getElementById('mainScreen').style.display  = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('sid').value = '';
+  document.getElementById('sname').value = '';
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.querySelectorAll('.tab-panel').forEach((p,i)=>p.classList.toggle('active',i===0));
+}
+
+// ════════════════════════════════════════════════
+//  タブ
+// ════════════════════════════════════════════════
+function swTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+  if (id==='growth') { renderDashboard(); renderReport(); }
+  if (id==='cert')   { renderCertDb(); renderCountdown(); }
+}
+
+// ════════════════════════════════════════════════
+//  全体レンダリング
+// ════════════════════════════════════════════════
+function renderAll() {
+  renderThisWeekBanner();
+  renderSubjectBtns();
+  renderAllSubjects();
+  renderDashboard();
+  renderReport();
+}
+
+// ─── 検定ダッシュボード描画 ──────────────────
+const CERT_DB_DATA = [
+  {
+    id:'word', icon:'📝', name:'Word文書処理技能認定試験', org:'サーティファイ ソフトウェア活用能力認定委員会',
+    headBg:'#E6F1FB', nameColor:'#0C447C', orgColor:'#378ADD',
+    levels:[
+      { name:'3級', badge:'エントリー', badgeBg:'#A0CC70', badgeColor:'#27500A',
+        boxBg:'#EAF3DE', boxBorder:'#A0CC70', nameColor:'#27500A', barColor:'#3B6D11',
+        rows:[['試験形式','実技のみ'],['試験時間','60分（5課題）'],['合格基準','得点率 70%以上'],['学習時間','約26時間（初学者）'],['受験料','約5,000円前後']] },
+      { name:'2級', badge:'ビジネス対応', badgeBg:'#B5D4F4', badgeColor:'#0C447C',
+        boxBg:'#E6F1FB', boxBorder:'#B5D4F4', nameColor:'#0C447C', barColor:'#0C447C',
+        rows:[['試験形式','知識15分＋実技90分'],['試験時間','計105分'],['合格基準','知識＋実技 合計70%以上'],['学習時間','3級取得後 約34時間'],['受験料','約6,000円前後']] }
+    ],
+    tips:['白紙の文書から「完成物」を作る実技形式。授業で練習した操作がそのまま活かせる','3級は実技のみのため、操作に慣れることを最優先に','2級は知識問題で機能の名称も問われる。ツール名を意識して覚えよう','履歴書への記載は2級以上が特に効果的'],
+    tipColor:'#0C447C',
+    links:[{name:'🔗 公式サイト',url:'https://www.sikaku.gr.jp/ns/wd/'},{name:'📄 サンプル問題',url:'https://www.sikaku.gr.jp/ns/wd/learn/sample/'},{name:'📋 出題範囲',url:'https://www.sikaku.gr.jp/ns/wd/introduction/range/'}]
+  },
+  {
+    id:'excel', icon:'📊', name:'Excel表計算処理技能認定試験', org:'サーティファイ ソフトウェア活用能力認定委員会',
+    headBg:'#EAF3DE', nameColor:'#27500A', orgColor:'#639922',
+    levels:[
+      { name:'3級', badge:'エントリー', badgeBg:'#A0CC70', badgeColor:'#27500A',
+        boxBg:'#EAF3DE', boxBorder:'#A0CC70', nameColor:'#27500A', barColor:'#3B6D11',
+        rows:[['試験形式','実技のみ'],['試験時間','60分'],['合格基準','得点率 70%以上'],['主な内容','基本操作・SUM・AVERAGE・グラフ'],['学習時間','約26時間（初学者）']] },
+      { name:'2級', badge:'ビジネス対応', badgeBg:'#B5D4F4', badgeColor:'#0C447C',
+        boxBg:'#E6F1FB', boxBorder:'#B5D4F4', nameColor:'#0C447C', barColor:'#0C447C',
+        rows:[['試験形式','知識15分＋実技90分'],['試験時間','計105分'],['合格基準','知識＋実技 合計70%以上'],['主な内容','IF・VLOOKUP・ピボット・DB機能'],['学習時間','3級取得後 約34時間']] }
+    ],
+    tips:['表や計算式を含む実務書類を一から作成する形式。Wordと同じ実技重視の試験','2級はIF・VLOOKUPが頻出。関数の構造を理解して使いこなすことが合格の鍵','WordとExcelを合わせて取得すると就職でのアピールが大幅に強化される'],
+    tipColor:'#3B6D11',
+    links:[{name:'🔗 公式サイト',url:'https://www.sikaku.gr.jp/ns/ex/'},{name:'📄 サンプル問題',url:'https://www.sikaku.gr.jp/ns/ex/learn/sample/'}]
+  },
+  {
+    id:'illust', icon:'✏️', name:'Illustratorクリエイター能力認定試験', org:'サーティファイ ソフトウェア活用能力認定委員会',
+    headBg:'#EEEDFE', nameColor:'#3C3489', orgColor:'#7F77DD',
+    levels:[
+      { name:'スタンダード', badge:'基礎', badgeBg:'#A0CC70', badgeColor:'#27500A',
+        boxBg:'#EAF3DE', boxBorder:'#A0CC70', nameColor:'#27500A', barColor:'#3B6D11',
+        rows:[['試験形式','実技のみ（2部構成）'],['試験時間','第1部40分＋第2部90分'],['合格基準','得点率 65%以上'],['受験料','7,800円（税込）'],['学習時間','約20時間（目安）']] },
+      { name:'エキスパート', badge:'応用', badgeBg:'#CECBF6', badgeColor:'#3C3489',
+        boxBg:'#EEEDFE', boxBorder:'#CECBF6', nameColor:'#3C3489', barColor:'#534AB7',
+        rows:[['試験形式','知識＋実技（3部構成）'],['試験時間','第1部50分＋第2部90分'],['合格基準','知識＋実技 合計65%以上'],['受験料','8,800円（税込）'],['学習時間','約60時間（目安）']] }
+    ],
+    tips:['白紙から指示書に沿って作品を制作する形式。手順が頭に浮かぶまで繰り返すことが大事','スタンダードから始めて合格後にエキスパートに挑戦するのがおすすめ','エキスパートは知識問題でDTP・Webデザイン用語も出題される','公式問題集を4周することが合格への近道と言われている'],
+    tipColor:'#534AB7',
+    links:[{name:'🔗 公式サイト',url:'https://www.sikaku.gr.jp/ns/il/'},{name:'📄 サンプル問題',url:'https://www.sikaku.gr.jp/ns/il/learn/sample/'}]
+  },
+  {
+    id:'photo', icon:'📷', name:'Photoshopクリエイター能力認定試験', org:'サーティファイ ソフトウェア活用能力認定委員会',
+    headBg:'#E1F5EE', nameColor:'#085041', orgColor:'#1D9E75',
+    levels:[
+      { name:'スタンダード', badge:'基礎', badgeBg:'#A0CC70', badgeColor:'#27500A',
+        boxBg:'#EAF3DE', boxBorder:'#A0CC70', nameColor:'#27500A', barColor:'#3B6D11',
+        rows:[['試験形式','実技のみ'],['合格基準','得点率 65%以上'],['受験料','7,800円（税込）'],['主な内容','画像編集・補正・基本加工'],['合格率','平均7割以上（取得しやすい）']] },
+      { name:'エキスパート', badge:'応用', badgeBg:'#9FE1CB', badgeColor:'#085041',
+        boxBg:'#E1F5EE', boxBorder:'#9FE1CB', nameColor:'#085041', barColor:'#0F6E56',
+        rows:[['試験形式','知識＋実技'],['合格基準','知識＋実技 合計65%以上'],['受験料','8,800円（税込）'],['主な内容','合成・レイヤー・フィルター・Web書き出し'],['学習時間','約60時間（目安）']] }
+    ],
+    tips:['作業指示書に沿って操作する形式。指示の意味を理解することが最初のハードル','Illustratorと合わせて受験する受験者が多く、デザイン職への就職に効果的','累計受験者数10万人近く・合格率7割以上と比較的取得しやすい試験'],
+    tipColor:'#0F6E56',
+    links:[{name:'🔗 公式サイト',url:'https://www.sikaku.gr.jp/ns/ps/'},{name:'📄 サンプル問題',url:'https://www.sikaku.gr.jp/ns/ps/learn/sample/'}]
+  },
+  {
+    id:'web', icon:'🌐', name:'Webクリエイター能力認定試験', org:'サーティファイ ソフトウェア活用能力認定委員会',
+    headBg:'#E6F1FB', nameColor:'#0C447C', orgColor:'#378ADD',
+    levels:[
+      { name:'スタンダード', badge:'基礎', badgeBg:'#A0CC70', badgeColor:'#27500A',
+        boxBg:'#EAF3DE', boxBorder:'#A0CC70', nameColor:'#27500A', barColor:'#3B6D11',
+        rows:[['試験形式','実技のみ'],['試験時間','60分'],['合格基準','得点率 65%以上'],['主な内容','HTML/CSSの基本コーディング・Webデザイン'],['合格率','平均約90%（取得しやすい）']] },
+      { name:'エキスパート', badge:'応用', badgeBg:'#B5D4F4', badgeColor:'#0C447C',
+        boxBg:'#E6F1FB', boxBorder:'#B5D4F4', nameColor:'#0C447C', barColor:'#185FA5',
+        rows:[['試験形式','知識＋実技'],['試験時間','110分'],['合格基準','知識＋実技 合計65%以上'],['主な内容','高度HTML/CSS・レスポンシブ・初歩JS'],['学習時間','公式問題集4周が目安']] }
+    ],
+    tips:['W3C標準に準拠したコーディング能力を問う試験。業界標準の書き方を身につけることが重要','平均合格率約90%とWeb系資格の中では取得しやすい部類','Illustrator・Photoshopと合わせて取得するとWebデザイナーとしての幅が広がる','エキスパートの知識問題では技術用語の理解が問われる'],
+    tipColor:'#185FA5',
+    links:[{name:'🔗 公式サイト',url:'https://www.sikaku.gr.jp/ns/we/'},{name:'📄 サンプル問題',url:'https://www.sikaku.gr.jp/ns/we/learn/sample/'}]
+  }
+];
+
+function renderCertDb() {
+  const tabsEl = document.getElementById('certDbTabs');
+  const contentEl = document.getElementById('certDbContent');
+  if (!tabsEl || !contentEl) return;
+
+  tabsEl.innerHTML = CERT_DB_DATA.map((c,i)=>
+    `<button class="cdt${i===0?' active':''}" onclick="swCertDb('${c.id}',this)">${c.icon} ${c.name.replace('技能認定試験','').replace('クリエイター能力認定試験','').replace('クリエイター能力認定','')}</button>`
+  ).join('');
+
+  contentEl.innerHTML = CERT_DB_DATA.map((c,i)=>`
+    <div class="cdb-panel${i===0?' active':''}" id="cdb-${c.id}">
+      <div class="cdb-card">
+        <div class="cdb-head" style="background:${c.headBg}">
+          <span class="cdb-icon">${c.icon}</span>
+          <div>
+            <div class="cdb-name" style="color:${c.nameColor}">${c.name}</div>
+            <div class="cdb-org" style="color:${c.orgColor}">${c.org}</div>
+          </div>
+        </div>
+        <div class="cdb-body">
+          <div class="cdb-lv-grid">
+            ${c.levels.map(lv=>`
+              <div class="cdb-lv" style="background:${lv.boxBg};border-color:${lv.boxBorder}">
+                <div class="cdb-lv-name" style="color:${lv.nameColor}">
+                  ${lv.name}
+                  <span class="cdb-lv-badge" style="background:${lv.badgeBg};color:${lv.badgeColor}">${lv.badge}</span>
+                </div>
+                ${lv.rows.map(r=>`
+                  <div class="cdb-row">
+                    <span class="cdb-label">${r[0]}</span>
+                    <span class="cdb-val">${r[1]}</span>
+                  </div>`).join('')}
+                <div class="cdb-bar-wrap">
+                  <div class="cdb-bar-lbl"><span>合格ライン</span><span style="color:${lv.barColor};font-weight:600">${lv.rows.find(r=>r[0]==='合格基準')?.[1].match(/\d+/)?.[0]}%</span></div>
+                  <div class="cdb-bar-bg"><div class="cdb-bar-fill" style="width:${lv.rows.find(r=>r[0]==='合格基準')?.[1].match(/\d+/)?.[0]}%;background:${lv.barColor}"></div></div>
+                </div>
+              </div>`).join('')}
+          </div>
+          <div class="cdb-tips">
+            <div class="cdb-tips-title">📌 合格のポイント</div>
+            ${c.tips.map(t=>`<div class="cdb-tip"><div class="cdb-tip-dot" style="background:${c.tipColor}"></div><span>${t}</span></div>`).join('')}
+          </div>
+          <div class="cdb-links">
+            ${c.links.map(l=>`<a class="cdb-link" href="${l.url}" target="_blank">${l.name}</a>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function swCertDb(id, btn) {
+  document.querySelectorAll('.cdb-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.cdt').forEach(b=>b.classList.remove('active'));
+  document.getElementById('cdb-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── 検定バナー描画 ─────────────────────────
+function renderCertBanners() {
+  const wrap = document.getElementById('certBanners');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  const certDefs = [
+    { id:'word',   name:'Word文書処理技能認定試験',       icon:'📝', req:['w04','w05','w06','w07','w08','w09','w10','w11','w13','w14','w17','w21','w22'], levels:['3級','2級'], color:'#0C447C', border:'#B5D4F4', bg:'#EAF6FF' },
+    { id:'excel',  name:'Excel表計算処理技能認定試験',     icon:'📊', req:['e01','e02','e03','e04','e05','e07','e08'], levels:['3級','2級'], color:'#3B6D11', border:'#A0CC70', bg:'#F4FAEe' },
+    { id:'illust', name:'Illustratorクリエイター能力認定', icon:'✏️', req:['i01','i02','i03','i04','i05','i06','i07'], levels:['スタンダード','エキスパート'], color:'#534AB7', border:'#CECBF6', bg:'#F3F2FE' },
+    { id:'photo',  name:'Photoshopクリエイター能力認定',   icon:'📷', req:['ph01','ph02','ph03','ph04','ph05','ph06'], levels:['スタンダード','エキスパート'], color:'#0F6E56', border:'#9FE1CB', bg:'#E8F9F4' },
+    { id:'web',    name:'Webクリエイター能力認定試験',      icon:'🌐', req:['wb01','wb02','wb03','wb04','wb05','wb06','wb07'], levels:['スタンダード','エキスパート'], color:'#185FA5', border:'#85B7EB', bg:'#EAF3FF' },
+  ];
+
+  certDefs.forEach(c => {
+    const ex    = getNextExam(c.id);
+    const done  = c.req.filter(id=>getLv(id)>=2).length;
+    const pct   = Math.round(done/c.req.length*100);
+    const days  = ex ? daysDiff(ex.date) : null;
+    const barColor = pct>=80 ? '#3B6D11' : pct>=50 ? '#BA7517' : c.color;
+    const msg   = pct>=80 ? '✨ 合格ライン突破！自信を持って受験できます' :
+                  pct>=50 ? '📖 あと一息！復習を続けましょう' :
+                  '🌱 コツコツ積み上げ中！毎日の練習が実力になります';
+    const daysClass = days<=7 ? 'urgent' : days<=21 ? 'soon' : 'future';
+
+    const div = document.createElement('div');
+    div.className = 'cert-banner';
+    div.style.cssText = `border-color:${c.border};background:${c.bg}`;
+    div.innerHTML = `
+      <div class="cert-banner-head">
+        <span class="cert-banner-icon">${c.icon}</span>
+        <span class="cert-banner-name" style="color:${c.color}">${c.name}</span>
+        ${days!==null ? `
+          <div style="text-align:right">
+            <div class="cert-banner-days" style="color:${barColor}">あと<span>${days}</span><span class="cert-banner-days-unit">日</span></div>
+            <div class="cert-banner-date" style="background:${c.bg};color:${c.color};border:1px solid ${c.border}">${fmtDate(ex.date)}（${['日','月','火','水','木','金','土'][ex.date.getDay()]}）</div>
+          </div>` : ''}
+      </div>
+      <div class="cert-gauge-wrap">
+        <div class="cert-gauge-labels">
+          <span style="font-size:11px;color:#555">合格予測ゲージ</span>
+          <span style="font-size:12px;font-weight:700;color:${barColor}">${pct}%</span>
+        </div>
+        <div class="cert-gauge-bg">
+          <div class="cert-gauge-fill" style="width:${pct}%;background:${barColor}"></div>
+        </div>
+        <div class="cert-gauge-msg" style="color:${barColor}">${msg}</div>
+      </div>
+      <div class="cert-levels-row">
+        ${c.levels.map(l=>`<span class="cert-level-item" style="border-color:${c.border};color:${c.color};background:${c.bg}">${l}</span>`).join('')}
+        <span style="font-size:11px;color:#888;align-self:center">対応レベル</span>
+      </div>`;
+    wrap.appendChild(div);
+  });
+}
+
+// ─── 全科目一覧（スクロールチェックリスト）────────────
+const allSubjectFilter = {};  // { word: 'all', excel: '3級', ... }
+
+function renderAllSubjects() {
+  const area = document.getElementById('allSubjectsArea');
+  if (!area) return;
+  area.innerHTML = '';
+
+  // 区切りラベル
+  const divLabel = document.createElement('div');
+  divLabel.style.cssText = 'font-size:12px;font-weight:600;color:#2E4057;padding:4px 2px 8px;letter-spacing:.05em';
+  divLabel.textContent = '📋 検定試験出題範囲';
+  area.appendChild(divLabel);
+
+  SUBJECTS.forEach(s => {
+    const meta  = SUBJECT_META[s.id];
+    const items = SKILLS[s.id] || [];
+    if (!items.length) return;
+
+    const filteredItems = items;
+
+    const lv3  = filteredItems.filter(i=>getLv(i.id)===3).length;
+    const lv12 = filteredItems.filter(i=>getLv(i.id)>=1&&getLv(i.id)<3).length;
+    const total = filteredItems.length;
+    const pct  = total ? Math.round(lv3/total*100) : 0;
+
+    const section = document.createElement('div');
+    section.className = 'all-subject-section';
+    section.id = 'allsec-' + s.id;
+
+    // ヘッダー
+    const head = document.createElement('div');
+    head.className = 'all-subject-head';
+    head.style.cssText = `background:${meta.bg};border-color:${meta.border};color:${meta.color}`;
+    head.innerHTML = `
+      <div class="all-subject-head-left">
+        <span class="all-subject-icon">${meta.icon}</span>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div class="all-subject-name" style="color:${meta.color}">${s.name}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
+            <span style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:99px;background:${{'slv-0':'#F1EFE8','slv-1':'#FEF3E2','slv-2':'#E6F1FB','slv-3':'#EEEDFE','slv-4':'#EAF3DE'}[getSubjectLevel(s.id).cls]};color:${{'slv-0':'#888','slv-1':'#633806','slv-2':'#0C447C','slv-3':'#3C3489','slv-4':'#27500A'}[getSubjectLevel(s.id).cls]}">${getSubjectLevel(s.id).label}</span>
+            <span class="all-subject-stats" style="color:${meta.color}">✔ ${lv3}/${total}項目（${pct}%）${lv12>0?`　📖 ${lv12}項目習得中`:''}</span>
+          </div>
+        </div>
+
+      </div>
+      <span class="all-subject-arrow">▶</span>`;
+
+    // ボディ
+    const body = document.createElement('div');
+    body.className = 'all-subject-body';
+    body.style.cssText = `border-color:${meta.border};display:none`;
+
+
+
+    // 凡例
+    const hint = document.createElement('div');
+    hint.style.cssText = 'font-size:10px;color:#888;padding:5px 12px;background:rgba(0,0,0,0.02)';
+    hint.innerHTML = '□ 未学習　📖 テキストあり　△ なんとなく　✔ テキストなし';
+    body.appendChild(hint);
+
+    // STEPグループ
+    const groups = {};
+    filteredItems.forEach(i=>{ if(!groups[i.step]) groups[i.step]=[]; groups[i.step].push(i); });
+
+    Object.entries(groups).forEach(([step, skills]) => {
+      const stepDone = skills.filter(sk=>getLv(sk.id)===3).length;
+      const sh = document.createElement('div');
+      sh.className = 'all-step-head';
+      sh.textContent = step + '　' + stepDone + '/' + skills.length;
+      body.appendChild(sh);
+
+      skills.forEach(sk => {
+        const lv   = getLv(sk.id);
+        const date = getDate(sk.id);
+        const certHtml = sk.cert.filter(c=>c!=='1級').map(c=>`<span class="all-tag">${c}</span>`).join('');
+        const row = document.createElement('div');
+        row.className = 'all-item';
+        row.id = 'all-'+sk.id;
+        row.innerHTML = `
+          <div class="all-item-left">
+            <div class="all-item-name">${sk.name}</div>
+            ${certHtml?`<div class="all-item-tags">${certHtml}</div>`:''}
+            ${date&&lv===3?`<div class="all-date">✔ ${date.slice(5)} 習得</div>`:''}
+          </div>
+          <div class="all-lv-btns">
+            ${[0,1,2,3].map(l=>`
+              <button class="all-lv-btn alb${l}${lv===l?' active':''}"
+                onclick="allSetLv('${sk.id}',${l},this)">
+                ${['未','📖','△','✔'][l]}
+              </button>`).join('')}
+          </div>`;
+        body.appendChild(row);
+      });
+    });
+
+    // 開閉トグル
+    let open = false;
+    head.onclick = () => {
+      open = !open;
+      body.style.display = open ? 'block' : 'none';
+      head.querySelector('.all-subject-arrow').classList.toggle('open', open);
+    };
+
+    section.appendChild(head);
+    section.appendChild(body);
+    area.appendChild(section);
+  });
+}
+
+function setAllSubjectFilter(subId, level) {
+  allSubjectFilter[subId] = level;
+  renderAllSubjects();
+}
+
+function allSetLv(id, lv, btn) {
+  const today  = new Date().toISOString().slice(0,10);
+  const prev   = skillData[id]||{};
+  const allItems = Object.values(SKILLS).flat();
+  const prevLv3  = allItems.filter(s=>getLv(s.id)===3).length;
+  skillData[id] = { lv, date: lv===3 ? today : (prev.date||'') };
+  lsSave('skills', skillData);
+  const newLv3 = allItems.filter(s=>getLv(s.id)===3).length;
+  checkBadge(prevLv3, newLv3);
+
+  btn.closest('.all-lv-btns').querySelectorAll('.all-lv-btn').forEach((b,i)=>b.classList.toggle('active',i===lv));
+
+  const itemDiv = document.getElementById('all-'+id);
+  if (itemDiv) {
+    let dateDiv = itemDiv.querySelector('.all-date');
+    if (lv===3) {
+      if (!dateDiv) { dateDiv=document.createElement('div'); dateDiv.className='all-date'; itemDiv.querySelector('.all-item-left').appendChild(dateDiv); }
+      dateDiv.textContent = '✔ '+today.slice(5)+' 習得';
+    } else if (dateDiv) dateDiv.textContent='';
+  }
+
+  // dashSkillAreaと同期
+  const dashBadge = document.getElementById('badge-'+id);
+  if (dashBadge) {
+    dashBadge.className = 'lv-badge lv'+lv;
+    dashBadge.textContent = ['未学習','📖 テキストあり','△ なんとなく','✔ テキストなし'][lv];
+  }
+
+  saveToGAS();
+  renderSubjectBtns();
+  renderDashboard();
+}
+
+// ─── 案A：10問ごとの達成バッジ ─────────────────────────
+const BADGE_MILESTONES = [
+  { count:10,  icon:'🌱', title:'10項目達成！',   sub:'最初の10歩！この調子で続けましょう' },
+  { count:20,  icon:'📖', title:'20項目達成！',   sub:'テキストなしで20項目できます！' },
+  { count:30,  icon:'⭐', title:'30項目達成！',   sub:'30項目！確実に力がついています' },
+  { count:50,  icon:'🔥', title:'50項目達成！',   sub:'50項目突破！すごい成長です！' },
+  { count:75,  icon:'💪', title:'75項目達成！',   sub:'もう半分以上！合格が見えてきました' },
+  { count:100, icon:'🏆', title:'100項目達成！',  sub:'100項目習得！検定合格まであと少し！' },
+  { count:150, icon:'🎯', title:'150項目達成！',  sub:'圧倒的な実力です！全科目制覇へ！' },
+];
+
+let lastBadgeCount = 0;
+
+function checkBadge(prevLv3, newLv3) {
+  // 新たにlv3になった場合のみチェック
+  if (newLv3 <= prevLv3) return;
+  const milestone = BADGE_MILESTONES.slice().reverse().find(m => prevLv3 < m.count && newLv3 >= m.count);
+  if (milestone) showBadge(milestone);
+}
+
+function showBadge(milestone) {
+  document.getElementById('badgeIcon').textContent  = milestone.icon;
+  document.getElementById('badgeTitle').textContent = milestone.title;
+  document.getElementById('badgeSub').textContent   = milestone.sub;
+  document.getElementById('badgePopup').classList.add('show');
+  document.getElementById('badgeOverlay').classList.add('show');
+  setTimeout(closeBadge, 3500);
+}
+
+function closeBadge() {
+  document.getElementById('badgePopup').classList.remove('show');
+  document.getElementById('badgeOverlay').classList.remove('show');
+}
+
+// ─── 案C：科目ごとの習熟度レベル判定 ───────────────────────
+function getSubjectLevel(subId) {
+  const items = SKILLS[subId] || [];
+  if (!items.length) return { level:0, label:'未開始', cls:'slv-0' };
+  const lv3 = items.filter(i=>getLv(i.id)===3).length;
+  const pct  = Math.round(lv3/items.length*100);
+  if (pct === 0)  return { level:0, label:'未開始',       cls:'slv-0', pct };
+  if (pct < 30)   return { level:1, label:'📖 基礎段階',   cls:'slv-1', pct };
+  if (pct < 60)   return { level:2, label:'📘 理解段階',   cls:'slv-2', pct };
+  if (pct < 80)   return { level:3, label:'✨ 習熟段階',   cls:'slv-3', pct };
+  return             { level:4, label:'🏆 合格圏！',     cls:'slv-4', pct };
+}
+
+// ─── 科目アイコン定義 ────────────────────────
+const SUBJECT_META = {
+  word:   { icon:'📝', color:'#0C447C', border:'#B5D4F4', bg:'#E6F1FB' },
+  excel:  { icon:'📊', color:'#3B6D11', border:'#A0CC70', bg:'#EAF3DE' },
+  pp:     { icon:'🎨', color:'#993C1D', border:'#F5C4B3', bg:'#FAECE7' },
+  illust: { icon:'✏️', color:'#534AB7', border:'#CECBF6', bg:'#EEEDFE' },
+  photo:  { icon:'📷', color:'#0F6E56', border:'#9FE1CB', bg:'#E1F5EE' },
+  web:    { icon:'🌐', color:'#185FA5', border:'#85B7EB', bg:'#E6F1FB' },
+  manner: { icon:'🤝', color:'#72243E', border:'#ED93B1', bg:'#FBEAF0' },
+};
+
+// 選択中の科目セット
+let selectedSubjects = new Set();
+
+// ─── 科目選択ボタン描画 ────────────────────────
+function renderSubjectBtns() {
+  const grid = document.getElementById('subjectBtnGrid');
+  const tw   = getThisWeekSubjects().map(s=>s.id);
+  grid.innerHTML = '';
+  SUBJECTS.forEach(s => {
+    const meta   = SUBJECT_META[s.id];
+    const items  = SKILLS[s.id]||[];
+    const lv3    = items.filter(i=>getLv(i.id)===3).length;
+    const total  = items.length;
+    const pct    = total ? Math.round(lv3/total*100) : 0;
+    const isThis = tw.includes(s.id);
+    const isSel  = selectedSubjects.has(s.id);
+    const ex     = getNextExam(s.id);
+    const exTxt  = ex ? `📅 試験まで あと${daysDiff(ex.date)}日` : '';
+
+    const btn = document.createElement('button');
+    btn.className = `subject-btn${isThis?' thisweek':''}${isSel?' selected':''}`;
+    btn.style.borderColor = isSel ? meta.color : meta.border;
+    btn.style.background  = isSel ? meta.color : meta.bg;
+    btn.style.color       = isSel ? '#fff'      : meta.color;
+    btn.innerHTML = `
+      <span class="sb-icon">${meta.icon}</span>
+      <span class="sb-name">${s.name}</span>
+      <span class="sb-prog" style="color:${isSel?'rgba(255,255,255,0.85)':meta.color}">${lv3}/${total}（${pct}%）</span>
+      ${isThis ? `<span style="font-size:10px;padding:2px 8px;border-radius:99px;background:${isSel?'rgba(255,255,255,0.25)':'rgba(255,255,255,0.6)'};color:${isSel?'#fff':meta.color};margin-top:4px;display:inline-block">🔥 今週学習中</span>` : ''}
+  
+    `;
+    btn.onclick = () => toggleSubject(s.id);
+    grid.appendChild(btn);
+  });
+}
+
+// ─── 科目選択トグル ────────────────────────────
+function toggleSubject(id) {
+  if (selectedSubjects.has(id)) {
+    selectedSubjects.delete(id);
+  } else {
+    selectedSubjects.add(id);
+  }
+  renderSubjectBtns();
+  renderDashSkills();
+}
+
+// ─── ダッシュボード内スキルチェックリスト描画 ─────
+// 各科目の級フィルター状態
+const subjectLevelFilter = {};
+
+function getLevelFilterOptions(subId) {
+  const certs = new Set();
+  (SKILLS[subId]||[]).forEach(s=>s.cert.forEach(c=>certs.add(c)));
+  return [...certs];
+}
+
+function renderDashSkills() {
+  const area = document.getElementById('dashSkillArea');
+  area.innerHTML = '';
+  if (selectedSubjects.size === 0) return;
+
+  selectedSubjects.forEach(subId => {
+    const s    = SUBJECTS.find(s=>s.id===subId);
+    const meta = SUBJECT_META[subId];
+    const allItems = SKILLS[subId]||[];
+    const levelOptions = getLevelFilterOptions(subId);
+    if (!subjectLevelFilter[subId]) subjectLevelFilter[subId] = 'all';
+    const activeFilter = subjectLevelFilter[subId];
+
+    // フィルター適用
+    const filteredItems = allItems;
+    const items = filteredItems;
+
+    const lv3  = filteredItems.filter(i=>getLv(i.id)===3).length;
+    const total = filteredItems.length;
+
+    const card = document.createElement('div');
+    card.className = 'dash-skill-card';
+    card.style.borderColor = meta.border;
+    card.id = 'dashcard-'+subId;
+
+    // ヘッダー
+    const head = document.createElement('div');
+    head.className = 'dash-skill-head';
+    head.style.background = meta.bg;
+
+    const filterBtns = '';
+
+    head.innerHTML = `
+      <span style="font-size:20px">${meta.icon}</span>
+      <div style="flex:1">
+        <span class="dash-skill-title" style="color:${meta.color}">${s.name}</span>
+        <div style="font-size:11px;color:#888;margin-top:2px">
+          <span style="color:${meta.color};font-weight:500">✔ テキストなし</span>：${lv3}/${total}項目　
+          <span style="color:#BA7517;font-weight:500">📖 テキストあり</span>：${filteredItems.filter(i=>getLv(i.id)>=1&&getLv(i.id)<3).length}
+        </div>
+        ${filterBtns}
+      </div>
+      <button class="dash-skill-close" style="border-color:${meta.color};color:${meta.color};align-self:flex-start" onclick="toggleSubject('${subId}')">✕</button>`;
+
+    const body = document.createElement('div');
+    body.className = 'dash-skill-body';
+    body.innerHTML = `<div class="lv-hint">タップして記録 → □ 未学習　📖 テキストあり　△ なんとなく　✔ テキストなし</div>`;
+
+    // STEPごとにグループ化（フィルター済みアイテム）
+    const groups = {};
+    filteredItems.forEach(i=>{ if(!groups[i.step]) groups[i.step]=[]; groups[i.step].push(i); });
+
+    Object.entries(groups).forEach(([step, skills]) => {
+      const stepDone = skills.filter(s=>getLv(s.id)===3).length;
+      const stepDiv = document.createElement('div');
+      stepDiv.className = 'dash-step-label';
+      stepDiv.textContent = step + '（'+stepDone+'/'+skills.length+'）';
+      body.appendChild(stepDiv);
+      skills.forEach(sk => {
+        const lv   = getLv(sk.id);
+        const date = getDate(sk.id);
+        const certHtml = sk.cert.filter(c=>c!=='1級').map(c=>`<span class="dash-cert">${c}</span>`).join('');
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'dash-item';
+        itemDiv.id = 'dash-'+sk.id;
+        itemDiv.innerHTML = `
+          <div class="dash-item-left">
+            <span class="dash-item-name">${sk.name}</span>
+            ${certHtml ? `<div class="dash-item-certs">${certHtml}</div>` : ''}
+            ${date&&lv===3 ? `<span style="font-size:10px;color:#27500A">✔ ${date.slice(5)} 習得</span>` : ''}
+          </div>
+          <div class="dash-lv-btns">
+            ${[0,1,2,3].map(l=>`<button class="dash-lv-btn dlb${l}${lv===l?' active':''}" onclick="dashSetLv('${sk.id}',${l},this)">${['未','📖','△','✔'][l]}</button>`).join('')}
+          </div>`;
+        body.appendChild(itemDiv);
+      });
+    });
+
+    card.appendChild(head);
+    card.appendChild(body);
+    area.appendChild(card);
+  });
+}
+
+function setLevelFilter(subId, level) {
+  subjectLevelFilter[subId] = level;
+  renderDashSkills();
+}
+
+// ─── ダッシュボードからレベル設定 ──────────────
+function dashSetLv(id, lv, btn) {
+  const today  = new Date().toISOString().slice(0,10);
+  const prev   = skillData[id]||{};
+  const allItems = Object.values(SKILLS).flat();
+  const prevLv3  = allItems.filter(s=>getLv(s.id)===3).length;
+  skillData[id] = { lv, date: lv===3 ? today : (prev.date||'') };
+  lsSave('skills', skillData);
+  const newLv3 = allItems.filter(s=>getLv(s.id)===3).length;
+  checkBadge(prevLv3, newLv3);
+
+  // ボタンUI更新
+  btn.closest('.dash-lv-btns').querySelectorAll('.dash-lv-btn').forEach((b,i)=>b.classList.toggle('active',i===lv));
+
+  // 日付表示更新
+  const itemDiv = document.getElementById('dash-'+id);
+  const leftDiv = itemDiv?.querySelector('.dash-item-left');
+  if (leftDiv) {
+    let dateSpan = leftDiv.querySelector('span[style*="27500A"]');
+    if (lv===3) {
+      if (!dateSpan) { dateSpan = document.createElement('span'); dateSpan.style='font-size:10px;color:#27500A'; leftDiv.appendChild(dateSpan); }
+      dateSpan.textContent = '✔ '+today.slice(5)+' 習得';
+    } else if (dateSpan) { dateSpan.textContent = ''; }
+  }
+
+  saveToGAS();
+  renderDashboard();
+  renderSubjectBtns();
+}
+
+// ─── カウントダウン ────────────────────────────
+function renderCountdown() {
+  const wrap = document.getElementById('countdownWrap');
+  wrap.innerHTML = '';
+  const tw = getThisWeekSubjects();
+  const shown = new Set();
+  tw.forEach(s => {
+    const ex = getNextExam(s.id);
+    if (!ex || shown.has(s.id)) return;
+    shown.add(s.id);
+    const days = daysDiff(ex.date);
+    if (days < 0) return;
+    const cls = days<=7 ? 'urgent' : days<=21 ? 'soon' : 'future';
+    wrap.innerHTML += `
+      <div class="cd-card ${cls}">
+        <div class="cd-subject">${ex.name}</div>
+        <div class="cd-days">あと${days}<span style="font-size:12px">日</span></div>
+        <div class="cd-date">${fmtDate(ex.date)}（${['日','月','火','水','木','金','土'][ex.date.getDay()]}）</div>
+      </div>`;
+  });
+  if (!wrap.innerHTML) {
+    wrap.innerHTML = '<div style="font-size:12px;color:#888;padding:8px 0">現在予定されている検定試験はありません</div>';
   }
 }
 
-// ── 送信（受講生・管理者からのデータ取得）─────────────────────
-function doGet(e) {
-  try {
-    const ss     = SpreadsheetApp.getActiveSpreadsheet();
-    const action = e.parameter.action || 'getStudent';
-    let result   = {};
-
-    if (action === 'getStudent') {
-      result = getStudentData(ss, e.parameter.studentId);
-    } else if (action === 'getAll' || action === 'summary') {
-      result = getAllStudents(ss);
-    }
-
-    return ContentService
-      .createTextOutput(JSON.stringify(result))
-      .setMimeType(ContentService.MimeType.JSON);
-
-  } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: 'error', message: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
+// ─── 今週バナー ────────────────────────────────
+function renderThisWeekBanner() {
+  const w    = getCurrentWeek();
+  const tw   = getThisWeekSubjects();
+  const today = new Date();
+  const dateStr = today.getFullYear() + '.' +
+    String(today.getMonth()+1).padStart(2,'0') + '.' +
+    String(today.getDate()).padStart(2,'0');
+  const weekdays = ['日','月','火','水','木','金','土'];
+  const wdStr = weekdays[today.getDay()];
+  const banner = document.getElementById('thisweekBanner');
+  banner.innerHTML = `
+    <span class="tw-label">${dateStr}（${wdStr}）　第${w}週</span>
+    <div class="tw-subjects">
+      ${tw.map(s=>`<span class="tw-tag">${s.name}</span>`).join('')}
+    </div>`;
 }
 
-// ── 学習データを保存 ─────────────────────────────────────────
-function saveLearningData(ss, data) {
+// ─── ダッシュボード ────────────────────────────
+function renderDashboard() {
+  const all   = Object.values(SKILLS).flat();
+  const today = new Date();
+  const lv3   = all.filter(s=>getLv(s.id)===3).length;
+  const total = all.length;
+  const daysPassed = Math.max(1, Math.round((today-TRAIN_START)/86400000));
+  const rate  = lv3/daysPassed;
 
-  // ① 理解度データシート（最新状態を受講生ごとに1行で保持）
-  let skillSheet = ss.getSheetByName(SHEET_SKILLS);
-  if (!skillSheet) {
-    skillSheet = ss.insertSheet(SHEET_SKILLS);
-    skillSheet.appendRow([
-      'タイムスタンプ', '受講生番号', '氏名', '総合（全体）',
-      'Word習得数', 'Excel習得数', 'PP習得数', 'Illustrator習得数',
-      'Photoshop習得数', 'Web習得数', 'ビジマナ習得数',
-      'スキルデータ(JSON)', '学習ログ(JSON)'
-    ]);
-    skillSheet.setFrozenRows(1);
-    skillSheet.getRange(1,1,1,13).setBackground('#2E4057').setFontColor('#ffffff').setFontWeight('bold');
-  }
+  document.getElementById('tl1w').textContent = lv3;
+  document.getElementById('tl1m').textContent = Math.min(total, Math.round(lv3+rate*30));
+  document.getElementById('tl3m').textContent = Math.min(total, Math.round(lv3+rate*90));
+  document.getElementById('tl5m').textContent = total;
 
-  // スキルデータ取得（skillData形式: { id: { lv, date } }）
-  const skillData = data.skillData || data.skills || {};
-
-  // 科目別lv3カウント（各科目のID prefix で判定）
-  const prefixes = { word:'w', excel:'e', pp:'p', illust:'i', photo:'ph', web:'wb', manner:'m' };
-  const counts = {};
-  Object.entries(prefixes).forEach(([subj, prefix]) => {
-    counts[subj] = Object.entries(skillData).filter(([id, v]) =>
-      id.startsWith(prefix) && v.lv === 3
-    ).length;
+  // レーダーチャート
+  const radarData = SUBJECTS.map(s=>subjectPct(s.id));
+  if (radarChart) radarChart.destroy();
+  radarChart = new Chart(document.getElementById('radarChart'), {
+    type:'radar',
+    data:{
+      labels: SUBJECTS.map(s=>s.name),
+      datasets:[{ label:'習熟度', data:radarData,
+        backgroundColor:'rgba(46,64,87,0.12)', borderColor:'#2E4057',
+        borderWidth:2, pointBackgroundColor:'#2E4057', pointRadius:4 }]
+    },
+    options:{ responsive:true,
+      scales:{ r:{ min:0,max:100, ticks:{ stepSize:25, font:{size:10} }, pointLabels:{ font:{size:11} } } },
+      plugins:{ legend:{ display:false } }
+    }
   });
 
-  // 総合lv3数
-  const totalLv3 = Object.values(skillData).filter(v => v.lv === 3).length;
+  // 合格予測ゲージ
+  renderCertGauges();
 
-  // 既存行を検索（01と1など表記ゆれも吸収）
-  const vals = skillSheet.getDataRange().getValues();
-  let targetRow = -1;
-  const normalId = String(parseInt(data.studentId)); // "01"→"1" に正規化
-  for (let i = 1; i < vals.length; i++) {
-    const rowId = String(parseInt(String(vals[i][1]))); // セルの値も正規化
-    if (rowId === normalId) {
-      targetRow = i + 1;
-      break;
-    }
-  }
+  // 検定バナー
+  renderCertBanners();
 
-  const row = [
-    new Date(),
-    data.studentId,
-    data.studentName || '',
-    totalLv3,
-    counts.word   || 0,
-    counts.excel  || 0,
-    counts.pp     || 0,
-    counts.illust || 0,
-    counts.photo  || 0,
-    counts.web    || 0,
-    counts.manner || 0,
-    JSON.stringify(skillData),
-    JSON.stringify(data.history || data.studyLog || {}),
+  // 週次進捗バー
+  const wp = document.getElementById('weekProgress');
+  wp.innerHTML = '';
+  SUBJECTS.forEach(s=>{
+    const items = SKILLS[s.id]||[];
+    if (!items.length) return;
+    const lv3c = items.filter(i=>getLv(i.id)===3).length;
+    const mid  = items.filter(i=>getLv(i.id)>=1&&getLv(i.id)<3).length;
+    const tot  = items.length;
+    const p3   = Math.round(lv3c/tot*100);
+    const pm   = Math.round(mid/tot*100);
+    wp.innerHTML += `
+      <div class="week-prog">
+        <div class="week-prog-head">
+          <span class="week-prog-label">${s.name}</span>
+          <span class="week-prog-pct">${p3}% 習得（${lv3c}/${tot}）</span>
+        </div>
+        <div class="week-prog-bar">
+          <div class="prog-fill-mid"  style="width:${p3+pm}%"></div>
+          <div class="prog-fill-done" style="width:${p3}%"></div>
+        </div>
+      </div>`;
+  });
+}
+
+// ─── 合格予測ゲージ ────────────────────────────
+function renderCertGauges() {
+  const wrap = document.getElementById('certGauges');
+  wrap.innerHTML = '';
+
+  const certDefs = [
+    { id:'word',   name:'Word 2・3級',           reqItems:['w04','w05','w06','w07','w08','w09','w10','w11','w13','w14','w17','w21','w22'], color:'#0C447C' },
+    { id:'excel',  name:'Excel 2・3級',           reqItems:['e01','e02','e03','e04','e05','e07','e08'], color:'#3B6D11' },
+    { id:'illust', name:'Illustratorクリエイター', reqItems:['i01','i02','i03','i04','i05','i06','i07'], color:'#534AB7' },
+    { id:'photo',  name:'Photoshopクリエイター',   reqItems:['ph01','ph02','ph03','ph04','ph05','ph06'], color:'#0F6E56' },
+    { id:'web',    name:'Webクリエイター',          reqItems:['wb01','wb02','wb03','wb04','wb05','wb06','wb07'], color:'#185FA5' },
   ];
 
-  if (targetRow > 0) {
-    skillSheet.getRange(targetRow, 1, 1, row.length).setValues([row]);
-  } else {
-    skillSheet.appendRow(row);
-  }
-
-  // ② 学習ログシート（保存履歴を追記）
-  let logSheet = ss.getSheetByName(SHEET_LOG);
-  if (!logSheet) {
-    logSheet = ss.insertSheet(SHEET_LOG);
-    logSheet.appendRow(['タイムスタンプ', '受講生番号', '氏名', '総習得数', 'Word', 'Excel', 'PP', 'Illustrator', 'Photoshop', 'Web', 'ビジマナ']);
-    logSheet.setFrozenRows(1);
-    logSheet.getRange(1,1,1,11).setBackground('#2E4057').setFontColor('#ffffff').setFontWeight('bold');
-  }
-  logSheet.appendRow([
-    new Date(), data.studentId, data.studentName || '', totalLv3,
-    counts.word, counts.excel, counts.pp, counts.illust,
-    counts.photo, counts.web, counts.manner
-  ]);
-
-  // ③ 集計サマリー更新
-  updateSummary(ss);
+  certDefs.forEach(c => {
+    const ex   = getNextExam(c.id);
+    const done = c.reqItems.filter(id=>getLv(id)>=2).length;
+    const pct  = Math.round(done/c.reqItems.length*100);
+    const daysLeft = ex ? daysDiff(ex.date) : null;
+    const barColor = pct>=80 ? '#3B6D11' : pct>=50 ? '#BA7517' : '#A32D2D';
+    const msg  = pct>=80 ? '✨ 合格ライン突破！自信を持って受験できます' : pct>=50 ? '📖 あと一息！復習を続けましょう' : '🌱 コツコツ積み上げ中！';
+    wrap.innerHTML += `
+      <div class="cg">
+        <div class="cg-head">
+          <span class="cg-name">${c.name}</span>
+          <span class="cg-pct" style="color:${barColor}">${pct}%</span>
+        </div>
+        ${daysLeft!==null ? `<div class="cg-date">📅 次の試験まで あと${daysLeft}日（${fmtDate(ex.date)}）</div>` : ''}
+        <div class="cg-bar-bg">
+          <div class="cg-bar" style="width:${pct}%;background:${barColor}"></div>
+        </div>
+        <div class="cg-msg" style="color:${barColor}">${msg}</div>
+      </div>`;
+  });
 }
 
-// ── 受講生個人データを返す ─────────────────────────────────────
-function getStudentData(ss, studentId) {
-  if (!studentId) return { status: 'error', message: 'studentId required' };
-
-  const sheet = ss.getSheetByName(SHEET_SKILLS);
-  if (!sheet || sheet.getLastRow() <= 1) return { status: 'ok', skillData: {}, history: [] };
-
-  const vals = sheet.getDataRange().getValues();
-  const normalStudentId = String(parseInt(studentId));
-  for (let i = 1; i < vals.length; i++) {
-    const rowId = String(parseInt(String(vals[i][1])));
-    if (rowId === normalStudentId) {
-      let skillData = {};
-      let history   = [];
-      try { skillData = JSON.parse(vals[i][11] || '{}'); } catch(e){}
-      try { history   = JSON.parse(vals[i][12] || '[]'); } catch(e){}
-      // historyがオブジェクト形式の場合は配列に変換
-      if (!Array.isArray(history) && typeof history === 'object') {
-        history = Object.entries(history).map(([date,avg])=>({ date, totalLv3: avg }));
-      }
-      return {
-        status:      'ok',
-        studentId:   vals[i][1],
-        studentName: vals[i][2],
-        skillData,
-        history,
-      };
-    }
-  }
-  return { status: 'ok', skillData: {}, history: [] };
+// ─── 科目タブ ──────────────────────────────────
+function renderSubjectTabs() {
+  const tw = getThisWeekSubjects().map(s=>s.id);
+  const el = document.getElementById('subjectTabs');
+  el.innerHTML = SUBJECTS.map(s=>{
+    const isThis = tw.includes(s.id);
+    const isActive = s.id===currentSubject;
+    return `<button class="subject-tab${isActive?' active':''}${isThis&&!isActive?' thisweek':''}"
+      onclick="swSubject('${s.id}',this)">
+      ${isThis?'🔥 ':''}${s.name}
+    </button>`;
+  }).join('');
 }
 
-// ── 全受講生データを返す（管理者用）──────────────────────────
-function getAllStudents(ss) {
-  const sheet = ss.getSheetByName(SHEET_SKILLS);
-  if (!sheet || sheet.getLastRow() <= 1) return { status: 'ok', students: [] };
+function swSubject(id, btn) {
+  currentSubject = id;
+  document.querySelectorAll('.subject-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSkills(id);
+}
 
-  const vals     = sheet.getDataRange().getValues();
-  const students = [];
+// ─── スキルリスト ──────────────────────────────
+function renderSkills(subId) {
+  const container = document.getElementById('skillsContainer');
+  const items = SKILLS[subId]||[];
+  const groups = {};
+  items.forEach(s=>{ if(!groups[s.step]) groups[s.step]=[]; groups[s.step].push(s); });
+  container.innerHTML = '';
 
-  for (let i = 1; i < vals.length; i++) {
-    students.push({
-      studentId:    String(vals[i][1]),
-      studentName:  vals[i][2],
-      totalLv3:     vals[i][3],
-      word:         vals[i][4],
-      excel:        vals[i][5],
-      pp:           vals[i][6],
-      illust:       vals[i][7],
-      photo:        vals[i][8],
-      web:          vals[i][9],
-      manner:       vals[i][10],
-      updatedAt:    vals[i][0] ? new Date(vals[i][0]).toLocaleDateString('ja-JP') : '',
+  Object.entries(groups).forEach(([step, skills])=>{
+    const done  = skills.filter(s=>getLv(s.id)===3).length;
+    const total = skills.length;
+
+    const groupEl = document.createElement('div');
+    groupEl.className = 'skill-group';
+
+    const head = document.createElement('div');
+    head.className = 'skill-group-head';
+    head.innerHTML = `
+      <span class="skill-group-name">${step}</span>
+      <span class="skill-group-prog">${done}/${total} 習得済み</span>
+      <span class="skill-group-arrow">▶</span>`;
+
+    const body = document.createElement('div');
+    body.className = 'skill-items';
+
+    skills.forEach(s=>{
+      const lv   = getLv(s.id);
+      const date = getDate(s.id);
+      const certHtml = s.cert.filter(c=>c!=='1級').map(c=>`<span class="cert-tag">${c}</span>`).join('');
+      const item = document.createElement('div');
+      item.className = 'skill-item';
+      item.innerHTML = `
+        <div class="skill-item-head">
+          <span class="lv-badge lv${lv}" id="badge-${s.id}">${LV_LABELS[lv]}</span>
+          <span class="skill-item-name">${s.name}${certHtml?`<span class="cert-tags" style="margin-left:4px">${certHtml}</span>`:''}</span>
+          ${date&&lv===3?`<span class="skill-date">${date.slice(5)}</span>`:''}
+        </div>
+        <div class="lv-btns">
+          ${[0,1,2,3].map(l=>`<button class="lv-btn lv-btn-${l}${lv===l?' active':''}" onclick="setLv('${s.id}',${l},this)">${LV_SHORT[l]}</button>`).join('')}
+        </div>`;
+      body.appendChild(item);
     });
-  }
 
-  return {
-    status:    'ok',
-    students:  students.sort((a,b)=>Number(a.studentId)-Number(b.studentId)),
-    updatedAt: new Date().toLocaleString('ja-JP'),
-  };
+    let open = true;
+    head.onclick = ()=>{
+      open = !open;
+      body.style.display = open ? '' : 'none';
+      head.querySelector('.skill-group-arrow').style.transform = open ? 'rotate(90deg)' : '';
+    };
+    // デフォルト展開
+    head.querySelector('.skill-group-arrow').style.transform = 'rotate(90deg)';
+
+    groupEl.appendChild(head);
+    groupEl.appendChild(body);
+    container.appendChild(groupEl);
+  });
 }
 
-// ── 集計サマリー自動更新 ──────────────────────────────────────
-function updateSummary(ss) {
-  let sheet = ss.getSheetByName(SHEET_SUMMARY);
-  if (!sheet) sheet = ss.insertSheet(SHEET_SUMMARY);
-  sheet.clearContents();
+// ─── レベル設定 ───────────────────────────────
+function setLv(id, lv, btn) {
+  const today = new Date().toISOString().slice(0,10);
+  const prev  = skillData[id]||{};
+  skillData[id] = { lv, date: lv===3 ? today : (prev.date||'') };
+  lsSave('skills', skillData);
 
-  const skillSheet = ss.getSheetByName(SHEET_SKILLS);
-  if (!skillSheet || skillSheet.getLastRow() <= 1) return;
+  btn.closest('.lv-btns').querySelectorAll('.lv-btn').forEach((b,i)=>b.classList.toggle('active',i===lv));
+  const badge = btn.closest('.skill-item').querySelector('.lv-badge');
+  badge.className = `lv-badge lv${lv}`;
+  badge.textContent = LV_LABELS[lv];
+  const dateEl = btn.closest('.skill-item').querySelector('.skill-date');
+  if (dateEl) dateEl.textContent = lv===3 ? today.slice(5) : '';
 
-  const vals = skillSheet.getDataRange().getValues();
-  const data = vals.slice(1);
-  if (!data.length) return;
-
-  const n        = data.length;
-  const avg      = (col) => Math.round(data.reduce((s,r)=>s+Number(r[col]||0),0)/n);
-  const avgTotal = avg(3);
-  const avgWord  = avg(4);
-  const avgExcel = avg(5);
-  const avgPP    = avg(6);
-  const avgIllust= avg(7);
-  const avgPhoto = avg(8);
-  const avgWeb   = avg(9);
-  const avgManner= avg(10);
-
-  sheet.getRange('A1').setValue('集計サマリー（自動更新）').setFontSize(14).setFontWeight('bold').setFontColor('#2E4057');
-  sheet.getRange('A2').setValue('最終更新：' + new Date().toLocaleString('ja-JP')).setFontColor('#888888');
-
-  const summaryData = [
-    ['', ''],
-    ['受講生数',                  n + '名'],
-    ['総習得数（平均）',           avgTotal + '項目'],
-    ['Word 習得数（平均）',        avgWord + '項目'],
-    ['Excel 習得数（平均）',       avgExcel + '項目'],
-    ['PowerPoint 習得数（平均）',  avgPP + '項目'],
-    ['Illustrator 習得数（平均）', avgIllust + '項目'],
-    ['Photoshop 習得数（平均）',   avgPhoto + '項目'],
-    ['Web 習得数（平均）',         avgWeb + '項目'],
-    ['ビジマナ 習得数（平均）',    avgManner + '項目'],
-  ];
-
-  sheet.getRange(3, 1, summaryData.length, 2).setValues(summaryData).setFontSize(12);
-  sheet.setColumnWidth(1, 240);
-  sheet.setColumnWidth(2, 120);
+  saveToGAS();
+  renderDashboard();
 }
+
+// ─── ユーティリティ ────────────────────────────
+function getLv(id)    { return skillData[id]?.lv||0; }
+function getDate(id)  { return skillData[id]?.date||''; }
+function subjectPct(subId) {
+  const items = SKILLS[subId]||[];
+  if (!items.length) return 0;
+  return Math.round(items.reduce((a,s)=>a+getLv(s.id),0)/items.length/3*100);
+}
+
+// ─── GAS保存 ───────────────────────────────────
+async function saveToGAS() {
+  if (!GAS_URL) return;
+  const all   = Object.values(SKILLS).flat();
+  const today = new Date().toISOString().slice(0,10);
+  const snap  = { date:today, totalLv3:all.filter(s=>getLv(s.id)===3).length, totalLv12:all.filter(s=>getLv(s.id)>=1&&getLv(s.id)<3).length };
+  const idx   = logHistory.findIndex(h=>h.date===today);
+  if (idx>=0) logHistory[idx]=snap; else logHistory.push(snap);
+  logHistory.sort((a,b)=>a.date.localeCompare(b.date));
+  lsSave('history', logHistory);
+  try {
+    await fetch(GAS_URL,{
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ type:'learning3', studentId:currentUser, studentName:currentName, skillData, history:logHistory, savedAt:new Date().toISOString() })
+    });
+  } catch(e){}
+}
+
+// ─── 月次レポート ─────────────────────────────
+function renderReport() {
+  const all  = Object.values(SKILLS).flat();
+  const lv3  = all.filter(s=>getLv(s.id)===3).length;
+  const lv12 = all.filter(s=>getLv(s.id)>=1&&getLv(s.id)<3).length;
+  const tot  = all.length;
+
+  document.getElementById('reportSummary').innerHTML = `
+    <div class="rg-card"><div class="rg-num">${lv3}</div><div class="rg-label">テキストなしで習得済み</div></div>
+    <div class="rg-card"><div class="rg-num">${lv12}</div><div class="rg-label">習得中（もう少し！）</div></div>
+    <div class="rg-card"><div class="rg-num">${tot-lv3-lv12}</div><div class="rg-label">これから学ぶ項目</div></div>
+    <div class="rg-card"><div class="rg-num">${Math.round(lv3/tot*100)}%</div><div class="rg-label">習得率</div></div>`;
+
+  const entries = logHistory.slice(-20);
+  if (lineChart) lineChart.destroy();
+  lineChart = new Chart(document.getElementById('lineChart'), {
+    type:'line',
+    data:{
+      labels:entries.map(e=>e.date.slice(5)),
+      datasets:[
+        { label:'テキストなし', data:entries.map(e=>e.totalLv3||0), borderColor:'#2E4057', backgroundColor:'rgba(46,64,87,0.08)', tension:0.3, fill:true, pointRadius:3 },
+        { label:'習得中',       data:entries.map(e=>e.totalLv12||0), borderColor:'#BA7517', backgroundColor:'rgba(186,117,23,0.05)', tension:0.3, fill:true, pointRadius:3 },
+      ]
+    },
+    options:{ responsive:true, scales:{ y:{ min:0, ticks:{ stepSize:5 } } }, plugins:{ legend:{ position:'bottom', labels:{ font:{size:11} } } } }
+  });
+
+  const subAvgs = SUBJECTS.map(s=>({ name:s.name, pct:subjectPct(s.id) }));
+  const best = subAvgs.reduce((a,b)=>a.pct>=b.pct?a:b);
+  const weak = subAvgs.filter(s=>s.pct>0).reduce((a,b)=>a.pct<=b.pct?a:b, subAvgs[0]);
+  let msg = lv3/tot>=0.5
+    ? `習得率${Math.round(lv3/tot*100)}%！素晴らしい成長です。テキストなしでできる項目がどんどん増えています。`
+    : lv3/tot>=0.2
+    ? `習得率${Math.round(lv3/tot*100)}%。着実に力をつけています。テキストを見ながらできる項目を少しずつテキストなしで試してみましょう。`
+    : `毎日コツコツ積み上げている段階です。テキストを見ながら「できた」という経験を大切に。繰り返すうちに必ずテキストなしでできるようになります。`;
+  msg += `<br>${best.name}が最も習熟しています。${weak?.name||''}はこれからもう一伸びが期待できます。`;
+  msg += `<br><br><span style="font-size:11px;color:#888">【アンケート記入時の参考】このレポートを見ながら「テキストなしでできる項目」と「まだテキストが必要な項目」を具体的に記入できます。</span>`;
+  document.getElementById('reportComment').innerHTML = msg;
+}
+</script>
+
+<!-- 達成バッジポップアップ -->
+<div class="badge-overlay" id="badgeOverlay" onclick="closeBadge()"></div>
+<div class="badge-popup" id="badgePopup">
+  <div class="badge-popup-icon" id="badgeIcon">🎉</div>
+  <div class="badge-popup-title" id="badgeTitle"></div>
+  <div class="badge-popup-sub" id="badgeSub"></div>
+</div>
+
+<!-- ログイン -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">📈</div>
+    <div class="login-title">学習成長記録システム</div>
+    <div class="login-sub">ITビジネス・Webデザイン養成科<br>令和8年度 4月7日〜9月4日</div>
+    <label class="login-label">受講生番号</label>
+    <input class="login-input" id="sid" type="text" placeholder="例：01" maxlength="2" inputmode="numeric">
+    <label class="login-label">氏名</label>
+    <input class="login-input" id="sname" type="text" placeholder="例：山田 太郎">
+    <button class="login-btn" onclick="doLogin()">ログイン</button>
+    <div style="font-size:12px;color:#888;margin-top:8px;text-align:center;display:none" id="loginLoading">確認中...</div>
+    <div class="login-motto">
+      📖 テキストを見ながらできれば、今日は合格！<br>
+      繰り返すうちに、自然とテキストなしでできるようになります。<br>
+      <strong>1週間後・1か月後・3か月後・5か月後の<br>自分の成長を楽しみましょう 😊</strong>
+    </div>
+  </div>
+</div>
+
+<!-- メイン画面 -->
+<div id="mainScreen">
+  <div class="header">
+    <div class="header-title">学習成長記録</div>
+    <div class="header-right">
+      <span class="header-name" id="headerName"></span>
+      <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="motto-bar" id="dailyMotto"></div>
+
+    <!-- 検定カウントダウン（非表示） -->
+    
+
+    <!-- 今週のバナー -->
+    <div class="thisweek-banner" id="thisweekBanner"></div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="swTab('today',this)">📝 今日の記録</button>
+      <button class="tab" onclick="swTab('growth',this)">📈 マイ成長</button>
+      <button class="tab" onclick="swTab('cert',this)">🏆 検定対策</button>
+    </div>
+
+    <!-- ════ タブ① 今日の記録 ════ -->
+    <div class="tab-panel active" id="panel-today">
+
+      <div class="card">
+        <div class="card-title">📚 全科目スキルチェックリスト</div>
+        <p style="font-size:12px;color:#888;margin-bottom:14px;line-height:1.7">
+          科目をタップするとチェックリストが展開されます。
+        </p>
+        <div class="subject-btn-grid" id="subjectBtnGrid"></div>
+      </div>
+
+      <!-- 選択科目のチェックリスト -->
+      <div id="dashSkillArea"></div>
+
+      <!-- 全科目一覧 (スクロールで確認可能) -->
+      <div id="allSubjectsArea"></div>
+
+      <!-- マイ成長ボタン -->
+      <div style="text-align:center;margin:1.5rem 0 0.5rem">
+        <button onclick="document.querySelector('[onclick*=growth]').click()"
+          style="padding:14px 40px;background:#2E4057;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">
+          📈 マイ成長を確認する
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ════ タブ② マイ成長 ════ -->
+    <div class="tab-panel" id="panel-growth">
+
+      <!-- 成長タイムライン -->
+      <div class="card">
+        <div class="card-title">🌱 成長タイムライン</div>
+        <div class="timeline">
+          <div class="tl-card tl-1w"><div class="tl-label">現在</div><div class="tl-num" id="tl1w">0</div><div class="tl-unit">項目習得済み</div></div>
+          <div class="tl-card tl-1m"><div class="tl-label">1か月後（予測）</div><div class="tl-num" id="tl1m">-</div><div class="tl-unit">項目習得済み</div></div>
+          <div class="tl-card tl-3m"><div class="tl-label">3か月後（予測）</div><div class="tl-num" id="tl3m">-</div><div class="tl-unit">項目習得済み</div></div>
+          <div class="tl-card tl-5m"><div class="tl-label">5か月後（目標）</div><div class="tl-num" id="tl5m">-</div><div class="tl-unit">項目習得済み</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📊 科目別 習熟度マップ</div>
+        <canvas id="radarChart" height="180"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📅 科目別 進捗</div>
+        <div id="weekProgress"></div>
+      </div>
+
+      <!-- 月次レポート（マイ成長の中に統合） -->
+      <div class="card">
+        <div class="card-title">📋 月次成長レポート
+          <button onclick="window.print()" style="margin-left:auto;font-size:11px;padding:5px 14px;border:1px solid #2E4057;border-radius:8px;background:#fff;color:#2E4057;cursor:pointer;">🖨 印刷</button>
+        </div>
+        <div class="report-grid" id="reportSummary"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 習熟度の推移</div>
+        <canvas id="lineChart" height="110"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-title">💬 コメント（アンケート記入時の参考に）</div>
+        <div class="comment-box" id="reportComment"></div>
+      </div>
+
+    </div>
+
+    <!-- ════ タブ③ 検定対策 ════ -->
+    <div class="tab-panel" id="panel-cert">
+
+      <!-- 合格予測ゲージ -->
+      <div class="card">
+        <div class="card-title">🎯 合格予測ゲージ</div>
+        <div class="cert-gauges" id="certGauges"></div>
+      </div>
+
+      <!-- 検定ダッシュボード（試験概要） -->
+      <div class="card">
+        <div class="card-title">📖 検定試験 概要・出題範囲</div>
+        <div class="cert-db-tabs" id="certDbTabs" style="margin-bottom:1rem"></div>
+        <div id="certDbContent"></div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
