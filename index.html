@@ -119,23 +119,20 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
 .skill-item-name { font-size:12px; color:#2C2C2A; flex:1; min-width:0; line-height:1.5; }
 .skill-date { font-size:10px; color:#27500A; background:#EAF3DE; padding:1px 7px; border-radius:99px; }
 .lv-badge { font-size:10px; font-weight:500; padding:2px 8px; border-radius:99px; white-space:nowrap; flex-shrink:0; }
-.lv0 { background:#F1EFE8; color:#5F5E5A; }
+.lv0 { background:#FCEBEB; color:#A32D2D; }
 .lv1 { background:#E6F1FB; color:#0C447C; }
-.lv2 { background:#FAEEDA; color:#633806; }
-.lv3 { background:#EAF3DE; color:#27500A; }
+.lv2 { background:#EAF3DE; color:#27500A; }
 .cert-tags { display:flex; gap:3px; flex-wrap:wrap; }
 .cert-tag { font-size:9px; padding:1px 5px; border-radius:99px; background:#F1EFE8; color:#5F5E5A; }
 .lv-btns { display:flex; gap:4px; flex-wrap:wrap; }
 .lv-btn { font-size:11px; padding:5px 10px; border-radius:99px; border:1.5px solid #D3D1C7; color:#aaa; cursor:pointer; background:#fff; transition:all 0.1s; font-family:inherit; min-width:34px; }
 .lv-btn:not(.active):hover { border-color:#888; color:#555; }
 .lv-btn-0 { border-color:#D3D1C7; color:#aaa; }
-.lv-btn-0.active { background:#888; color:#fff; border-color:#888; font-weight:700; }
+.lv-btn-0.active { background:#A32D2D; color:#fff; border-color:#A32D2D; font-weight:700; }
 .lv-btn-1 { border-color:#D3D1C7; color:#aaa; }
 .lv-btn-1.active { background:#378ADD; color:#fff; border-color:#378ADD; font-weight:700; }
 .lv-btn-2 { border-color:#D3D1C7; color:#aaa; }
-.lv-btn-2.active { background:#BA7517; color:#fff; border-color:#BA7517; font-weight:700; }
-.lv-btn-3 { border-color:#D3D1C7; color:#aaa; }
-.lv-btn-3.active { background:#3B6D11; color:#fff; border-color:#3B6D11; font-weight:700; }
+.lv-btn-2.active { background:#3B6D11; color:#fff; border-color:#3B6D11; font-weight:700; }
 
 /* ─── 週次進捗バー ─── */
 .week-prog { margin-bottom:10px; }
@@ -199,8 +196,8 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
 .all-lv-btn:not(.active):hover { border-color:#888; color:#555; }
 .alb0.active { background:#888; color:#fff; border-color:#888; font-weight:700; }
 .alb1.active { background:#378ADD; color:#fff; border-color:#378ADD; font-weight:700; }
-.alb2.active { background:#BA7517; color:#fff; border-color:#BA7517; font-weight:700; }
-.alb3.active { background:#3B6D11; color:#fff; border-color:#3B6D11; font-weight:700; }
+
+.alb2.active { background:#3B6D11; color:#fff; border-color:#3B6D11; font-weight:700; }
 
 /* ─── 検定ダッシュボード ─── */
 .cert-db-tabs { display:flex; gap:4px; margin-bottom:1rem; flex-wrap:wrap; }
@@ -281,15 +278,14 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
 .dash-item-certs { display:flex; gap:3px; flex-wrap:wrap; }
 .dash-cert { font-size:9px; padding:1px 5px; border-radius:99px; background:#F1EFE8; color:#5F5E5A; }
 .dash-lv-btns { display:flex; gap:3px; flex-wrap:wrap; flex-shrink:0; }
-.dash-lv-btn { font-size:10px; padding:3px 8px; border-radius:99px; border:1px solid; cursor:pointer; background:transparent; font-family:inherit; white-space:nowrap; }
-.dlb0 { border-color:#D3D1C7; color:#888; }
-.dlb0.active { background:#F1EFE8; color:#5F5E5A; border-color:#B4B2A9; }
-.dlb1 { border-color:#B5D4F4; color:#185FA5; }
-.dlb1.active { background:#E6F1FB; color:#0C447C; border-color:#378ADD; }
-.dlb2 { border-color:#FAC775; color:#854F0B; }
-.dlb2.active { background:#FAEEDA; color:#633806; border-color:#EF9F27; }
-.dlb3 { border-color:#A0CC70; color:#3B6D11; }
-.dlb3.active { background:#EAF3DE; color:#27500A; border-color:#639922; }
+.dash-lv-btn { font-size:11px; padding:5px 10px; border-radius:99px; border:1.5px solid #D3D1C7; color:#aaa; cursor:pointer; background:#fff; font-family:inherit; white-space:nowrap; min-width:34px; transition:all 0.1s; }
+.dash-lv-btn:not(.active):hover { border-color:#888; color:#555; }
+.dlb0 { border-color:#D3D1C7; color:#aaa; }
+.dlb0.active { background:#A32D2D; color:#fff; border-color:#A32D2D; font-weight:700; }
+.dlb1 { border-color:#D3D1C7; color:#aaa; }
+.dlb1.active { background:#378ADD; color:#fff; border-color:#378ADD; font-weight:700; }
+.dlb2 { border-color:#D3D1C7; color:#aaa; }
+.dlb2.active { background:#3B6D11; color:#fff; border-color:#3B6D11; font-weight:700; }
 .lv-hint { font-size:11px; color:#888; margin-bottom:8px; padding:6px 8px; background:#F9F9F6; border-radius:6px; }
 
 @media (max-width:400px) {
@@ -340,79 +336,231 @@ const EXAMS = [
 // ────── スキル定義 ──────────────────────────────
 const SKILLS = {
   word: [
-    // ── 作業環境（3級・2級共通） ──
-    { id:'w01',week:1,step:'作業環境・基礎知識',name:'Wordの画面要素の名称と役割（ドキュメント・文書／スクロールバー／ステータスバー／クイックアクセスツールバー／リボン）',cert:['3級','2級'] },
-    { id:'w02',week:1,step:'作業環境・基礎知識',name:'各タブ（ファイル・ホーム・挿入・デザイン・レイアウト・参考資料・差し込み文書・校閲・表示）の役割',cert:['3級','2級'] },
-    { id:'w03',week:1,step:'作業環境・基礎知識',name:'文書の表示形式：印刷レイアウト、閲覧モード、Webレイアウト、アウトライン、下書き',cert:['3級','2級'] },
-    { id:'w04',week:1,step:'作業環境・基礎知識',name:'表示/非表示：ルーラー、グリッド線、ナビゲーションウィンドウ',cert:['3級','2級'] },
-    { id:'w05',week:1,step:'作業環境・基礎知識',name:'ズーム（拡大・縮小）ができる',cert:['3級','2級'] },
-    { id:'w06',week:1,step:'作業環境・基礎知識',name:'ウィンドウ：新しいウィンドウを開く、整列、分割、ウィンドウの切り替え',cert:['2級'] },
-    { id:'w07',week:1,step:'作業環境・基礎知識',name:'Wordのオプション：基本設定、表示、文章校正（オートコレクト機能含む）、文字体裁、詳細設定',cert:['2級'] },
-    { id:'w08',week:1,step:'作業環境・基礎知識',name:'リボンのユーザー設定、クイックアクセスツールバーのカスタマイズ',cert:['2級'] },
-    // ── 文字書式（3級・2級） ──
-    { id:'w09',week:2,step:'文字書式',name:'フォントの種類とサイズ：日本語用のフォント、英数字用のフォント、フォントサイズ',cert:['3級','2級'] },
-    { id:'w10',week:2,step:'文字書式',name:'スタイル：太字、斜体',cert:['3級','2級'] },
-    { id:'w11',week:2,step:'文字書式',name:'フォントの色',cert:['3級','2級'] },
-    { id:'w12',week:2,step:'文字書式',name:'下線',cert:['3級','2級'] },
-    { id:'w13',week:2,step:'文字書式',name:'文字の効果：文字の効果の設定、文字の塗りつぶし、文字の輪郭、影、反射、光彩、ぼかし、3-D書式',cert:['3級','2級'] },
-    { id:'w14',week:2,step:'文字書式',name:'文字飾り：取り消し線、二重取り消し線、隠し文字、上付き、下付き、小型英大文字、すべて大文字',cert:['2級'] },
-    { id:'w15',week:2,step:'文字書式',name:'文字幅と間隔：倍率、文字間隔、位置、カーニング',cert:['2級'] },
-    { id:'w16',week:2,step:'文字書式',name:'拡張書式：ルビ、囲い文字、縦中横、組み文字、割注、文字の均等割り付け',cert:['2級'] },
-    { id:'w17',week:2,step:'文字書式',name:'書式のコピー/貼り付け、書式のクリア',cert:['3級','2級'] },
-    // ── 段落書式（3級・2級） ──
-    { id:'w18',week:3,step:'段落書式',name:'配置：左揃え、中央揃え、右揃え、両端揃え、均等割り付け',cert:['3級','2級'] },
-    { id:'w19',week:3,step:'段落書式',name:'インデント：左右のインデント、字下げ、ぶら下げ',cert:['3級','2級'] },
-    { id:'w20',week:3,step:'段落書式',name:'間隔：段落前後の間隔、行間',cert:['3級','2級'] },
-    { id:'w21',week:3,step:'段落書式',name:'体裁：改行時の処理、文字幅と間隔',cert:['3級','2級'] },
-    { id:'w22',week:3,step:'段落書式',name:'タブとリーダー',cert:['2級'] },
-    { id:'w23',week:3,step:'段落書式',name:'段組みの設定と解除：種類、段数、段の幅と間隔、設定対象',cert:['2級'] },
-    { id:'w24',week:3,step:'段落書式',name:'箇条書き',cert:['3級','2級'] },
-    { id:'w25',week:3,step:'段落書式',name:'段落番号',cert:['3級','2級'] },
-    // ── ファイル・印刷（3級・2級） ──
-    { id:'w26',week:2,step:'ファイル・印刷',name:'新規作成、開く、閉じる、上書き保存、名前を付けて保存',cert:['3級','2級'] },
-    { id:'w27',week:2,step:'ファイル・印刷',name:'Word文書（*.docx）、Word97-2003文書（*.doc）で保存できる',cert:['3級','2級'] },
-    { id:'w28',week:2,step:'ファイル・印刷',name:'PDF（*.pdf）、Webページ（*.htm）、リッチテキスト形式（*.rtf）、書式なし（*.txt）で保存できる',cert:['2級'] },
-    { id:'w29',week:2,step:'ファイル・印刷',name:'印刷設定、印刷プレビュー',cert:['3級','2級'] },
-    // ── ページ設定・デザイン（3級・2級） ──
-    { id:'w30',week:2,step:'ページ設定・デザイン',name:'ページ設定：用紙サイズ、余白、文字数と行数、印刷の向き、ヘッダーとフッターの用紙の端からの距離',cert:['3級','2級'] },
-    { id:'w31',week:2,step:'ページ設定・デザイン',name:'ヘッダー、フッター、ページ番号',cert:['3級','2級'] },
-    { id:'w32',week:4,step:'ページ設定・デザイン',name:'テーマ：テーマ、配色、フォント、効果',cert:['2級'] },
-    { id:'w33',week:4,step:'ページ設定・デザイン',name:'ページの背景：透かし、ページの色、ページ罫線',cert:['3級','2級'] },
-    // ── 文書編集（3級・2級） ──
-    { id:'w34',week:2,step:'文書編集',name:'選択と解除：文字、行、段落、文書全体の選択',cert:['3級','2級'] },
-    { id:'w35',week:2,step:'文書編集',name:'キー操作：Enter、Delete、BackSpaceの役割、Ctrl、Alt、Shiftの基本的な役割',cert:['3級','2級'] },
-    { id:'w36',week:2,step:'文書編集',name:'文字列の削除、切り取り、コピー、貼り付け、挿入',cert:['3級','2級'] },
-    { id:'w37',week:2,step:'文書編集',name:'元に戻す、やり直し、繰り返し',cert:['3級','2級'] },
-    { id:'w38',week:3,step:'文書編集',name:'検索、置換、ジャンプ',cert:['2級'] },
-    { id:'w39',week:3,step:'文書編集',name:'改ページの挿入と削除、セクション区切り',cert:['2級'] },
-    { id:'w40',week:3,step:'文書編集',name:'ページ区切り：段区切り、文字列の折り返し',cert:['2級'] },
-    { id:'w41',week:4,step:'文書編集',name:'スペルチェックと文章校正、文字カウント、スマート検索、表記ゆれチェック',cert:['2級'] },
-    { id:'w42',week:4,step:'文書編集',name:'スタイルの作成と変更、スタイルの適用',cert:['2級'] },
-    // ── 罫線と表（3級・2級） ──
-    { id:'w43',week:3,step:'罫線と表',name:'表の作成（マス目指定・数値指定）、文字列を表にする、表の解除',cert:['3級','2級'] },
-    { id:'w44',week:3,step:'罫線と表',name:'表のデザイン：セルの塗りつぶし、罫線のスタイル・ペンの色・太さ',cert:['3級','2級'] },
-    { id:'w45',week:3,step:'罫線と表',name:'表のレイアウト：罫線を引く・削除、行・列の挿入',cert:['3級','2級'] },
-    { id:'w46',week:3,step:'罫線と表',name:'行の高さ、列の幅、セルのサイズ調整',cert:['3級','2級'] },
-    { id:'w47',week:3,step:'罫線と表',name:'セルの結合/分割',cert:['3級','2級'] },
-    { id:'w48',week:3,step:'罫線と表',name:'セル内の文字列の配置、文字の方向',cert:['3級','2級'] },
-    { id:'w49',week:3,step:'罫線と表',name:'表のスタイル：クイックスタイルからの設定',cert:['3級','2級'] },
-    { id:'w50',week:4,step:'罫線と表',name:'表の配置と文字列の折り返し、表のオプション',cert:['2級'] },
-    { id:'w51',week:4,step:'罫線と表',name:'表内で計算式（MAX、MIN、AVERAGE、SUM）を使う',cert:['2級'] },
-    // ── オブジェクト（3級・2級） ──
-    { id:'w52',week:5,step:'オブジェクト（図形・画像）',name:'図形の作成：最近使用した図形、線、四角形、基本図形、ブロック矢印、フローチャート、吹き出し等',cert:['3級','2級'] },
-    { id:'w53',week:5,step:'オブジェクト（図形・画像）',name:'テキストボックス：横書きテキストボックス、縦書きテキストボックス',cert:['3級','2級'] },
-    { id:'w54',week:5,step:'オブジェクト（図形・画像）',name:'図形のスタイル：クイックスタイル、図形の塗りつぶし、図形の枠線、図形の効果',cert:['3級','2級'] },
-    { id:'w55',week:5,step:'オブジェクト（図形・画像）',name:'図形のサイズ変更・移動、数値を指定したサイズ変更、回転/反転',cert:['3級','2級'] },
-    { id:'w56',week:5,step:'オブジェクト（図形・画像）',name:'前面へ移動/背面へ移動、配置/整列',cert:['3級','2級'] },
-    { id:'w57',week:5,step:'オブジェクト（図形・画像）',name:'グループ化、グループ解除、再グループ化',cert:['3級','2級'] },
-    { id:'w58',week:5,step:'オブジェクト（図形・画像）',name:'図形の変更、頂点の編集（2級）',cert:['2級'] },
-    { id:'w59',week:5,step:'オブジェクト（図形・画像）',name:'画像の挿入、文字列の折り返しの設定、位置',cert:['3級','2級'] },
-    { id:'w60',week:5,step:'オブジェクト（図形・画像）',name:'図のスタイル：クイックスタイル、図の枠線、図の効果',cert:['3級','2級'] },
-    { id:'w61',week:5,step:'オブジェクト（図形・画像）',name:'修整、色、アート効果、図の圧縮、図の変更、図のリセット',cert:['2級'] },
-    { id:'w62',week:5,step:'オブジェクト（図形・画像）',name:'サイズ変更（図のトリミングを含む）',cert:['3級','2級'] },
-    { id:'w63',week:5,step:'オブジェクト（図形・画像）',name:'ワードアートの挿入とスタイル変更',cert:['2級'] },
-    { id:'w64',week:5,step:'オブジェクト（図形・画像）',name:'オブジェクトの選択（3級）・表示/非表示（2級）',cert:['3級','2級'] },
-    { id:'w65',week:5,step:'オブジェクト（図形・画像）',name:'Excelワークシートの挿入、Excelの表・グラフの貼り付け',cert:['2級'] },
+    // ── タイピング基礎 ──
+    { id:'w001',week:1,step:'タイピング基礎',name:'英字小文字の入力ができる',cert:['3級','2級'] },
+    { id:'w002',week:1,step:'タイピング基礎',name:'練習3',cert:[] },
+    { id:'w003',week:1,step:'タイピング基礎',name:'文字を消すことができる',cert:['3級','2級'] },
+    { id:'w004',week:1,step:'タイピング基礎',name:'改行することができる',cert:['3級','2級'] },
+    { id:'w005',week:1,step:'タイピング基礎',name:'練習4',cert:[] },
+    { id:'w006',week:1,step:'タイピング基礎',name:'数字の入力ができる',cert:['3級','2級'] },
+    { id:'w007',week:1,step:'タイピング基礎',name:'練習5',cert:[] },
+    { id:'w008',week:1,step:'タイピング基礎',name:'記号の入力ができる',cert:['3級','2級'] },
+    { id:'w009',week:1,step:'タイピング基礎',name:'練習6',cert:[] },
+    { id:'w010',week:1,step:'タイピング基礎',name:'大文字の入力ができる',cert:['3級','2級'] },
+    { id:'w011',week:1,step:'タイピング基礎',name:'練習7',cert:[] },
+    { id:'w012',week:1,step:'タイピング基礎',name:'練習8',cert:[] },
+    { id:'w013',week:1,step:'タイピング基礎',name:'ひらがなの入力ができる',cert:['3級','2級'] },
+    { id:'w014',week:1,step:'タイピング基礎',name:'練習9',cert:[] },
+    { id:'w015',week:1,step:'タイピング基礎',name:'長音、そく音、よう音の入力ができる',cert:['3級','2級'] },
+    { id:'w016',week:1,step:'タイピング基礎',name:'練習10',cert:[] },
+    { id:'w017',week:1,step:'タイピング基礎',name:'漢字の入力ができる',cert:['3級','2級'] },
+    { id:'w018',week:1,step:'タイピング基礎',name:'練習11',cert:[] },
+    { id:'w019',week:1,step:'タイピング基礎',name:'カタカナ変換ができる',cert:['3級','2級'] },
+    { id:'w020',week:1,step:'タイピング基礎',name:'練習12',cert:[] },
+    { id:'w021',week:1,step:'タイピング基礎',name:'アルファベット変換ができる',cert:['3級','2級'] },
+    { id:'w022',week:1,step:'タイピング基礎',name:'練習13',cert:[] },
+    { id:'w023',week:1,step:'タイピング基礎',name:'文章の編集ができる',cert:['3級','2級'] },
+    { id:'w024',week:1,step:'タイピング基礎',name:'入力の仕方ができる',cert:['3級','2級'] },
+    { id:'w025',week:1,step:'タイピング基礎',name:'文節変換ができる',cert:['3級','2級'] },
+    { id:'w026',week:1,step:'タイピング基礎',name:'一括変換ができる',cert:['3級','2級'] },
+    { id:'w027',week:1,step:'タイピング基礎',name:'文字の追加ができる',cert:['3級','2級'] },
+    { id:'w028',week:1,step:'タイピング基礎',name:'練習14',cert:[] },
+    { id:'w029',week:1,step:'タイピング基礎',name:'文書の保存ができる',cert:['3級','2級'] },
+    { id:'w030',week:1,step:'タイピング基礎',name:'上書き保存ができる',cert:['3級','2級'] },
+    { id:'w031',week:1,step:'タイピング基礎',name:'文書を開くことができる',cert:['3級','2級'] },
+    { id:'w032',week:1,step:'タイピング基礎',name:'印刷ができる',cert:['3級','2級'] },
+    { id:'w033',week:1,step:'タイピング基礎',name:'新規作成ができる',cert:['3級','2級'] },
+    { id:'w034',week:1,step:'タイピング基礎',name:'入力問題1',cert:[] },
+    { id:'w035',week:1,step:'タイピング基礎',name:'入力問題2',cert:[] },
+    { id:'w036',week:1,step:'タイピング基礎',name:'入力問題3',cert:[] },
+    { id:'w037',week:1,step:'タイピング基礎',name:'入力問題4',cert:[] },
+    { id:'w038',week:1,step:'タイピング基礎',name:'入力問題5',cert:[] },
+    { id:'w039',week:1,step:'タイピング基礎',name:'入力問題6',cert:[] },
+    // ── Word基本操作 ──
+    { id:'w040',week:2,step:'Word基本操作',name:'Wordが起動できる',cert:['3級','2級'] },
+    { id:'w041',week:2,step:'Word基本操作',name:'画面構成がわかる',cert:['3級','2級'] },
+    { id:'w042',week:2,step:'Word基本操作',name:'ビジネス文書の種類がわかる',cert:['3級','2級'] },
+    { id:'w043',week:2,step:'Word基本操作',name:'受信者名につける敬称がわかる',cert:['3級','2級'] },
+    { id:'w044',week:2,step:'Word基本操作',name:'頭語と結語がわかる',cert:['3級','2級'] },
+    { id:'w045',week:2,step:'Word基本操作',name:'時候の挨拶がわかる',cert:['3級','2級'] },
+    { id:'w046',week:2,step:'Word基本操作',name:'相手の繁栄、幸福を祝う挨拶文がわかる',cert:['3級','2級'] },
+    { id:'w047',week:2,step:'Word基本操作',name:'相手への感謝をあらわす挨拶文がわかる',cert:['3級','2級'] },
+    { id:'w048',week:2,step:'Word基本操作',name:'文書作成の流れがわかる',cert:['3級','2級'] },
+    { id:'w049',week:2,step:'Word基本操作',name:'右揃えができる',cert:['3級','2級'] },
+    { id:'w050',week:2,step:'Word基本操作',name:'練習1',cert:[] },
+    { id:'w051',week:2,step:'Word基本操作',name:'均等割付ができる',cert:['3級','2級'] },
+    { id:'w052',week:2,step:'Word基本操作',name:'練習2',cert:[] },
+    { id:'w053',week:2,step:'Word基本操作',name:'F4キーで同操作を連続することができる',cert:['3級','2級'] },
+    { id:'w054',week:2,step:'Word基本操作',name:'用紙設定ができる',cert:['3級','2級'] },
+    { id:'w055',week:2,step:'Word基本操作',name:'余白と印刷の向きを設定できる',cert:['3級','2級'] },
+    { id:'w056',week:2,step:'Word基本操作',name:'文字数と行数を設定できる',cert:['3級','2級'] },
+    { id:'w057',week:2,step:'Word基本操作',name:'印刷プレビューを確認できる',cert:['3級','2級'] },
+    { id:'w058',week:2,step:'Word基本操作',name:'名前を付けて保存ができる',cert:['3級','2級'] },
+    { id:'w059',week:2,step:'Word基本操作',name:'上書き保存ができる',cert:['3級','2級'] },
+    { id:'w060',week:2,step:'Word基本操作',name:'新規文書ができる',cert:['3級','2級'] },
+    { id:'w061',week:2,step:'Word基本操作',name:'練習3',cert:[] },
+    { id:'w062',week:2,step:'Word基本操作',name:'フォントとサイズの設定ができる',cert:['3級','2級'] },
+    { id:'w063',week:2,step:'Word基本操作',name:'文字飾りができる',cert:['3級','2級'] },
+    { id:'w064',week:2,step:'Word基本操作',name:'リボンからの設定ができる',cert:['3級','2級'] },
+    { id:'w065',week:2,step:'Word基本操作',name:'設定の解除ができる',cert:['3級','2級'] },
+    { id:'w066',week:2,step:'Word基本操作',name:'練習4',cert:[] },
+    { id:'w067',week:2,step:'Word基本操作',name:'練習5',cert:[] },
+    { id:'w068',week:2,step:'Word基本操作',name:'練習6',cert:[] },
+    { id:'w069',week:2,step:'Word基本操作',name:'練習7',cert:[] },
+    // ── 表の作成 ──
+    { id:'w070',week:3,step:'表の作成',name:'数値で指定して表を作成できる',cert:['3級','2級'] },
+    { id:'w071',week:3,step:'表の作成',name:'マス目で指定して表を作成できる',cert:['3級','2級'] },
+    { id:'w072',week:3,step:'表の作成',name:'列の幅を揃える（列の調節）ことができる',cert:['3級','2級'] },
+    { id:'w073',week:3,step:'表の作成',name:'行の高さを揃える（行の調節）ことができる',cert:['3級','2級'] },
+    { id:'w074',week:3,step:'表の作成',name:'斜め線を引くことができる',cert:['3級','2級'] },
+    { id:'w075',week:3,step:'表の作成',name:'ドラッグして線を引くことができる',cert:['3級','2級'] },
+    { id:'w076',week:3,step:'表の作成',name:'セルの結合ができる',cert:['3級','2級'] },
+    { id:'w077',week:3,step:'表の作成',name:'セル内に文字を入力することができる',cert:['3級','2級'] },
+    { id:'w078',week:3,step:'表の作成',name:'練習8',cert:[] },
+    { id:'w079',week:3,step:'表の作成',name:'練習9',cert:[] },
+    { id:'w080',week:3,step:'表の作成',name:'上書き・挿入の切り替えができる',cert:['3級','2級'] },
+    { id:'w081',week:3,step:'表の作成',name:'練習10',cert:[] },
+    { id:'w082',week:3,step:'表の作成',name:'練習11',cert:[] },
+    { id:'w083',week:3,step:'表の作成',name:'太線・線の種類を変更できる',cert:['3級','2級'] },
+    { id:'w084',week:3,step:'表の作成',name:'罫線を消すことができる',cert:['3級','2級'] },
+    { id:'w085',week:3,step:'表の作成',name:'練習12',cert:[] },
+    { id:'w086',week:3,step:'表の作成',name:'直線を引くことができる',cert:['3級','2級'] },
+    { id:'w087',week:3,step:'表の作成',name:'線の色を黒、スタイルを破線にすることができる',cert:['3級','2級'] },
+    { id:'w088',week:3,step:'表の作成',name:'四角形を作ることができる',cert:['3級','2級'] },
+    { id:'w089',week:3,step:'表の作成',name:'練習13',cert:[] },
+    { id:'w090',week:3,step:'表の作成',name:'練習14',cert:[] },
+    // ── 文書編集 ──
+    { id:'w091',week:3,step:'文書編集',name:'単語登録ができる',cert:['2級'] },
+    { id:'w092',week:3,step:'文書編集',name:'単語登録の削除ができる',cert:['2級'] },
+    { id:'w093',week:3,step:'文書編集',name:'い抜き言葉の修正ができる',cert:['2級'] },
+    { id:'w094',week:3,step:'文書編集',name:'表記の統一ができる',cert:['2級'] },
+    { id:'w095',week:3,step:'文書編集',name:'スペルチェックができる',cert:['2級'] },
+    { id:'w096',week:3,step:'文書編集',name:'練習1（文書編集）',cert:[] },
+    { id:'w097',week:3,step:'文書編集',name:'段落・行間の設定ができる',cert:['3級','2級'] },
+    { id:'w098',week:3,step:'文書編集',name:'リボンからの行と段落の間隔の設定ができる',cert:['3級','2級'] },
+    { id:'w099',week:3,step:'文書編集',name:'編集記号を使うことができる',cert:['3級','2級'] },
+    { id:'w100',week:3,step:'文書編集',name:'課題1',cert:[] },
+    { id:'w101',week:3,step:'文書編集',name:'ルーラーでインデントを設定ができる',cert:['2級'] },
+    { id:'w102',week:3,step:'文書編集',name:'練習2（インデント）',cert:[] },
+    { id:'w103',week:3,step:'文書編集',name:'箇条書きを設定できる',cert:['3級','2級'] },
+    { id:'w104',week:3,step:'文書編集',name:'段落番号を設定できる',cert:['3級','2級'] },
+    { id:'w105',week:3,step:'文書編集',name:'アウトラインを設定できる',cert:['2級'] },
+    { id:'w106',week:3,step:'文書編集',name:'練習3（箇条書き）',cert:[] },
+    { id:'w107',week:3,step:'文書編集',name:'タブ設定ができる',cert:['2級'] },
+    { id:'w108',week:3,step:'文書編集',name:'タブの解除ができる',cert:['2級'] },
+    { id:'w109',week:3,step:'文書編集',name:'練習4（タブ）',cert:[] },
+    { id:'w110',week:4,step:'文書編集',name:'文字間隔が設定できる',cert:['2級'] },
+    { id:'w111',week:4,step:'文書編集',name:'特殊文字の挿入ができる',cert:['2級'] },
+    { id:'w112',week:4,step:'文書編集',name:'囲い文字が設定できる',cert:['2級'] },
+    { id:'w113',week:4,step:'文書編集',name:'組み文字が設定できる',cert:['2級'] },
+    { id:'w114',week:4,step:'文書編集',name:'ルビ設定ができる',cert:['2級'] },
+    { id:'w115',week:4,step:'文書編集',name:'練習5（特殊書式）',cert:[] },
+    { id:'w116',week:4,step:'文書編集',name:'文字の拡大と縮小ができる',cert:['2級'] },
+    { id:'w117',week:4,step:'文書編集',name:'縦中横が設定できる',cert:['2級'] },
+    { id:'w118',week:4,step:'文書編集',name:'課題2',cert:[] },
+    { id:'w119',week:4,step:'文書編集',name:'課題3',cert:[] },
+    { id:'w120',week:4,step:'文書編集',name:'課題4',cert:[] },
+    { id:'w121',week:4,step:'文書編集',name:'検索ができる',cert:['2級'] },
+    { id:'w122',week:4,step:'文書編集',name:'練習6（検索）',cert:[] },
+    { id:'w123',week:4,step:'文書編集',name:'移動ができる',cert:['2級'] },
+    { id:'w124',week:4,step:'文書編集',name:'複写ができる',cert:['2級'] },
+    { id:'w125',week:4,step:'文書編集',name:'表示倍率の変更ができる',cert:['3級','2級'] },
+    { id:'w126',week:4,step:'文書編集',name:'閲覧モードを設定できる',cert:['2級'] },
+    { id:'w127',week:4,step:'文書編集',name:'印刷レイアウトがわかる',cert:['3級','2級'] },
+    { id:'w128',week:4,step:'文書編集',name:'アウトラインがわかる',cert:['2級'] },
+    { id:'w129',week:4,step:'文書編集',name:'下書き表示がわかる',cert:['2級'] },
+    { id:'w130',week:4,step:'文書編集',name:'ステータスバーの表示モードボタンがわかる',cert:['3級','2級'] },
+    { id:'w131',week:4,step:'文書編集',name:'課題5',cert:[] },
+    { id:'w132',week:4,step:'文書編集',name:'課題6',cert:[] },
+    { id:'w133',week:4,step:'文書編集',name:'課題7',cert:[] },
+    // ── 段組み・ページ設定 ──
+    { id:'w134',week:4,step:'段組み・ページ設定',name:'段組み設定できる',cert:['2級'] },
+    { id:'w135',week:4,step:'段組み・ページ設定',name:'段組みの解除ができる',cert:['2級'] },
+    { id:'w136',week:4,step:'段組み・ページ設定',name:'部分的に段組みができる',cert:['2級'] },
+    { id:'w137',week:4,step:'段組み・ページ設定',name:'段区切りができる',cert:['2級'] },
+    { id:'w138',week:4,step:'段組み・ページ設定',name:'改ページができる',cert:['2級'] },
+    { id:'w139',week:4,step:'段組み・ページ設定',name:'絵柄の挿入ができる',cert:['3級','2級'] },
+    { id:'w140',week:4,step:'段組み・ページ設定',name:'ページ罫線の挿入ができる',cert:['3級','2級'] },
+    { id:'w141',week:4,step:'段組み・ページ設定',name:'課題8',cert:[] },
+    { id:'w142',week:4,step:'段組み・ページ設定',name:'課題9',cert:[] },
+    // ── 表の応用 ──
+    { id:'w143',week:4,step:'表の応用',name:'セルの塗りつぶしができる',cert:['3級','2級'] },
+    { id:'w144',week:4,step:'表の応用',name:'練習1（塗りつぶし）',cert:[] },
+    { id:'w145',week:4,step:'表の応用',name:'セルの分割ができる',cert:['3級','2級'] },
+    { id:'w146',week:4,step:'表の応用',name:'罫線を引いて分割できる',cert:['3級','2級'] },
+    { id:'w147',week:4,step:'表の応用',name:'セルの分割で分割できる',cert:['3級','2級'] },
+    { id:'w148',week:4,step:'表の応用',name:'練習2（分割）',cert:[] },
+    { id:'w149',week:4,step:'表の応用',name:'練習3（分割）',cert:[] },
+    { id:'w150',week:4,step:'表の応用',name:'セル内での文字の縦書き・横書きができる',cert:['3級','2級'] },
+    { id:'w151',week:4,step:'表の応用',name:'練習4（縦書き）',cert:[] },
+    { id:'w152',week:4,step:'表の応用',name:'セル内でのルーラーを利用した均等割り付けができる',cert:['2級'] },
+    { id:'w153',week:4,step:'表の応用',name:'練習5（均等割り付け）',cert:[] },
+    { id:'w154',week:4,step:'表の応用',name:'行の挿入ができる',cert:['3級','2級'] },
+    { id:'w155',week:4,step:'表の応用',name:'列の削除ができる',cert:['3級','2級'] },
+    { id:'w156',week:4,step:'表の応用',name:'表の削除ができる',cert:['3級','2級'] },
+    { id:'w157',week:4,step:'表の応用',name:'表の分割ができる',cert:['2級'] },
+    { id:'w158',week:4,step:'表の応用',name:'練習6（表の応用）',cert:[] },
+    { id:'w159',week:4,step:'表の応用',name:'課題1（表の応用）',cert:[] },
+    { id:'w160',week:4,step:'表の応用',name:'列・行のサイズを数値で指定できる',cert:['3級','2級'] },
+    { id:'w161',week:4,step:'表の応用',name:'セルの自動調整ができる',cert:['3級','2級'] },
+    { id:'w162',week:4,step:'表の応用',name:'表の移動ができる',cert:['3級','2級'] },
+    { id:'w163',week:4,step:'表の応用',name:'課題2（表の応用）',cert:[] },
+    { id:'w164',week:4,step:'表の応用',name:'課題3（表の応用）',cert:[] },
+    // ── ヘッダー・フッター・画像 ──
+    { id:'w165',week:5,step:'ヘッダー・フッター・画像',name:'ヘッダー・フッターの設定ができる',cert:['3級','2級'] },
+    { id:'w166',week:5,step:'ヘッダー・フッター・画像',name:'ページ番号の設定ができる',cert:['3級','2級'] },
+    { id:'w167',week:5,step:'ヘッダー・フッター・画像',name:'日付と時刻が設定できる',cert:['2級'] },
+    { id:'w168',week:5,step:'ヘッダー・フッター・画像',name:'表にスタイルを適用できる',cert:['3級','2級'] },
+    { id:'w169',week:5,step:'ヘッダー・フッター・画像',name:'画像の貼り付けができる',cert:['3級','2級'] },
+    { id:'w170',week:5,step:'ヘッダー・フッター・画像',name:'Wordに貼り付ける方法がわかる',cert:['3級','2級'] },
+    { id:'w171',week:5,step:'ヘッダー・フッター・画像',name:'課題4（ヘッダー・画像）',cert:[] },
+    { id:'w172',week:5,step:'ヘッダー・フッター・画像',name:'課題5（ヘッダー・画像）',cert:[] },
+    { id:'w173',week:5,step:'ヘッダー・フッター・画像',name:'PDFファイル形式の発行ができる',cert:['2級'] },
+    { id:'w174',week:5,step:'ヘッダー・フッター・画像',name:'PDFを開くことができる',cert:['2級'] },
+    { id:'w175',week:5,step:'ヘッダー・フッター・画像',name:'ワードアートの挿入ができる',cert:['2級'] },
+    { id:'w176',week:5,step:'ヘッダー・フッター・画像',name:'ワードアートのスタイルの変更ができる',cert:['2級'] },
+    { id:'w177',week:5,step:'ヘッダー・フッター・画像',name:'形状の変更・文字の効果を設定できる',cert:['2級'] },
+    { id:'w178',week:5,step:'ヘッダー・フッター・画像',name:'文字列の折り返しを設定できる',cert:['3級','2級'] },
+    { id:'w179',week:5,step:'ヘッダー・フッター・画像',name:'練習8（ワードアート）',cert:[] },
+    { id:'w180',week:5,step:'ヘッダー・フッター・画像',name:'課題6（ワードアート）',cert:[] },
+    // ── 図形・オブジェクト ──
+    { id:'w181',week:5,step:'図形・オブジェクト',name:'さまざまな図形を挿入できる',cert:['3級','2級'] },
+    { id:'w182',week:5,step:'図形・オブジェクト',name:'図形を削除できる',cert:['3級','2級'] },
+    { id:'w183',week:5,step:'図形・オブジェクト',name:'練習1（図形）',cert:[] },
+    { id:'w184',week:5,step:'図形・オブジェクト',name:'テキストボックスを挿入できる',cert:['3級','2級'] },
+    { id:'w185',week:5,step:'図形・オブジェクト',name:'練習2（テキストボックス）',cert:[] },
+    { id:'w186',week:5,step:'図形・オブジェクト',name:'図形を移動できる',cert:['3級','2級'] },
+    { id:'w187',week:5,step:'図形・オブジェクト',name:'数値を指定してサイズ変更できる',cert:['3級','2級'] },
+    { id:'w188',week:5,step:'図形・オブジェクト',name:'図形を回転できる',cert:['3級','2級'] },
+    { id:'w189',week:5,step:'図形・オブジェクト',name:'図形の線の色・線の太さや種類を設定できる',cert:['3級','2級'] },
+    { id:'w190',week:5,step:'図形・オブジェクト',name:'図形の背景色を設定できる',cert:['3級','2級'] },
+    { id:'w191',week:5,step:'図形・オブジェクト',name:'影、３－Ｄ効果を設定できる',cert:['2級'] },
+    { id:'w192',week:5,step:'図形・オブジェクト',name:'図形を反転できる',cert:['3級','2級'] },
+    { id:'w193',week:5,step:'図形・オブジェクト',name:'図形を変更できる',cert:['2級'] },
+    { id:'w194',week:5,step:'図形・オブジェクト',name:'練習3（図形応用）',cert:[] },
+    { id:'w195',week:5,step:'図形・オブジェクト',name:'書式の貼り付けができる',cert:['3級','2級'] },
+    { id:'w196',week:5,step:'図形・オブジェクト',name:'グリッド線の表示・非表示ができる',cert:['2級'] },
+    { id:'w197',week:5,step:'図形・オブジェクト',name:'課題1（図形）',cert:[] },
+    { id:'w198',week:5,step:'図形・オブジェクト',name:'課題2（図形）',cert:[] },
+    { id:'w199',week:5,step:'図形・オブジェクト',name:'前面、背面への移動ができる',cert:['3級','2級'] },
+    { id:'w200',week:5,step:'図形・オブジェクト',name:'練習4（前面・背面）',cert:[] },
+    { id:'w201',week:5,step:'図形・オブジェクト',name:'グループ化ができる',cert:['3級','2級'] },
+    { id:'w202',week:5,step:'図形・オブジェクト',name:'グループ化の解除ができる',cert:['3級','2級'] },
+    { id:'w203',week:5,step:'図形・オブジェクト',name:'練習5（グループ化）',cert:[] },
+    { id:'w204',week:5,step:'図形・オブジェクト',name:'下揃え・左右に整列ができる',cert:['3級','2級'] },
+    { id:'w205',week:5,step:'図形・オブジェクト',name:'課題3（整列）',cert:[] },
+    { id:'w206',week:5,step:'図形・オブジェクト',name:'課題4（整列）',cert:[] },
+    { id:'w207',week:5,step:'図形・オブジェクト',name:'課題5（整列）',cert:[] },
+    { id:'w208',week:5,step:'図形・オブジェクト',name:'オンライン画像の挿入ができる',cert:['2級'] },
+    { id:'w209',week:5,step:'図形・オブジェクト',name:'文字列の折り返しができる',cert:['3級','2級'] },
+    { id:'w210',week:5,step:'図形・オブジェクト',name:'図のトリミングができる',cert:['2級'] },
+    { id:'w211',week:5,step:'図形・オブジェクト',name:'色の変更ができる',cert:['2級'] },
+    { id:'w212',week:5,step:'図形・オブジェクト',name:'明るさ・コントラストの調整ができる',cert:['2級'] },
+    { id:'w213',week:5,step:'図形・オブジェクト',name:'アート効果の設定ができる',cert:['2級'] },
+    { id:'w214',week:5,step:'図形・オブジェクト',name:'練習6（画像）',cert:[] },
+    { id:'w215',week:5,step:'図形・オブジェクト',name:'写真の挿入ができる',cert:['3級','2級'] },
+    { id:'w216',week:5,step:'図形・オブジェクト',name:'文字列の折り返し設定ができる',cert:['3級','2級'] },
+    { id:'w217',week:5,step:'図形・オブジェクト',name:'図形のスタイルを設定できる',cert:['3級','2級'] },
   ],
     excel: [
     // ── Excel基本操作 ──────────────────────────────────────
@@ -788,8 +936,8 @@ const SUBJECTS = [
   { id:'manner', name:'ビジマナ・就職',color:'#72243E' },
 ];
 
-const LV_LABELS = ['未学習','📖 テキストあり','△ なんとなく','✔ テキストなし'];
-const LV_SHORT  = ['未','📖','△','✔'];
+const LV_LABELS = ['テキストを見てもできない','テキストを見てできる','できる'];
+const LV_SHORT  = ['✗','📖','✔'];
 
 const MOTTOS = [
   '👣 今日も一歩一歩確実に階段を上っていきましょう。',
@@ -1143,7 +1291,7 @@ function renderAllSubjects() {
 
     const filteredItems = items;
 
-    const lv3  = filteredItems.filter(i=>getLv(i.id)===3).length;
+    const lv3  = filteredItems.filter(i=>getLv(i.id)===2).length;
     const lv12 = filteredItems.filter(i=>getLv(i.id)>=1&&getLv(i.id)<3).length;
     const total = filteredItems.length;
     const pct  = total ? Math.round(lv3/total*100) : 0;
@@ -1182,7 +1330,7 @@ function renderAllSubjects() {
     // 凡例
     const hint = document.createElement('div');
     hint.style.cssText = 'font-size:10px;color:#888;padding:5px 12px;background:rgba(0,0,0,0.02)';
-    hint.innerHTML = '□ 未学習　📖 テキストあり　△ なんとなく　✔ テキストなし';
+    hint.innerHTML = '✗ テキストを見てもできない　📖 テキストを見てできる　✔ できる';
     body.appendChild(hint);
 
     // STEPグループ
@@ -1210,10 +1358,10 @@ function renderAllSubjects() {
             ${date&&lv===3?`<div class="all-date">✔ ${date.slice(5)} 習得</div>`:''}
           </div>
           <div class="all-lv-btns">
-            ${[0,1,2,3].map(l=>`
+            ${[0,1,2].map(l=>`
               <button class="all-lv-btn alb${l}${lv===l?' active':''}"
                 onclick="allSetLv('${sk.id}',${l},this)">
-                ${['未','📖','△','✔'][l]}
+                ${['✗','📖','✔'][l]}
               </button>`).join('')}
           </div>`;
         body.appendChild(row);
@@ -1245,7 +1393,7 @@ function allSetLv(id, lv, btn) {
   const prev   = skillData[id]||{};
   const allItems = Object.values(SKILLS).flat();
   const prevLv3  = allItems.filter(s=>getLv(s.id)===3).length;
-  skillData[id] = { lv, date: lv===3 ? today : (prev.date||'') };
+  skillData[id] = { lv, date: lv===2 ? today : (prev.date||'') };
   lsSave('skills', skillData);
   const newLv3 = allItems.filter(s=>getLv(s.id)===3).length;
   checkBadge(prevLv3, newLv3);
@@ -1257,7 +1405,7 @@ function allSetLv(id, lv, btn) {
     let dateDiv = itemDiv.querySelector('.all-date');
     if (lv===3) {
       if (!dateDiv) { dateDiv=document.createElement('div'); dateDiv.className='all-date'; itemDiv.querySelector('.all-item-left').appendChild(dateDiv); }
-      dateDiv.textContent = '✔ '+today.slice(5)+' 習得';
+      if (lv===2) dateDiv.textContent = '✔ '+today.slice(5)+' できる';
     } else if (dateDiv) dateDiv.textContent='';
   }
 
@@ -1414,7 +1562,7 @@ function renderDashSkills() {
     const filteredItems = allItems;
     const items = filteredItems;
 
-    const lv3  = filteredItems.filter(i=>getLv(i.id)===3).length;
+    const lv3  = filteredItems.filter(i=>getLv(i.id)===2).length;
     const total = filteredItems.length;
 
     const card = document.createElement('div');
@@ -1443,7 +1591,7 @@ function renderDashSkills() {
 
     const body = document.createElement('div');
     body.className = 'dash-skill-body';
-    body.innerHTML = `<div class="lv-hint">タップして記録 → □ 未学習　📖 テキストあり　△ なんとなく　✔ テキストなし</div>`;
+    body.innerHTML = `<div class="lv-hint">タップして記録 → ✗ テキストを見てもできない　📖 テキストを見てできる　✔ できる</div>`;
 
     // STEPごとにグループ化（フィルター済みアイテム）
     const groups = {};
@@ -1469,7 +1617,7 @@ function renderDashSkills() {
             ${date&&lv===3 ? `<span style="font-size:10px;color:#27500A">✔ ${date.slice(5)} 習得</span>` : ''}
           </div>
           <div class="dash-lv-btns">
-            ${[0,1,2,3].map(l=>`<button class="dash-lv-btn dlb${l}${lv===l?' active':''}" onclick="dashSetLv('${sk.id}',${l},this)">${['未','📖','△','✔'][l]}</button>`).join('')}
+            ${[0,1,2].map(l=>`<button class="dash-lv-btn dlb${l}${lv===l?' active':''}" onclick="dashSetLv('${sk.id}',${l},this)">${['✗','📖','✔'][l]}</button>`).join('')}
           </div>`;
         body.appendChild(itemDiv);
       });
@@ -1492,7 +1640,7 @@ function dashSetLv(id, lv, btn) {
   const prev   = skillData[id]||{};
   const allItems = Object.values(SKILLS).flat();
   const prevLv3  = allItems.filter(s=>getLv(s.id)===3).length;
-  skillData[id] = { lv, date: lv===3 ? today : (prev.date||'') };
+  skillData[id] = { lv, date: lv===2 ? today : (prev.date||'') };
   lsSave('skills', skillData);
   const newLv3 = allItems.filter(s=>getLv(s.id)===3).length;
   checkBadge(prevLv3, newLv3);
@@ -1563,7 +1711,7 @@ function renderThisWeekBanner() {
 function renderDashboard() {
   const all   = Object.values(SKILLS).flat();
   const today = new Date();
-  const lv3   = all.filter(s=>getLv(s.id)===3).length;
+  const lv3   = all.filter(s=>getLv(s.id)===2).length;
   const total = all.length;
   const daysPassed = Math.max(1, Math.round((today-TRAIN_START)/86400000));
   const rate  = lv3/daysPassed;
@@ -1715,7 +1863,7 @@ function renderSkills(subId) {
           ${date&&lv===3?`<span class="skill-date">${date.slice(5)}</span>`:''}
         </div>
         <div class="lv-btns">
-          ${[0,1,2,3].map(l=>`<button class="lv-btn lv-btn-${l}${lv===l?' active':''}" onclick="setLv('${s.id}',${l},this)">${LV_SHORT[l]}</button>`).join('')}
+          ${[0,1,2].map(l=>`<button class="lv-btn lv-btn-${l}${lv===l?' active':''}" onclick="setLv('${s.id}',${l},this)">${LV_SHORT[l]}</button>`).join('')}
         </div>`;
       body.appendChild(item);
     });
@@ -1739,7 +1887,7 @@ function renderSkills(subId) {
 function setLv(id, lv, btn) {
   const today = new Date().toISOString().slice(0,10);
   const prev  = skillData[id]||{};
-  skillData[id] = { lv, date: lv===3 ? today : (prev.date||'') };
+  skillData[id] = { lv, date: lv===2 ? today : (prev.date||'') };
   lsSave('skills', skillData);
 
   btn.closest('.lv-btns').querySelectorAll('.lv-btn').forEach((b,i)=>b.classList.toggle('active',i===lv));
@@ -1759,7 +1907,7 @@ function getDate(id)  { return skillData[id]?.date||''; }
 function subjectPct(subId) {
   const items = SKILLS[subId]||[];
   if (!items.length) return 0;
-  return Math.round(items.reduce((a,s)=>a+getLv(s.id),0)/items.length/3*100);
+  return Math.round(items.reduce((a,s)=>a+getLv(s.id),0)/items.length/2*100);
 }
 
 // ─── GAS保存 ───────────────────────────────────
