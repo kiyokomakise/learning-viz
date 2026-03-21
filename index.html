@@ -1273,17 +1273,54 @@ function renderAllSubjects() {
   if (!area) return;
   area.innerHTML = '';
 
-  // 区切りラベル
-  const divLabel = document.createElement('div');
-  divLabel.style.cssText = 'font-size:12px;font-weight:600;color:#2E4057;padding:4px 2px 8px;letter-spacing:.05em';
-  // 区切り線
+  // ── 区切り線・タイトル ──
   const divider = document.createElement('div');
   divider.style.cssText = 'border-top:2px solid #2E4057;margin:1.5rem 0 1rem;';
   area.appendChild(divider);
+  const divLabel = document.createElement('div');
   divLabel.style.cssText = 'font-size:14px;font-weight:700;color:#2E4057;padding:4px 2px 10px;letter-spacing:.05em;display:flex;align-items:center;gap:8px';
   divLabel.innerHTML = '📋 検定試験 理解度チェックリスト <span style="font-size:11px;font-weight:400;color:#888;">（検定出題範囲ベース）</span>';
   area.appendChild(divLabel);
 
+  // ── カード型グリッド（授業チェックリストと同形式） ──
+  const certGrid = document.createElement('div');
+  certGrid.id = 'certBtnGrid';
+  certGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:1rem;';
+  area.appendChild(certGrid);
+
+  // カード描画関数（renderAllSubjectsから呼べるよう即時実行）
+  function renderCertBtns() {
+    certGrid.innerHTML = '';
+    SUBJECTS.forEach(s => {
+      const meta  = SUBJECT_META[s.id];
+      const items = SKILLS[s.id] || [];
+      if (!items.length) return;
+      const lv3   = items.filter(i=>getLv(i.id)===2).length;
+      const lv12  = items.filter(i=>getLv(i.id)>=1&&getLv(i.id)<2).length;
+      const total = items.length;
+      const pct   = total ? Math.round(lv3/total*100) : 0;
+      const slv   = getSubjectLevel(s.id);
+      const slvBg  = {'slv-0':'#F1EFE8','slv-1':'#FEF3E2','slv-2':'#E6F1FB','slv-3':'#EEEDFE','slv-4':'#EAF3DE'}[slv.cls];
+      const slvCol = {'slv-0':'#888','slv-1':'#633806','slv-2':'#0C447C','slv-3':'#3C3489','slv-4':'#27500A'}[slv.cls];
+
+      const isOpen = document.getElementById('allsec-'+s.id)?.dataset.open === '1';
+      const btn = document.createElement('button');
+      btn.style.cssText = `border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;border:2px solid ${isOpen?meta.color:meta.border};background:${isOpen?meta.color:meta.bg};color:${isOpen?'#fff':meta.color};transition:all 0.15s;font-family:inherit;width:100%;`;
+      btn.innerHTML = `
+        <span style="font-size:24px;margin-bottom:6px;display:block;">${meta.icon}</span>
+        <span style="font-size:13px;font-weight:600;display:block;margin-bottom:4px;">${s.name}</span>
+        <span style="font-size:11px;display:block;color:${isOpen?'rgba(255,255,255,0.85)':meta.color}">✔ ${lv3}/${total}（${pct}%）</span>
+        <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:${isOpen?'rgba(255,255,255,0.2)':slvBg};color:${isOpen?'#fff':slvCol};margin-top:5px;display:inline-block;">${slv.label}</span>
+        ${lv12>0?`<span style="font-size:10px;padding:2px 8px;border-radius:99px;background:${isOpen?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.6)'};color:${isOpen?'#fff':meta.color};margin-top:3px;display:inline-block;">📖 ${lv12}習得中</span>`:''}
+      `;
+      btn.onclick = () => toggleCertSection(s.id);
+      btn.id = 'certbtn-'+s.id;
+      certGrid.appendChild(btn);
+    });
+  }
+  renderCertBtns();
+
+  // ── 科目セクション（アコーディオン） ──
   SUBJECTS.forEach(s => {
     const meta  = SUBJECT_META[s.id];
     const items = SKILLS[s.id] || [];
@@ -1292,21 +1329,23 @@ function renderAllSubjects() {
     const filteredItems = items;
 
     const lv3  = filteredItems.filter(i=>getLv(i.id)===2).length;
-    const lv12 = filteredItems.filter(i=>getLv(i.id)>=1&&getLv(i.id)<3).length;
+    const lv12 = filteredItems.filter(i=>getLv(i.id)>=1&&getLv(i.id)<2).length;
     const total = filteredItems.length;
     const pct  = total ? Math.round(lv3/total*100) : 0;
 
     const section = document.createElement('div');
     section.className = 'all-subject-section';
     section.id = 'allsec-' + s.id;
+    section.dataset.open = '0';
+    section.style.display = 'none'; // 初期は非表示、カードクリックで展開
 
-    // ヘッダー
+    // ヘッダー（クローズボタン付き）
     const head = document.createElement('div');
     head.className = 'all-subject-head';
     head.style.cssText = `background:${meta.bg};border-color:${meta.border};color:${meta.color}`;
     head.innerHTML = `
       <div class="all-subject-head-left">
-        <span class="all-subject-icon">${meta.icon}</span>
+        <span class="all-subject-icon" style="font-size:24px;">${meta.icon}</span>
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div class="all-subject-name" style="color:${meta.color}">${s.name}</div>
@@ -1316,9 +1355,8 @@ function renderAllSubjects() {
             <span class="all-subject-stats" style="color:${meta.color}">✔ ${lv3}/${total}項目（${pct}%）${lv12>0?`　📖 ${lv12}項目習得中`:''}</span>
           </div>
         </div>
-
       </div>
-      <span class="all-subject-arrow">▶</span>`;
+      <span class="all-subject-arrow open">▼</span>`;
 
     // ボディ
     const body = document.createElement('div');
@@ -1368,20 +1406,871 @@ function renderAllSubjects() {
       });
     });
 
-    // 開閉トグル（デフォルトは全部閉じた状態）
-    let open = false;
-    body.style.display = 'none';
-    head.onclick = () => {
-      open = !open;
-      body.style.display = open ? 'block' : 'none';
-      head.querySelector('.all-subject-arrow').classList.toggle('open', open);
-    };
+    // ヘッダークリック → 閉じる
+    head.onclick = () => toggleCertSection(s.id);
 
     section.appendChild(head);
     section.appendChild(body);
     area.appendChild(section);
   });
+
+  // カードボタンと科目セクションの開閉を制御
+  function toggleCertSection(id) {
+    const section = document.getElementById('allsec-'+id);
+    if (!section) return;
+    const isOpen = section.dataset.open === '1';
+    if (isOpen) {
+      section.style.display = 'none';
+      section.dataset.open = '0';
+    } else {
+      SUBJECTS.forEach(s => {
+        const sec = document.getElementById('allsec-'+s.id);
+        if (sec) { sec.style.display = 'none'; sec.dataset.open = '0'; }
+      });
+      section.style.display = 'block';
+      section.dataset.open = '1';
+      setTimeout(() => section.scrollIntoView({ behavior:'smooth', block:'start' }), 50);
+    }
+    renderCertBtns();
+  }
+
+  // ─── 検定出題範囲 ────────────────────────────────────
+  const scopeDivider = document.createElement('div');
+  scopeDivider.style.cssText = 'border-top:2px solid #2E4057;margin:1.5rem 0 1rem;';
+  area.appendChild(scopeDivider);
+
+  const scopeLabel = document.createElement('div');
+  scopeLabel.style.cssText = 'font-size:14px;font-weight:700;color:#2E4057;padding:4px 2px 10px;letter-spacing:.05em;display:flex;align-items:center;gap:8px';
+  scopeLabel.innerHTML = '📋 検定出題範囲 <span style="font-size:11px;font-weight:400;color:#888;">（出題範囲一覧）</span>';
+  area.appendChild(scopeLabel);
+
+  // 科目タブ
+  const scopeTabWrap = document.createElement('div');
+  scopeTabWrap.style.cssText = 'display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;';
+  const SCOPE_TAB_INFO = {
+    word:   {label:'✍️ Word',        color:'#185FA5', bg:'#E6F1FB', border:'#B5D4F4'},
+    excel:  {label:'📊 Excel',       color:'#27500A', bg:'#EAF3DE', border:'#A0CC70'},
+    illust: {label:'✏️ Illustrator', color:'#534AB7', bg:'#EEEDFE', border:'#CECBF6'},
+    photo:  {label:'📷 Photoshop',   color:'#0F6E56', bg:'#E1F5EE', border:'#9FE1CB'},
+    web:    {label:'🌐 Web',         color:'#185FA5', bg:'#E6F1FB', border:'#85B7EB'},
+  };
+  const SCOPE_SUBS = ['word','excel','illust','photo','web'];
+  SCOPE_SUBS.forEach((sub,i) => {
+    const inf = SCOPE_TAB_INFO[sub];
+    const btn = document.createElement('button');
+    btn.id = 'scopetab-'+sub;
+    btn.style.cssText = `font-size:13px;font-weight:600;padding:9px 18px;border-radius:10px;border:2px solid ${i===0?'#2E4057':inf.border};background:${i===0?'#2E4057':inf.bg};color:${i===0?'#fff':inf.color};cursor:pointer;font-family:inherit;transition:all 0.15s;`;
+    btn.textContent = inf.label;
+    btn.onclick = () => {
+      SCOPE_SUBS.forEach(s => {
+        const b = document.getElementById('scopetab-'+s);
+        const p = document.getElementById('scopepanel-'+s);
+        const ii = SCOPE_TAB_INFO[s];
+        const act = s===sub;
+        b.style.background = act ? '#2E4057' : ii.bg;
+        b.style.color = act ? '#fff' : ii.color;
+        b.style.borderColor = act ? '#2E4057' : ii.border;
+        p.style.display = act ? 'block' : 'none';
+      });
+    };
+    scopeTabWrap.appendChild(btn);
+  });
+  area.appendChild(scopeTabWrap);
+
+  // ── 出題範囲データ ──────────────────────────────────────
+  // Word/Excel: {name, g3, g2}  /  Illust/Photo/Web: {name, gs, ge}
+  const SCOPE_DATA = {
+    word:[
+      {step:'タイピング基礎',items:[
+        {name:'英字小文字の入力ができる',g3:true,g2:true},
+        {name:'文字を消すことができる',g3:true,g2:true},
+        {name:'改行することができる',g3:true,g2:true},
+        {name:'数字の入力ができる',g3:true,g2:true},
+        {name:'記号の入力ができる',g3:true,g2:true},
+        {name:'大文字の入力ができる',g3:true,g2:true},
+        {name:'ひらがなの入力ができる',g3:true,g2:true},
+        {name:'長音・そく音・よう音の入力ができる',g3:true,g2:true},
+        {name:'漢字の入力ができる',g3:true,g2:true},
+        {name:'カタカナ変換ができる',g3:true,g2:true},
+        {name:'アルファベット変換ができる',g3:true,g2:true},
+        {name:'文章の編集ができる',g3:true,g2:true},
+        {name:'文節変換ができる',g3:true,g2:true},
+        {name:'一括変換ができる',g3:true,g2:true},
+        {name:'文字の追加ができる',g3:true,g2:true},
+        {name:'文書の保存ができる',g3:true,g2:true},
+        {name:'上書き保存ができる',g3:true,g2:true},
+        {name:'文書を開くことができる',g3:true,g2:true},
+        {name:'印刷ができる',g3:true,g2:true},
+        {name:'新規作成ができる',g3:true,g2:true},
+      ]},
+      {step:'Word基本操作',items:[
+        {name:'Wordが起動できる',g3:true,g2:true},
+        {name:'画面構成がわかる',g3:true,g2:true},
+        {name:'ビジネス文書の種類がわかる',g3:true,g2:true},
+        {name:'受信者名につける敬称がわかる',g3:true,g2:true},
+        {name:'頭語と結語がわかる',g3:true,g2:true},
+        {name:'時候の挨拶がわかる',g3:true,g2:true},
+        {name:'相手の繁栄・幸福を祝う挨拶文がわかる',g3:true,g2:true},
+        {name:'相手への感謝をあらわす挨拶文がわかる',g3:true,g2:true},
+        {name:'文書作成の流れがわかる',g3:true,g2:true},
+        {name:'右揃えができる',g3:true,g2:true},
+        {name:'均等割付ができる',g3:true,g2:true},
+        {name:'F4キーで同操作を連続することができる',g3:true,g2:true},
+        {name:'用紙設定ができる',g3:true,g2:true},
+        {name:'余白と印刷の向きを設定できる',g3:true,g2:true},
+        {name:'文字数と行数を設定できる',g3:true,g2:true},
+        {name:'印刷プレビューを確認できる',g3:true,g2:true},
+        {name:'名前を付けて保存ができる',g3:true,g2:true},
+        {name:'フォントとサイズの設定ができる',g3:true,g2:true},
+        {name:'文字飾りができる',g3:true,g2:true},
+        {name:'リボンからの設定ができる',g3:true,g2:true},
+        {name:'設定の解除ができる',g3:true,g2:true},
+      ]},
+      {step:'表の作成',items:[
+        {name:'数値で指定して表を作成できる',g3:true,g2:true},
+        {name:'マス目で指定して表を作成できる',g3:true,g2:true},
+        {name:'列の幅を揃えることができる',g3:true,g2:true},
+        {name:'行の高さを揃えることができる',g3:true,g2:true},
+        {name:'斜め線を引くことができる',g3:true,g2:true},
+        {name:'ドラッグして線を引くことができる',g3:true,g2:true},
+        {name:'セルの結合ができる',g3:true,g2:true},
+        {name:'セル内に文字を入力することができる',g3:true,g2:true},
+        {name:'ドラッグによる範囲選択ができる',g3:true,g2:true},
+        {name:'文字のコピーができる',g3:true,g2:true},
+        {name:'元に戻す操作ができる',g3:true,g2:true},
+        {name:'表に文字色がつけられる',g3:true,g2:true},
+        {name:'表に太字の設定ができる',g3:true,g2:true},
+        {name:'表の中央揃え・右揃えができる',g3:true,g2:true},
+        {name:'行間の変更ができる',g3:true,g2:true},
+        {name:'段落前後の間隔の設定ができる',g3:true,g2:true},
+      ]},
+      {step:'文字書式・段落書式',items:[
+        {name:'インデントの設定ができる',g3:true,g2:true},
+        {name:'ルーラーを使ったインデントの設定ができる',g3:true,g2:true},
+        {name:'均等割り付けができる（段落書式）',g3:true,g2:true},
+        {name:'タブの設定ができる',g3:true,g2:true},
+        {name:'箇条書きができる',g3:true,g2:true},
+        {name:'段落番号の設定ができる',g3:true,g2:true},
+        {name:'飾り枠の設定ができる',g3:true,g2:true},
+        {name:'文字の網かけの設定ができる',g3:true,g2:true},
+        {name:'文字の効果の設定ができる',g3:true,g2:true},
+        {name:'書式のコピーができる',g3:true,g2:true},
+        {name:'ルビの設定ができる',g3:false,g2:true},
+        {name:'囲い文字の設定ができる',g3:false,g2:true},
+      ]},
+      {step:'段組み・ページ設定',items:[
+        {name:'絵柄の挿入ができる',g3:true,g2:true},
+        {name:'ページ罫線の挿入ができる',g3:true,g2:true},
+        {name:'段組みの設定ができる',g3:false,g2:true},
+        {name:'段区切りができる',g3:false,g2:true},
+        {name:'改ページができる',g3:false,g2:true},
+      ]},
+      {step:'表の応用',items:[
+        {name:'セルの塗りつぶしができる',g3:true,g2:true},
+        {name:'セルの分割ができる',g3:true,g2:true},
+        {name:'罫線を引いて分割できる',g3:true,g2:true},
+        {name:'セル内での文字の縦書き・横書きができる',g3:true,g2:true},
+        {name:'行の挿入ができる',g3:true,g2:true},
+        {name:'列の削除ができる',g3:true,g2:true},
+        {name:'表の削除ができる',g3:true,g2:true},
+        {name:'列・行のサイズを数値で指定できる',g3:true,g2:true},
+        {name:'セルの自動調整ができる',g3:true,g2:true},
+        {name:'表の移動ができる',g3:true,g2:true},
+        {name:'セル内でのルーラーを利用した均等割り付けができる',g3:false,g2:true},
+        {name:'表の分割ができる',g3:false,g2:true},
+      ]},
+      {step:'ヘッダー・フッター・画像',items:[
+        {name:'ヘッダー・フッターの設定ができる',g3:true,g2:true},
+        {name:'ページ番号の設定ができる',g3:true,g2:true},
+        {name:'表にスタイルを適用できる',g3:true,g2:true},
+        {name:'画像の貼り付けができる',g3:true,g2:true},
+        {name:'文字列の折り返しを設定できる',g3:true,g2:true},
+        {name:'日付と時刻が設定できる',g3:false,g2:true},
+        {name:'PDFファイル形式の発行ができる',g3:false,g2:true},
+        {name:'PDFを開くことができる',g3:false,g2:true},
+        {name:'ワードアートの挿入ができる',g3:false,g2:true},
+        {name:'ワードアートのスタイルの変更ができる',g3:false,g2:true},
+        {name:'形状の変更・文字の効果を設定できる',g3:false,g2:true},
+      ]},
+      {step:'図形・オブジェクト',items:[
+        {name:'さまざまな図形を挿入できる',g3:true,g2:true},
+        {name:'図形を削除できる',g3:true,g2:true},
+        {name:'テキストボックスを挿入できる',g3:true,g2:true},
+        {name:'図形を移動できる',g3:true,g2:true},
+        {name:'数値を指定してサイズ変更できる',g3:true,g2:true},
+        {name:'図形を回転できる',g3:true,g2:true},
+        {name:'図形の線の色・太さや種類を設定できる',g3:true,g2:true},
+        {name:'図形の背景色を設定できる',g3:true,g2:true},
+        {name:'図形を反転できる',g3:true,g2:true},
+        {name:'書式の貼り付けができる',g3:true,g2:true},
+        {name:'前面・背面への移動ができる',g3:true,g2:true},
+        {name:'グループ化ができる',g3:true,g2:true},
+        {name:'グループ化の解除ができる',g3:true,g2:true},
+        {name:'下揃え・左右に整列ができる',g3:true,g2:true},
+        {name:'文字列の折り返しができる',g3:true,g2:true},
+        {name:'写真の挿入ができる',g3:true,g2:true},
+        {name:'図形のスタイルを設定できる',g3:true,g2:true},
+        {name:'影・３Ｄ効果を設定できる',g3:false,g2:true},
+        {name:'図形を変更できる',g3:false,g2:true},
+        {name:'グリッド線の表示・非表示ができる',g3:false,g2:true},
+        {name:'オンライン画像の挿入ができる',g3:false,g2:true},
+        {name:'図のトリミングができる',g3:false,g2:true},
+        {name:'色の変更ができる',g3:false,g2:true},
+        {name:'明るさ・コントラストの調整ができる',g3:false,g2:true},
+        {name:'アート効果の設定ができる',g3:false,g2:true},
+      ]},
+    ],
+    excel:[
+      {step:'Excel基本操作',items:[
+        {name:'Excelの起動ができる',g3:true,g2:true},
+        {name:'Excelの画面構成がわかる',g3:true,g2:true},
+        {name:'文字の入力ができる',g3:true,g2:true},
+        {name:'数字の入力ができる',g3:true,g2:true},
+        {name:'SUM関数が使える',g3:true,g2:true},
+        {name:'オートフィルができる',g3:true,g2:true},
+        {name:'四則演算ができる',g3:true,g2:true},
+        {name:'再計算機能が使える',g3:true,g2:true},
+        {name:'印刷イメージの確認ができる',g3:true,g2:true},
+        {name:'ページ設定ができる',g3:true,g2:true},
+        {name:'名前を付けて保存ができる',g3:true,g2:true},
+        {name:'上書き保存ができる',g3:true,g2:true},
+        {name:'ブックを開くことができる',g3:true,g2:true},
+        {name:'新しいブックを作成できる',g3:true,g2:true},
+      ]},
+      {step:'行・列操作',items:[
+        {name:'行の挿入ができる',g3:true,g2:true},
+        {name:'行の削除ができる',g3:true,g2:true},
+        {name:'列の挿入ができる',g3:true,g2:true},
+        {name:'列の削除ができる',g3:true,g2:true},
+        {name:'割合を求めることができる',g3:true,g2:true},
+        {name:'AVERAGE関数が使える',g3:true,g2:true},
+        {name:'MAX・MIN関数が使える',g3:true,g2:true},
+      ]},
+      {step:'書式設定',items:[
+        {name:'桁区切りスタイルが設定できる',g3:true,g2:true},
+        {name:'通貨表示形式が設定できる',g3:true,g2:true},
+        {name:'パーセントスタイルが設定できる',g3:true,g2:true},
+        {name:'小数点以下の表示が設定できる',g3:true,g2:true},
+        {name:'表示形式の解除ができる',g3:true,g2:true},
+        {name:'文字位置の設定ができる',g3:true,g2:true},
+        {name:'列幅と行の高さの設定ができる',g3:true,g2:true},
+        {name:'数値を指定して行の高さを変更できる',g3:true,g2:true},
+        {name:'ダブルクリックによる列幅の自動調整ができる',g3:true,g2:true},
+        {name:'罫線・塗りつぶしの設定ができる',g3:true,g2:true},
+        {name:'点線を引くことができる',g3:true,g2:true},
+        {name:'二重線を引くことができる',g3:true,g2:true},
+        {name:'斜線を引くことができる',g3:true,g2:true},
+        {name:'リボンから塗りつぶしの設定ができる',g3:true,g2:true},
+        {name:'文字のフォントとサイズの設定ができる',g3:true,g2:true},
+        {name:'オートコンプリートができる',g3:true,g2:true},
+        {name:'表示形式の詳細設定ができる',g3:false,g2:true},
+      ]},
+      {step:'データ操作',items:[
+        {name:'コピーができる',g3:true,g2:true},
+        {name:'移動ができる',g3:true,g2:true},
+        {name:'ショートカットメニューでの移動・コピーができる',g3:true,g2:true},
+        {name:'ショートカットキー一覧表がわかる',g3:true,g2:true},
+        {name:'ウィンドウ枠の固定ができる',g3:true,g2:true},
+        {name:'表示モードの切り替えができる',g3:true,g2:true},
+        {name:'改ページプレビューができる',g3:true,g2:true},
+        {name:'検索ができる',g3:true,g2:true},
+        {name:'セルの書式設定での文字配置ができる',g3:true,g2:true},
+        {name:'セル内の縦書きができる',g3:true,g2:true},
+        {name:'セルの書式設定での文字方向の設定ができる',g3:true,g2:true},
+        {name:'ユーザー定義の設定ができる',g3:false,g2:true},
+        {name:'記号を使った入力ができる',g3:false,g2:true},
+        {name:'置換ができる',g3:false,g2:true},
+      ]},
+      {step:'グラフ',items:[
+        {name:'グラフタイトルの設定ができる',g3:true,g2:true},
+        {name:'グラフの移動とサイズ変更ができる',g3:true,g2:true},
+        {name:'グラフ内のフォントサイズを変えることができる',g3:true,g2:true},
+        {name:'軸ラベルを表示できる',g3:true,g2:true},
+        {name:'目盛間隔を変更できる',g3:true,g2:true},
+        {name:'グラフのデータ範囲を変更できる',g3:true,g2:true},
+        {name:'グラフの種類を変更できる',g3:true,g2:true},
+        {name:'グラフの色の変更ができる',g3:true,g2:true},
+        {name:'グラフスタイルの変更ができる',g3:true,g2:true},
+        {name:'折れ線グラフの構成要素の名称がわかる',g3:true,g2:true},
+        {name:'主なグラフの種類とポイントがわかる',g3:true,g2:true},
+        {name:'離れたセル範囲のグラフの作成ができる',g3:true,g2:true},
+        {name:'凡例の編集ができる',g3:true,g2:true},
+        {name:'凡例の色を設定できる',g3:true,g2:true},
+        {name:'複合グラフの作成ができる',g3:false,g2:true},
+      ]},
+      {step:'データベース機能',items:[
+        {name:'並べ替えができる',g3:true,g2:true},
+        {name:'フィルターでのデータ抽出ができる',g3:true,g2:true},
+        {name:'フィルターの解除ができる',g3:true,g2:true},
+        {name:'スパークラインの種類の変更ができる',g3:true,g2:true},
+        {name:'スパークラインのスタイルの変更ができる',g3:true,g2:true},
+        {name:'スパークラインの色・マーカーの色が設定できる',g3:true,g2:true},
+        {name:'スパークラインの削除ができる',g3:true,g2:true},
+        {name:'複数キーによる並べ替えができる',g3:false,g2:true},
+        {name:'数値フィルターでのデータ抽出ができる',g3:false,g2:true},
+        {name:'テキストフィルターでのデータ抽出ができる',g3:false,g2:true},
+        {name:'複数条件での抽出ができる',g3:false,g2:true},
+        {name:'ワイルドカードがわかる',g3:false,g2:true},
+        {name:'テーブルスタイルの変更ができる',g3:false,g2:true},
+        {name:'集計行の表示ができる',g3:false,g2:true},
+        {name:'テーブルとスタイルの解除ができる',g3:false,g2:true},
+      ]},
+      {step:'関数・計算（応用）',items:[
+        {name:'ROUND関数が使える',g3:true,g2:true},
+        {name:'ROUNDUP・ROUNDDOWN関数が使える',g3:true,g2:true},
+        {name:'構成比を求めることができる',g3:true,g2:true},
+        {name:'相対参照・絶対参照・複合参照が使える',g3:true,g2:true},
+        {name:'RANK.EQ関数が使える',g3:true,g2:true},
+        {name:'RANK.AVG関数が使える',g3:true,g2:true},
+        {name:'COUNT・COUNTA関数が使える',g3:true,g2:true},
+        {name:'ヘッダー・フッターの表示ができる',g3:true,g2:true},
+        {name:'ヘッダー・フッターの要素が設定できる',g3:true,g2:true},
+        {name:'TODAY関数が使える',g3:false,g2:true},
+        {name:'NOW関数が使える',g3:false,g2:true},
+        {name:'WEEKDAY関数が使える',g3:false,g2:true},
+        {name:'日付の表示形式が設定できる',g3:false,g2:true},
+      ]},
+      {step:'IF関数・条件分岐',items:[
+        {name:'IF関数が使える',g3:true,g2:true},
+        {name:'図形の挿入ができる',g3:true,g2:true},
+        {name:'複雑な条件の設定ができる',g3:false,g2:true},
+        {name:'PHONETIC関数が使える',g3:false,g2:true},
+        {name:'ふりがなをひらがなにすることができる',g3:false,g2:true},
+        {name:'文字の上にふりがなをつけることができる',g3:false,g2:true},
+        {name:'表示形式の定義ができる',g3:false,g2:true},
+        {name:'セルの強調表示ルールが設定できる',g3:false,g2:true},
+        {name:'ルールの管理ができる',g3:false,g2:true},
+        {name:'時間給の計算の仕方がわかる',g3:false,g2:true},
+        {name:'COUNTIF関数が使える',g3:false,g2:true},
+        {name:'SUMIF関数が使える',g3:false,g2:true},
+        {name:'MOD関数が使える',g3:false,g2:true},
+        {name:'TRUNC関数が使える',g3:false,g2:true},
+        {name:'IFS関数が使える',g3:false,g2:true},
+        {name:'SWITCH関数が使える',g3:false,g2:true},
+        {name:'MAXIFS関数が使える',g3:false,g2:true},
+        {name:'MINIFS関数が使える',g3:false,g2:true},
+        {name:'CONCAT関数が使える',g3:false,g2:true},
+        {name:'TEXTJOIN関数が使える',g3:false,g2:true},
+      ]},
+      {step:'ピボットテーブル・シート操作',items:[
+        {name:'シート名の変更ができる',g3:true,g2:true},
+        {name:'ワークシートの挿入ができる',g3:true,g2:true},
+        {name:'ワークシートの削除ができる',g3:true,g2:true},
+        {name:'ワークシートの移動ができる',g3:true,g2:true},
+        {name:'ワークシートのコピーができる',g3:true,g2:true},
+        {name:'シート見出しの色の設定ができる',g3:true,g2:true},
+        {name:'フィールドのグループ化ができる',g3:false,g2:true},
+        {name:'データの更新ができる',g3:false,g2:true},
+        {name:'行ラベルの追加ができる',g3:false,g2:true},
+        {name:'ピボットテーブルスタイルの設定ができる',g3:false,g2:true},
+        {name:'ピボットグラフの作成ができる',g3:false,g2:true},
+        {name:'串刺し集計ができる',g3:false,g2:true},
+      ]},
+      {step:'高度なデータ操作',items:[
+        {name:'フィルターオプションの設定ができる',g3:false,g2:true},
+        {name:'集計ができる',g3:false,g2:true},
+        {name:'集計の解除ができる',g3:false,g2:true},
+        {name:'アウトラインの記号がわかる',g3:false,g2:true},
+        {name:'アウトラインの作成ができる',g3:false,g2:true},
+        {name:'アウトラインの解除ができる',g3:false,g2:true},
+        {name:'可視セルのコピーができる',g3:false,g2:true},
+        {name:'ユーザー設定リストでの並べ替えができる',g3:false,g2:true},
+        {name:'半角カタカナの設定ができる',g3:false,g2:true},
+        {name:'リストから選択できる',g3:false,g2:true},
+        {name:'エラーメッセージを表示できる',g3:false,g2:true},
+        {name:'重複データを入力できないように設定できる',g3:false,g2:true},
+      ]},
+      {step:'コメント・SmartArt',items:[
+        {name:'コメントの挿入ができる',g3:false,g2:true},
+        {name:'コメントの編集ができる',g3:false,g2:true},
+        {name:'コメントの削除ができる',g3:false,g2:true},
+        {name:'コメントの表示・非表示ができる',g3:false,g2:true},
+        {name:'SmartArtの挿入ができる',g3:false,g2:true},
+        {name:'ボックス（部下）の追加ができる',g3:false,g2:true},
+        {name:'スタイルの設定ができる',g3:false,g2:true},
+        {name:'ロゴマークの作成ができる',g3:false,g2:true},
+      ]},
+      {step:'VLOOKUP・検索関数',items:[
+        {name:'VLOOKUP関数が使える',g3:false,g2:true},
+        {name:'引数「検索方法」が指定できる',g3:false,g2:true},
+        {name:'IFERRORが使える',g3:false,g2:true},
+        {name:'HLOOKUP関数が使える',g3:false,g2:true},
+        {name:'見積書でVLOOKUP関数を使うことができる',g3:false,g2:true},
+        {name:'LEFT関数が使える',g3:false,g2:true},
+        {name:'RIGHT関数が使える',g3:false,g2:true},
+        {name:'INDEX関数が使える',g3:false,g2:true},
+        {name:'MATCH関数が使える',g3:false,g2:true},
+        {name:'CHOOSE関数が使える',g3:false,g2:true},
+        {name:'ゴールシークが使える',g3:false,g2:true},
+      ]},
+    ],
+    illust:[
+      {step:'ファイル操作',items:[
+        {name:'指定されたファイル形式での保存',gs:true,ge:true},
+        {name:'適切なファイル形式での保存',gs:false,ge:true},
+      ]},
+      {step:'ドキュメント設定・各種パネル',items:[
+        {name:'指定された内容でのドキュメント設定',gs:true,ge:true},
+        {name:'用途や目的に応じたドキュメント設定',gs:false,ge:true},
+        {name:'アウトライン表示/プレビュー表示の切り替え',gs:true,ge:true},
+        {name:'オーバープリントプレビュー/ピクセルプレビューの使用',gs:false,ge:true},
+        {name:'ワークスペースの変更および保存',gs:false,ge:true},
+        {name:'スクリーンモードの変更',gs:true,ge:true},
+        {name:'各種パネルの機能に関する知識',gs:true,ge:true},
+      ]},
+      {step:'プリント',items:[
+        {name:'用紙サイズやプリントサイズの設定',gs:true,ge:true},
+        {name:'プリント分割ツールを使用した印刷領域の指定',gs:true,ge:true},
+        {name:'［プリント］ダイアログボックスの内容に関する知識',gs:false,ge:true},
+      ]},
+      {step:'環境設定',items:[
+        {name:'一般/単位/ガイド・グリッドの設定',gs:true,ge:true},
+        {name:'環境設定に関する知識',gs:false,ge:true},
+      ]},
+      {step:'塗りと線',items:[
+        {name:'ツールバー・カラーピッカー・カラーパネルによるカラーの選択',gs:true,ge:true},
+        {name:'線パネルによる線幅・線端・角の形状・破線の設定',gs:true,ge:true},
+        {name:'スポイトツールによる塗りや線などの属性のコピー',gs:true,ge:true},
+      ]},
+      {step:'オブジェクトの作成',items:[
+        {name:'基本図形ツール（長方形・楕円・多角形・スターなど）による図形の描画',gs:true,ge:true},
+        {name:'フレアツールによるフレアの描画',gs:false,ge:true},
+        {name:'直線・円弧・スパイラルツールによる図形の描画',gs:true,ge:true},
+        {name:'グリッドツールによるグリッドの描画',gs:true,ge:true},
+        {name:'ブラシツールによるオブジェクトの描画',gs:true,ge:true},
+        {name:'ブラシの作成・編集',gs:false,ge:true},
+      ]},
+      {step:'オブジェクトの選択',items:[
+        {name:'自動選択ツール/なげなわツールによるオブジェクトの選択',gs:true,ge:true},
+        {name:'属性を条件にしたオブジェクトの選択',gs:false,ge:true},
+      ]},
+      {step:'基本的な編集操作',items:[
+        {name:'カット/コピー/ペースト/移動コマンドによるオブジェクトの移動・複製',gs:true,ge:true},
+        {name:'重ね順変更コマンドによるオブジェクトの重ね順変更',gs:true,ge:true},
+      ]},
+      {step:'レイアウトの補助機能',items:[
+        {name:'定規やガイド・スナップ・スマートガイドによる正確なレイアウト',gs:true,ge:true},
+        {name:'オブジェクトからのガイドの作成やガイドの解除',gs:true,ge:true},
+        {name:'整列パネルによるオブジェクトの整列・分布',gs:true,ge:true},
+        {name:'特定のオブジェクトを基準とした整列',gs:true,ge:true},
+        {name:'オブジェクトのグループ化/グループ解除',gs:true,ge:true},
+        {name:'オブジェクトのロック・すべてをロック解除',gs:true,ge:true},
+        {name:'オブジェクトの表示・非表示',gs:false,ge:true},
+      ]},
+      {step:'パスの描画',items:[
+        {name:'ペンツール/アンカーポイントツールによるパスの描画・編集',gs:true,ge:true},
+        {name:'鉛筆ツールによるパスの描画',gs:true,ge:true},
+      ]},
+      {step:'パスの編集',items:[
+        {name:'選択ツール/ダイレクト選択ツール/はさみツールによるパスの編集',gs:true,ge:true},
+        {name:'スムーズツール/パス消しゴムツールによるパスの編集',gs:true,ge:true},
+        {name:'［連結］/［平均］コマンドによるパスの編集',gs:true,ge:true},
+        {name:'パスの高度な編集（オブジェクトメニュー）',gs:false,ge:true},
+      ]},
+      {step:'カラーモード',items:[
+        {name:'各カラーモデル（グレースケール/RGB/CMYK）の概念と特徴',gs:false,ge:true},
+        {name:'カラーモードの設定',gs:true,ge:true},
+        {name:'目的や用途に応じたカラーモードの設定',gs:false,ge:true},
+        {name:'Webセーフカラーの選択',gs:false,ge:true},
+      ]},
+      {step:'スウォッチ',items:[
+        {name:'スウォッチパネルによるカラーの管理',gs:true,ge:true},
+        {name:'グローバルプロセスカラーの設定・適用',gs:true,ge:true},
+        {name:'スポットカラー（特色）の設定・適用',gs:false,ge:true},
+        {name:'パターンの作成・適用',gs:true,ge:true},
+      ]},
+      {step:'グラデーション',items:[
+        {name:'グラデーションツールによるグラデーションの適用',gs:true,ge:true},
+        {name:'グラデーションパネルによるグラデーションの設定・編集',gs:true,ge:true},
+        {name:'メッシュツールによる複雑なグラデーションの適用',gs:false,ge:true},
+      ]},
+      {step:'透明・カラーマネジメント',items:[
+        {name:'透明パネルによる不透明度と描画モードの設定',gs:true,ge:true},
+        {name:'不透明マスクの作成・適用',gs:false,ge:true},
+        {name:'カラーマネジメントに関する知識',gs:false,ge:true},
+        {name:'［カラー設定］ダイアログボックスの内容に関する知識',gs:false,ge:true},
+        {name:'［校正設定］/［色の校正］コマンドに関する知識',gs:false,ge:true},
+      ]},
+      {step:'アピアランス',items:[
+        {name:'複数のアピアランスの適用',gs:true,ge:true},
+        {name:'グループやレイヤーに対するアピアランスの設定',gs:false,ge:true},
+        {name:'アピアランスの分割',gs:true,ge:true},
+      ]},
+      {step:'オブジェクトの変形',items:[
+        {name:'回転・リフレクト・拡大縮小・シアー・自由変形ツールによる編集',gs:true,ge:true},
+        {name:'リキッドツール/リシェイプツールによるオブジェクトの編集',gs:true,ge:true},
+        {name:'［エンベロープ］コマンドによるオブジェクトの編集',gs:true,ge:true},
+        {name:'［個別に変形］コマンドや変形パネルによるオブジェクトの編集',gs:false,ge:true},
+        {name:'［変形の繰り返し］コマンドの使用',gs:true,ge:true},
+      ]},
+      {step:'複数オブジェクトの組み合わせ',items:[
+        {name:'ブレンドオブジェクトの作成・編集',gs:true,ge:true},
+        {name:'クリッピングマスクの作成',gs:true,ge:true},
+        {name:'［複合パス］コマンドによるオブジェクトの編集',gs:true,ge:true},
+        {name:'パスファインダーパネルによる複合シェイプの作成',gs:true,ge:true},
+        {name:'シンボルパネルとシンボルツールによるインスタンスの編集',gs:false,ge:true},
+        {name:'シンボルパネルによるシンボルの管理',gs:false,ge:true},
+      ]},
+      {step:'グラフィックスタイル・効果',items:[
+        {name:'グラフィックスタイルの適用',gs:true,ge:true},
+        {name:'グラフィックスタイルパネルへの登録・変更',gs:false,ge:true},
+        {name:'［効果］メニューによるオブジェクトの編集（スタイライズ/パスなど）',gs:true,ge:true},
+        {name:'その他の効果によるオブジェクトの編集',gs:false,ge:true},
+        {name:'オブジェクトのラスタライズ',gs:false,ge:true},
+      ]},
+      {step:'レイヤー',items:[
+        {name:'レイヤーの作成/ロック/表示/削除/移動/サブレイヤーによる管理',gs:true,ge:true},
+        {name:'テンプレートレイヤーの利用',gs:false,ge:true},
+        {name:'レイヤーを使用したクリッピングマスクの作成',gs:false,ge:true},
+      ]},
+      {step:'テキストの入力と編集',items:[
+        {name:'文字ツール各種による文字入力・フォント/サイズ/行揃え/カラーの設定',gs:true,ge:true},
+        {name:'行送り・垂直水平比率・トラッキング・カーニングの設定',gs:true,ge:true},
+        {name:'上記以外の設定による文字の編集',gs:false,ge:true},
+        {name:'行揃え・インデント・禁則処理・文字組みの設定',gs:true,ge:true},
+        {name:'テキストの回り込み設定',gs:false,ge:true},
+        {name:'スレッドテキストオプションによるテキストのリンク設定',gs:true,ge:true},
+        {name:'エリア内文字オプションによる段組みの設定',gs:false,ge:true},
+        {name:'タブパネルによるタブやリーダーの設定',gs:false,ge:true},
+        {name:'OpenTypeパネルや字形パネルに関する知識',gs:false,ge:true},
+        {name:'フォントの検索・置換',gs:false,ge:true},
+        {name:'アウトライン化による形状の編集',gs:true,ge:true},
+        {name:'合成フォントの作成',gs:false,ge:true},
+      ]},
+      {step:'グラフ・アクション・スクリプト',items:[
+        {name:'グラフツールによるグラフの作成',gs:false,ge:true},
+        {name:'グラフ設定ダイアログボックスによる設定',gs:false,ge:true},
+        {name:'アクションの再生/作成/編集/保存',gs:false,ge:true},
+        {name:'スクリプトによる一括処理',gs:false,ge:true},
+      ]},
+      {step:'データの入出力',items:[
+        {name:'［配置］コマンドによる画像の配置',gs:true,ge:true},
+        {name:'リンクパネルによる画像ファイルの管理',gs:false,ge:true},
+        {name:'目的に応じたファイル形式での書き出し',gs:false,ge:true},
+        {name:'Web用画像の保存',gs:true,ge:true},
+        {name:'スライス画像の書き出し',gs:false,ge:true},
+        {name:'スライスツールによるスライスの編集',gs:false,ge:true},
+      ]},
+      {step:'DTP・Webデザイン基本知識',items:[
+        {name:'PDFの形式と特徴',gs:false,ge:true},
+        {name:'画像解像度（dpi・ppi）の知識',gs:false,ge:true},
+        {name:'色分解の知識',gs:false,ge:true},
+        {name:'プロファイル・ガンマ補正の知識',gs:false,ge:true},
+        {name:'オーバープリント/トラッピング/レジストレーションカラーの知識',gs:false,ge:true},
+        {name:'トリムエリア（トンボ）/トリムマーク・裁ち落としの設定',gs:false,ge:true},
+        {name:'Webデザインのファイル形式の知識',gs:false,ge:true},
+        {name:'オブジェクトへのイメージマップの設定',gs:false,ge:true},
+        {name:'フォントの知識（フォントフォーマット）',gs:false,ge:true},
+        {name:'ベクトルデータ/ビットマップデータの概念',gs:true,ge:true},
+      ]},
+    ],
+    photo:[
+      {step:'ファイル操作・各種パネル',items:[
+        {name:'指定されたファイル形式での保存',gs:true,ge:true},
+        {name:'適切なファイル形式での保存',gs:false,ge:true},
+        {name:'ワークスペースの変更および保存',gs:false,ge:true},
+        {name:'各種パネルの機能に関する知識',gs:true,ge:true},
+      ]},
+      {step:'カラーの選択・変更',items:[
+        {name:'カラー選択ボックス・カラーピッカー・カラーパネルによるカラーの選択',gs:true,ge:true},
+        {name:'スウォッチパネルによるカラーの管理',gs:true,ge:true},
+        {name:'Webセーフカラーの選択',gs:false,ge:true},
+      ]},
+      {step:'環境設定',items:[
+        {name:'一般/単位・定規/ガイド・グリッド・スライスの設定',gs:true,ge:true},
+        {name:'環境設定に関する知識',gs:false,ge:true},
+      ]},
+      {step:'選択ツール',items:[
+        {name:'各選択ツールによる選択範囲の作成',gs:true,ge:true},
+        {name:'選択範囲の移動/変形/反転/解除/再選択',gs:true,ge:true},
+      ]},
+      {step:'選択範囲の保存・編集',items:[
+        {name:'選択範囲の保存/読み込み（アルファチャンネル）',gs:true,ge:true},
+        {name:'クイックマスクによる選択範囲の編集',gs:true,ge:true},
+        {name:'パスによる選択範囲の作成',gs:true,ge:true},
+        {name:'文字マスクツールによる選択範囲の作成',gs:true,ge:true},
+        {name:'［色域指定］コマンドによる選択範囲の作成',gs:false,ge:true},
+      ]},
+      {step:'画像解像度・サイズ変更',items:[
+        {name:'指示内容に従った画像解像度やカンバスサイズへの変更',gs:true,ge:true},
+        {name:'用途や目的に応じた画像解像度やカンバスサイズへの変更',gs:false,ge:true},
+      ]},
+      {step:'画像の移動と変形',items:[
+        {name:'画像の変形（拡大縮小/回転/ゆがみ/遠近法など）',gs:true,ge:true},
+        {name:'切り抜きコマンド/切り抜きツールによる画像の切り抜き',gs:true,ge:true},
+        {name:'カット/コピー/ペーストなどによる画像の複製',gs:true,ge:true},
+        {name:'定規やガイド・スナップによる正確なレイアウト',gs:true,ge:true},
+      ]},
+      {step:'カラーモード・色調補正',items:[
+        {name:'カラーモードの設定（グレースケール・RGB・CMYK）',gs:true,ge:true},
+        {name:'各カラーモードの特徴およびチャンネルパネルの理解',gs:false,ge:true},
+        {name:'8ビット/チャンネル・16ビット/チャンネルの理解',gs:false,ge:true},
+        {name:'自動補正・カラーバランス・明るさ・レベル補正・トーンカーブによる補正',gs:true,ge:true},
+        {name:'カラーマネジメントに関する知識',gs:false,ge:true},
+        {name:'［カラー設定］ダイアログボックスの内容に関する知識',gs:false,ge:true},
+        {name:'校正設定/色の校正/色域外警告コマンドに関する知識',gs:false,ge:true},
+      ]},
+      {step:'ペイント系ツール',items:[
+        {name:'ブラシツール/鉛筆ツールによる描画',gs:true,ge:true},
+        {name:'各種消しゴムツールによる編集',gs:true,ge:true},
+        {name:'ブラシパネルによるブラシの種類変更やカスタマイズ',gs:true,ge:true},
+        {name:'グラデーションツールによるグラデーションの作成',gs:true,ge:true},
+        {name:'コピースタンプツールによる画像の複製',gs:true,ge:true},
+      ]},
+      {step:'レタッチ系ツール',items:[
+        {name:'修復ブラシ/スポット修復ブラシ/パッチツールによる修正',gs:true,ge:true},
+        {name:'覆い焼き/焼き込み/スポンジツールによる修正',gs:true,ge:true},
+        {name:'色の置き換えツールによる画像の編集',gs:true,ge:true},
+        {name:'ヒストリーブラシ/アートヒストリーブラシツールによる編集',gs:false,ge:true},
+      ]},
+      {step:'ペイント系コマンド',items:[
+        {name:'［パターンを定義］コマンドによるパターンの登録',gs:false,ge:true},
+        {name:'［境界線を描く］コマンドによる選択範囲の境界線の描画',gs:true,ge:true},
+      ]},
+      {step:'レイヤーパネル',items:[
+        {name:'レイヤーの作成/複製/削除/移動/リンク/結合による画像の合成・編集',gs:true,ge:true},
+        {name:'レイヤーの描画モード/不透明度/塗りによる画像の合成',gs:true,ge:true},
+        {name:'レイヤースタイルによる非破壊編集',gs:true,ge:true},
+        {name:'レイヤー・グループ作成によるレイヤーの管理',gs:true,ge:true},
+        {name:'レイヤー内の画像の整列・分布',gs:false,ge:true},
+      ]},
+      {step:'レイヤーの応用',items:[
+        {name:'調整レイヤー/塗りつぶしレイヤーによる非破壊編集',gs:true,ge:true},
+        {name:'レイヤーマスク/ベクトルマスクによる画像の合成',gs:true,ge:true},
+        {name:'クリッピングマスクの作成',gs:true,ge:true},
+        {name:'［マッティング］コマンドによる不要部分の削除',gs:true,ge:true},
+        {name:'スタイルパネルによるレイヤースタイルの適用',gs:true,ge:true},
+        {name:'レイヤーカンプによる複数デザイン案の比較',gs:false,ge:true},
+      ]},
+      {step:'パスの作成と編集',items:[
+        {name:'ペンツールによる描画',gs:true,ge:true},
+        {name:'パスコンポーネント選択ツールなどによるパスの編集',gs:true,ge:true},
+        {name:'フリーフォームペンツールによる単純な形状のパスの作成',gs:true,ge:true},
+        {name:'複雑な形状のパスの作成',gs:false,ge:true},
+        {name:'クリッピングパスを利用した画像の保存',gs:false,ge:true},
+      ]},
+      {step:'シェイプ',items:[
+        {name:'シェイプツールによる図形の描画',gs:true,ge:true},
+        {name:'シェイプの拡大縮小・カラーの変更',gs:true,ge:true},
+        {name:'シェイプの合成',gs:true,ge:true},
+        {name:'シェイプの整列・分布',gs:false,ge:true},
+        {name:'カスタムシェイプの登録',gs:false,ge:true},
+      ]},
+      {step:'テキストの入力と編集',items:[
+        {name:'横書き/縦書き文字ツールによる文字入力と各設定',gs:true,ge:true},
+        {name:'テキストレイヤーの拡大縮小/回転/ゆがみ/反転',gs:true,ge:true},
+        {name:'ワープテキストの作成',gs:true,ge:true},
+        {name:'行送り・トラッキング・カーニング・ベースラインシフトの設定',gs:true,ge:true},
+        {name:'上記以外の設定による文字の編集',gs:false,ge:true},
+        {name:'行揃え・インデント・禁則処理・文字組みの設定',gs:true,ge:true},
+        {name:'テキストレイヤーのラスタライズ',gs:true,ge:true},
+        {name:'ポイントテキストと段落テキストの変換',gs:false,ge:true},
+      ]},
+      {step:'フィルター',items:[
+        {name:'フィルターの適用',gs:true,ge:true},
+        {name:'［シャープ］コマンドによる画像の修正',gs:true,ge:true},
+        {name:'［ぼかし］コマンドによるぼかしや動きの表現',gs:true,ge:true},
+        {name:'複数のフィルターの適用',gs:false,ge:true},
+      ]},
+      {step:'画像の入出力・Web用画像・アクション',items:[
+        {name:'用紙サイズやプリントサイズの適切な設定',gs:true,ge:true},
+        {name:'プリントオプションに関する知識',gs:false,ge:true},
+        {name:'入力解像度と出力解像度に関する知識',gs:false,ge:true},
+        {name:'Web用画像の保存',gs:true,ge:true},
+        {name:'スライス画像の書き出し',gs:false,ge:true},
+        {name:'スライスツールによるスライスの編集',gs:false,ge:true},
+        {name:'アクションの再生',gs:true,ge:true},
+        {name:'アクションの作成/編集/保存',gs:false,ge:true},
+        {name:'バッチコマンドによる複数ファイルの一括処理',gs:false,ge:true},
+      ]},
+      {step:'DTP・Webデザイン基本知識',items:[
+        {name:'画像解像度（dpi・ppi）とスクリーン線数（lpi）の知識',gs:true,ge:true},
+        {name:'色分解の知識',gs:false,ge:true},
+        {name:'プロファイル・ガンマ補正の知識',gs:false,ge:true},
+        {name:'トンボ・裁ち落としの知識',gs:false,ge:true},
+        {name:'Webデザインのファイル形式の知識',gs:false,ge:true},
+        {name:'フォントの知識（フォントフォーマット）',gs:false,ge:true},
+        {name:'カラースペース',gs:false,ge:true},
+        {name:'ビットマップデータ/ベクトルデータの概念',gs:false,ge:true},
+      ]},
+    ],
+    web:[
+      {step:'制作環境・ファイルの種類',items:[
+        {name:'ファイルの操作（保存/複製/拡張子/ファイル名）',gs:true,ge:true},
+        {name:'テキスト/ソースの操作（コピー&ペースト/入力/変更/削除）',gs:true,ge:true},
+        {name:'ブラウザー/ドメイン（名称・URL・スキームなど）',gs:true,ge:true},
+        {name:'HTML/CSS言語の特徴・構造とデザインの分離',gs:true,ge:true},
+        {name:'画像ファイル（GIF/JPEG/PNG）の特徴',gs:true,ge:true},
+        {name:'JavaScript言語の特徴・動的コンテンツの特徴',gs:false,ge:true},
+        {name:'SVG/Webフォント（ベクトル形式・フォント表示形式の特徴）',gs:false,ge:true},
+        {name:'動画/音声/リッチコンテンツの特徴',gs:false,ge:true},
+      ]},
+      {step:'ページ構成',items:[
+        {name:'基本ページ/フォーマット',gs:true,ge:true},
+        {name:'トップページ',gs:true,ge:true},
+        {name:'テキストと画像のページ',gs:true,ge:true},
+        {name:'テーブルのページ',gs:true,ge:true},
+        {name:'フォームのページ',gs:true,ge:true},
+        {name:'サムネイルのページ',gs:false,ge:true},
+        {name:'レスポンシブWebデザインの対応',gs:false,ge:true},
+      ]},
+      {step:'レイアウト・パーツ設計・ユーザビリティ',items:[
+        {name:'ヘッダー領域/フッター領域',gs:true,ge:true},
+        {name:'ナビゲーション領域',gs:true,ge:true},
+        {name:'コンテンツ領域/メイン領域/サブ領域',gs:true,ge:true},
+        {name:'バナー/ボタン',gs:true,ge:true},
+        {name:'動的コンテンツ',gs:false,ge:true},
+        {name:'タイトル/見出しの統一',gs:true,ge:true},
+        {name:'文字色と背景色のコントラスト',gs:true,ge:true},
+        {name:'パンくずリスト',gs:false,ge:true},
+        {name:'ページ内リンクの移動',gs:false,ge:true},
+        {name:'ユーザー導線（ファーストビュー/Z軸/F軸など）',gs:false,ge:true},
+        {name:'テキスト/リンク（文字サイズ・下線・未読/既読リンクの明確化）',gs:false,ge:true},
+        {name:'ボタン/アイコン（矢印・メタファー・アフォーダンス）',gs:false,ge:true},
+        {name:'色や形の表示（色に左右されないWebページ）',gs:false,ge:true},
+        {name:'画像のalt属性の配慮・凡例表示の配慮',gs:false,ge:true},
+        {name:'PDF/動画/フォーム/ダウンロードの取り扱い',gs:false,ge:true},
+      ]},
+      {step:'HTML基本構造',items:[
+        {name:'セマンテック/コンテンツモデル/カテゴリーの概念',gs:true,ge:true},
+        {name:'HTML5の移行（HTML4.01/XHTML1.0からの移行）',gs:true,ge:false},
+        {name:'文字参照/実体参照（記号の記述）',gs:true,ge:true},
+        {name:'コメント（<!-- -->）',gs:true,ge:true},
+        {name:'基本構造（文書型宣言・html・head・body・title要素など）',gs:true,ge:true},
+        {name:'外部スタイルシートの読み込み（link要素）',gs:true,ge:true},
+        {name:'メディアクエリー（link要素）',gs:false,ge:true},
+        {name:'汎用コンテナー（div・span要素）',gs:true,ge:true},
+        {name:'ID名/クラス名（id・class属性）',gs:true,ge:true},
+        {name:'見出し/段落/改行（h1〜h6・p・br要素）',gs:true,ge:true},
+        {name:'重要/コピーライト/連絡先（strong・small・address要素）',gs:true,ge:true},
+        {name:'リスト（ul・ol・li・dl・dt・dd要素）',gs:true,ge:true},
+        {name:'ハイパーリンク（フレージングコンテンツ・a要素）',gs:true,ge:true},
+        {name:'ハイパーリンク（フローコンテンツ対応・a要素）',gs:false,ge:true},
+        {name:'画像（img要素・関連する属性）',gs:true,ge:true},
+        {name:'テーブル（行と列・見出しセル・キャプション）',gs:true,ge:true},
+        {name:'テーブルのセル結合（colspan・rowspan属性）',gs:true,ge:true},
+        {name:'表の区分（thead・tbody・tfoot要素）',gs:false,ge:true},
+        {name:'フォームの範囲（form要素）',gs:true,ge:true},
+        {name:'テキストフィールド（input type="text"）',gs:true,ge:true},
+        {name:'テキストエリア（textarea要素）',gs:true,ge:true},
+        {name:'ラベル（label要素）',gs:true,ge:true},
+        {name:'送信ボタン（input type="submit"）',gs:true,ge:true},
+        {name:'指定のある入力フォーム（tel・email型・required属性）',gs:false,ge:true},
+        {name:'選択フォーム（checkbox・radio・select要素）',gs:false,ge:true},
+        {name:'ヘッダー/フッター（header・footer要素）',gs:true,ge:true},
+        {name:'セクション（article・section・nav・aside要素）',gs:true,ge:true},
+        {name:'日時（time要素）',gs:false,ge:true},
+        {name:'図版（figure・figcaption要素）',gs:false,ge:true},
+        {name:'スクリプト（script・noscript要素）',gs:false,ge:true},
+      ]},
+      {step:'CSS基本',items:[
+        {name:'文字エンコード（@charset）',gs:true,ge:true},
+        {name:'コメント（/* */）',gs:true,ge:true},
+        {name:'外部スタイルシート（@import）',gs:true,ge:true},
+        {name:'ユニバーサルセレクター/タイプセレクター',gs:true,ge:true},
+        {name:'IDセレクター/クラスセレクター',gs:true,ge:true},
+        {name:'子孫セレクター/セレクターのグループ化',gs:true,ge:true},
+        {name:'リンク疑似クラス/ユーザーアクション擬似クラス',gs:true,ge:true},
+        {name:'属性セレクター',gs:false,ge:true},
+        {name:'構造疑似クラス',gs:false,ge:true},
+        {name:'CSSの優先順位（詳細度/!important）',gs:false,ge:true},
+        {name:'表示（display・関連する値）',gs:true,ge:true},
+        {name:'リスト（list-style）',gs:true,ge:true},
+        {name:'幅/高さ（width・height）',gs:true,ge:true},
+        {name:'マージン/パディング（margin・padding）',gs:true,ge:true},
+        {name:'ボックス（overflow）',gs:true,ge:true},
+        {name:'ボックスの透明度（opacity）',gs:true,ge:true},
+        {name:'ボーダー（border）',gs:true,ge:true},
+        {name:'配置（position・top・bottom・left・right）',gs:true,ge:true},
+        {name:'フロート/フロートの解除（float・clear）',gs:true,ge:true},
+        {name:'文字色/フォント（color・font）',gs:true,ge:true},
+        {name:'テキスト（text-indent・text-decoration・text-align）',gs:true,ge:true},
+        {name:'テーブル（table-layout・border-collapse）',gs:true,ge:true},
+        {name:'背景・単体指定（background）',gs:true,ge:true},
+        {name:'背景・複数指定（background）',gs:false,ge:true},
+      ]},
+      {step:'CSSスタイリング技法',items:[
+        {name:'リセットCSS/ノーマライズCSS',gs:true,ge:true},
+        {name:'見出し/ボタンのスタイリング',gs:true,ge:true},
+        {name:'マージンによる左右中央揃え',gs:true,ge:true},
+        {name:'clearfix',gs:true,ge:true},
+        {name:'CSSスプライト/CSSシグネチャ',gs:false,ge:true},
+        {name:'交互する背景色',gs:false,ge:true},
+      ]},
+      {step:'ビジュアルデザインと配色・運営と管理',items:[
+        {name:'ビジュアルデザイン（グリッドシステム・タイポグラフィなど）',gs:false,ge:true},
+        {name:'配色（70:25:5の法則・色の三属性など）',gs:false,ge:true},
+        {name:'画像加工の操作（トリミング・リサイズ・カラー補正）',gs:false,ge:true},
+        {name:'プライバシーポリシー/SSL/サイトマップ/バリデート/ファイル転送',gs:false,ge:true},
+      ]},
+    ],
+  };
+
+  // ── パネル生成 ──────────────────────────────────────
+  SCOPE_SUBS.forEach((sub, si) => {
+    const panel = document.createElement('div');
+    panel.id = 'scopepanel-'+sub;
+    panel.style.display = si===0 ? 'block' : 'none';
+
+    const isGraded = sub==='word' || sub==='excel';
+    const colW = isGraded ? '50px' : '72px';
+    const col1Label = isGraded ? '3級' : 'スタンダード';
+    const col2Label = isGraded ? '2級' : 'エキスパート';
+    const col1CircleColor = isGraded ? '#BA7517' : '#27500A';
+    const col2CircleColor = isGraded ? '#185FA5' : '#534AB7';
+    const col1HeadColor = isGraded ? '#FFD580' : '#A5E6B0';
+    const col2HeadColor = isGraded ? '#85B7EB' : '#C4B5F8';
+
+    SCOPE_DATA[sub].forEach(group => {
+      const gh = document.createElement('div');
+      gh.style.cssText = `display:grid;grid-template-columns:1fr ${colW} ${colW};align-items:center;padding:9px 10px 9px 14px;background:#2C2C2A;border-radius:0;cursor:pointer;user-select:none;border:1px solid #2C2C2A;margin-top:2px;`;
+      gh.innerHTML = `
+        <span style="font-size:13px;font-weight:600;color:#fff;">${group.step}</span>
+        <span style="font-size:10px;font-weight:700;color:${col1HeadColor};text-align:center;line-height:1.3;">${col1Label}</span>
+        <span style="font-size:10px;font-weight:700;color:${col2HeadColor};text-align:center;line-height:1.3;">${col2Label}</span>
+      `;
+
+      const gb = document.createElement('div');
+      gb.style.cssText = 'display:none;border-left:1px solid #ccc;border-right:1px solid #ccc;border-bottom:1px solid #ccc;';
+
+      const ch = document.createElement('div');
+      ch.style.cssText = `display:grid;grid-template-columns:1fr ${colW} ${colW};background:#F5F5F2;border-bottom:1px solid #2C2C2A;padding:5px 10px 5px 38px;`;
+      ch.innerHTML = `<div></div><div style="font-size:10px;font-weight:700;color:${col1CircleColor};text-align:center;line-height:1.3;">${col1Label}</div><div style="font-size:10px;font-weight:700;color:${col2CircleColor};text-align:center;line-height:1.3;">${col2Label}</div>`;
+      gb.appendChild(ch);
+
+      group.items.forEach((it, idx) => {
+        const row = document.createElement('div');
+        const isLast = idx === group.items.length - 1;
+        row.style.cssText = `display:grid;grid-template-columns:1fr ${colW} ${colW};align-items:center;padding:8px 10px 8px 10px;background:#fff;${isLast?'':'border-bottom:1px solid #000;'}`;
+        const c1 = isGraded ? it.g3 : it.gs;
+        const c2 = isGraded ? it.g2 : it.ge;
+        const o1 = c1 ? `<span style="display:inline-block;width:22px;height:22px;line-height:20px;border-radius:50%;border:2px solid ${col1CircleColor};color:${col1CircleColor};font-size:13px;font-weight:700;text-align:center;">○</span>` : '';
+        const o2 = c2 ? `<span style="display:inline-block;width:22px;height:22px;line-height:20px;border-radius:50%;border:2px solid ${col2CircleColor};color:${col2CircleColor};font-size:13px;font-weight:700;text-align:center;">○</span>` : '';
+        row.innerHTML = `
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:10px;color:#ccc;width:22px;text-align:right;flex-shrink:0;">${idx+1}</span>
+            <span style="font-size:12px;color:#2C2C2A;line-height:1.55;">${it.name}</span>
+          </div>
+          <div style="text-align:center;">${o1}</div>
+          <div style="text-align:center;">${o2}</div>
+        `;
+        gb.appendChild(row);
+      });
+
+      let open = false;
+      gh.onclick = () => {
+        open = !open;
+        gb.style.display = open ? 'block' : 'none';
+      };
+
+      panel.appendChild(gh);
+      panel.appendChild(gb);
+    });
+
+    area.appendChild(panel);
+  });
 }
+
 
 function setAllSubjectFilter(subId, level) {
   allSubjectFilter[subId] = level;
@@ -1418,6 +2307,7 @@ function allSetLv(id, lv, btn) {
 
   saveToGAS();
   renderSubjectBtns();
+  if (typeof renderCertBtns === 'function') renderCertBtns();
   renderDashboard();
 }
 
