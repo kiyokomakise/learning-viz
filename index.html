@@ -1058,7 +1058,7 @@ function swTab(id, btn) {
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   btn.classList.add('active');
-  if (id==='growth') { renderDashboard(); renderReport(); }
+  if (id==='growth') { renderDashboard(); renderReport(); renderWeeklyBar(); renderStrengthMap(); }
   if (id==='cert')   { renderCertDb(); renderCountdown(); }
 }
 
@@ -1069,6 +1069,8 @@ function renderAll() {
   renderThisWeekBanner();
   renderSubjectBtns();
   renderAllSubjects();
+  renderWeeklyBar();
+  renderStrengthMap();
   renderDashboard();
   renderReport();
 }
@@ -1376,7 +1378,7 @@ function renderAllSubjects() {
     filteredItems.forEach(i=>{ if(!groups[i.step]) groups[i.step]=[]; groups[i.step].push(i); });
 
     Object.entries(groups).forEach(([step, skills]) => {
-      const stepDone = skills.filter(sk=>getLv(sk.id)===3).length;
+      const stepDone = skills.filter(sk=>getLv(sk.id)===2).length;
       const sh = document.createElement('div');
       sh.className = 'all-step-head';
       sh.textContent = step + '　' + stepDone + '/' + skills.length;
@@ -1393,7 +1395,7 @@ function renderAllSubjects() {
           <div class="all-item-left">
             <div class="all-item-name">${sk.name}</div>
             ${certHtml?`<div class="all-item-tags">${certHtml}</div>`:''}
-            ${date&&lv===3?`<div class="all-date">✔ ${date.slice(5)} 習得</div>`:''}
+            ${date&&lv===2?`<div class="all-date">✔ ${date.slice(5)} 習得</div>`:''}
           </div>
           <div class="all-lv-btns">
             ${[0,1,2].map(l=>`
@@ -2281,10 +2283,10 @@ function allSetLv(id, lv, btn) {
   const today  = new Date().toISOString().slice(0,10);
   const prev   = skillData[id]||{};
   const allItems = Object.values(SKILLS).flat();
-  const prevLv3  = allItems.filter(s=>getLv(s.id)===3).length;
+  const prevLv3  = allItems.filter(s=>getLv(s.id)===2).length;
   skillData[id] = { lv, date: lv===2 ? today : (prev.date||'') };
   lsSave('skills', skillData);
-  const newLv3 = allItems.filter(s=>getLv(s.id)===3).length;
+  const newLv3 = allItems.filter(s=>getLv(s.id)===2).length;
   checkBadge(prevLv3, newLv3);
 
   btn.closest('.all-lv-btns').querySelectorAll('.all-lv-btn').forEach((b,i)=>b.classList.toggle('active',i===lv));
@@ -2292,7 +2294,7 @@ function allSetLv(id, lv, btn) {
   const itemDiv = document.getElementById('all-'+id);
   if (itemDiv) {
     let dateDiv = itemDiv.querySelector('.all-date');
-    if (lv===3) {
+    if (lv===2) {
       if (!dateDiv) { dateDiv=document.createElement('div'); dateDiv.className='all-date'; itemDiv.querySelector('.all-item-left').appendChild(dateDiv); }
       if (lv===2) dateDiv.textContent = '✔ '+today.slice(5)+' できる';
     } else if (dateDiv) dateDiv.textContent='';
@@ -2349,7 +2351,7 @@ function closeBadge() {
 function getSubjectLevel(subId) {
   const items = SKILLS[subId] || [];
   if (!items.length) return { level:0, label:'未開始', cls:'slv-0' };
-  const lv3 = items.filter(i=>getLv(i.id)===3).length;
+  const lv3 = items.filter(i=>getLv(i.id)===2).length;
   const pct  = Math.round(lv3/items.length*100);
   if (pct === 0)  return { level:0, label:'未開始',       cls:'slv-0', pct };
   if (pct < 30)   return { level:1, label:'📖 基礎段階',   cls:'slv-1', pct };
@@ -2380,7 +2382,7 @@ function renderSubjectBtns() {
   SUBJECTS.forEach(s => {
     const meta   = SUBJECT_META[s.id];
     const items  = SKILLS[s.id]||[];
-    const lv3    = items.filter(i=>getLv(i.id)===3).length;
+    const lv3    = items.filter(i=>getLv(i.id)===2).length;
     const total  = items.length;
     const pct    = total ? Math.round(lv3/total*100) : 0;
     const isThis = tw.includes(s.id);
@@ -2473,7 +2475,7 @@ function renderDashSkills() {
         <span class="dash-skill-title" style="color:${meta.color}">${s.name}</span>
         <div style="font-size:11px;color:#888;margin-top:2px">
           <span style="color:${meta.color};font-weight:500">✔ テキストなし</span>：${lv3}/${total}項目　
-          <span style="color:#BA7517;font-weight:500">📖 テキストあり</span>：${filteredItems.filter(i=>getLv(i.id)>=1&&getLv(i.id)<3).length}
+          <span style="color:#BA7517;font-weight:500">📖 テキストあり</span>：${filteredItems.filter(i=>getLv(i.id)>=1&&getLv(i.id)<2).length}
         </div>
         ${filterBtns}
       </div>
@@ -2488,7 +2490,7 @@ function renderDashSkills() {
     filteredItems.forEach(i=>{ if(!groups[i.step]) groups[i.step]=[]; groups[i.step].push(i); });
 
     Object.entries(groups).forEach(([step, skills]) => {
-      const stepDone = skills.filter(s=>getLv(s.id)===3).length;
+      const stepDone = skills.filter(s=>getLv(s.id)===2).length;
       const stepDiv = document.createElement('div');
       stepDiv.className = 'dash-step-label';
       stepDiv.textContent = step + '（'+stepDone+'/'+skills.length+'）';
@@ -2504,7 +2506,7 @@ function renderDashSkills() {
           <div class="dash-item-left">
             <span class="dash-item-name">${sk.name}</span>
             ${certHtml ? `<div class="dash-item-certs">${certHtml}</div>` : ''}
-            ${date&&lv===3 ? `<span style="font-size:10px;color:#27500A">✔ ${date.slice(5)} 習得</span>` : ''}
+            ${date&&lv===2 ? `<span style="font-size:10px;color:#27500A">✔ ${date.slice(5)} 習得</span>` : ''}
           </div>
           <div class="dash-lv-btns">
             ${[0,1,2].map(l=>`<button class="dash-lv-btn dlb${l}${lv===l?' active':''}" onclick="dashSetLv('${sk.id}',${l},this)">${['✗','📖','✔'][l]}</button>`).join('')}
@@ -2529,10 +2531,10 @@ function dashSetLv(id, lv, btn) {
   const today  = new Date().toISOString().slice(0,10);
   const prev   = skillData[id]||{};
   const allItems = Object.values(SKILLS).flat();
-  const prevLv3  = allItems.filter(s=>getLv(s.id)===3).length;
+  const prevLv3  = allItems.filter(s=>getLv(s.id)===2).length;
   skillData[id] = { lv, date: lv===2 ? today : (prev.date||'') };
   lsSave('skills', skillData);
-  const newLv3 = allItems.filter(s=>getLv(s.id)===3).length;
+  const newLv3 = allItems.filter(s=>getLv(s.id)===2).length;
   checkBadge(prevLv3, newLv3);
 
   // ボタンUI更新
@@ -2543,7 +2545,7 @@ function dashSetLv(id, lv, btn) {
   const leftDiv = itemDiv?.querySelector('.dash-item-left');
   if (leftDiv) {
     let dateSpan = leftDiv.querySelector('span[style*="27500A"]');
-    if (lv===3) {
+    if (lv===2) {
       if (!dateSpan) { dateSpan = document.createElement('span'); dateSpan.style='font-size:10px;color:#27500A'; leftDiv.appendChild(dateSpan); }
       dateSpan.textContent = '✔ '+today.slice(5)+' 習得';
     } else if (dateSpan) { dateSpan.textContent = ''; }
@@ -2628,11 +2630,12 @@ function renderDashboard() {
     }
   });
 
-  // 合格予測ゲージ
-  renderCertGauges();
-
   // 検定バナー
   renderCertBanners();
+
+  // 週次グラフ・強弱マップも更新
+  renderWeeklyBar();
+  renderStrengthMap();
 
   // 週次進捗バー
   const wp = document.getElementById('weekProgress');
@@ -2640,8 +2643,8 @@ function renderDashboard() {
   SUBJECTS.forEach(s=>{
     const items = SKILLS[s.id]||[];
     if (!items.length) return;
-    const lv3c = items.filter(i=>getLv(i.id)===3).length;
-    const mid  = items.filter(i=>getLv(i.id)>=1&&getLv(i.id)<3).length;
+    const lv3c = items.filter(i=>getLv(i.id)===2).length;
+    const mid  = items.filter(i=>getLv(i.id)>=1&&getLv(i.id)<2).length;
     const tot  = items.length;
     const p3   = Math.round(lv3c/tot*100);
     const pm   = Math.round(mid/tot*100);
@@ -2724,7 +2727,7 @@ function renderSkills(subId) {
   container.innerHTML = '';
 
   Object.entries(groups).forEach(([step, skills])=>{
-    const done  = skills.filter(s=>getLv(s.id)===3).length;
+    const done  = skills.filter(s=>getLv(s.id)===2).length;
     const total = skills.length;
 
     const groupEl = document.createElement('div');
@@ -2750,7 +2753,7 @@ function renderSkills(subId) {
         <div class="skill-item-head">
           <span class="lv-badge lv${lv}" id="badge-${s.id}">${LV_LABELS[lv]}</span>
           <span class="skill-item-name">${s.name}${certHtml?`<span class="cert-tags" style="margin-left:4px">${certHtml}</span>`:''}</span>
-          ${date&&lv===3?`<span class="skill-date">${date.slice(5)}</span>`:''}
+          ${date&&lv===2?`<span class="skill-date">${date.slice(5)}</span>`:''}
         </div>
         <div class="lv-btns">
           ${[0,1,2].map(l=>`<button class="lv-btn lv-btn-${l}${lv===l?' active':''}" onclick="setLv('${s.id}',${l},this)">${LV_SHORT[l]}</button>`).join('')}
@@ -2785,9 +2788,11 @@ function setLv(id, lv, btn) {
   badge.className = `lv-badge lv${lv}`;
   badge.textContent = LV_LABELS[lv];
   const dateEl = btn.closest('.skill-item').querySelector('.skill-date');
-  if (dateEl) dateEl.textContent = lv===3 ? today.slice(5) : '';
+  if (dateEl) dateEl.textContent = lv===2 ? today.slice(5) : '';
 
   saveToGAS();
+  renderSubjectBtns();
+  if (typeof renderCertBtns === 'function') renderCertBtns();
   renderDashboard();
 }
 
@@ -2805,7 +2810,7 @@ async function saveToGAS() {
   if (!GAS_URL) return;
   const all   = Object.values(SKILLS).flat();
   const today = new Date().toISOString().slice(0,10);
-  const snap  = { date:today, totalLv3:all.filter(s=>getLv(s.id)===3).length, totalLv12:all.filter(s=>getLv(s.id)>=1&&getLv(s.id)<3).length };
+  const snap  = { date:today, totalLv3:all.filter(s=>getLv(s.id)===2).length, totalLv12:all.filter(s=>getLv(s.id)>=1&&getLv(s.id)<2).length };
   const idx   = logHistory.findIndex(h=>h.date===today);
   if (idx>=0) logHistory[idx]=snap; else logHistory.push(snap);
   logHistory.sort((a,b)=>a.date.localeCompare(b.date));
@@ -2820,10 +2825,126 @@ async function saveToGAS() {
 }
 
 // ─── 月次レポート ─────────────────────────────
+let weeklyBarChart = null;
+
+// ─── 週次習得グラフ ──────────────────────────────
+function renderWeeklyBar() {
+  const canvas = document.getElementById('weeklyBarChart');
+  if (!canvas) return;
+
+  // skillDataから日付ごとの習得数を週別に集計
+  const weekCounts = {};
+  const allItems = Object.values(SKILLS).flat();
+  allItems.forEach(sk => {
+    const d = getDate(sk.id);
+    if (!d || getLv(sk.id) < 2) return;
+    const date = new Date(d);
+    const msFromStart = date - TRAIN_START;
+    const weekNum = Math.max(1, Math.ceil(msFromStart / (7*86400000)));
+    weekCounts[weekNum] = (weekCounts[weekNum]||0) + 1;
+  });
+
+  // 現在週まで連続データを生成
+  const today = new Date();
+  const currentWeek = Math.max(1, Math.ceil((today - TRAIN_START) / (7*86400000)));
+  const maxWeek = Math.min(currentWeek, 26); // 最大26週
+  const labels = [], data = [];
+  for (let w = 1; w <= maxWeek; w++) {
+    labels.push('W'+w);
+    data.push(weekCounts[w]||0);
+  }
+
+  if (weeklyBarChart) weeklyBarChart.destroy();
+  weeklyBarChart = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: '新規習得数',
+        data,
+        backgroundColor: data.map(v => v >= 10 ? 'rgba(59,109,17,0.75)' : v >= 5 ? 'rgba(186,117,23,0.75)' : 'rgba(46,64,87,0.55)'),
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.y}項目マスター` } }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 5, font: { size: 11 } }, title: { display: true, text: '習得項目数', font: { size: 10 } } },
+        x: { ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+// ─── 得意・苦手 科目分析 ─────────────────────────
+function renderStrengthMap() {
+  const area = document.getElementById('subjectStrengthArea');
+  if (!area) return;
+
+  const rows = SUBJECTS.map(s => {
+    const items = SKILLS[s.id]||[];
+    if (!items.length) return null;
+    const lv3  = items.filter(i=>getLv(i.id)===2).length;
+    const lv12 = items.filter(i=>getLv(i.id)>=1&&getLv(i.id)<2).length;
+    const tot  = items.length;
+    const pct  = Math.round(lv3/tot*100);
+    const midPct = Math.round(lv12/tot*100);
+    const meta = SUBJECT_META[s.id];
+    let rank, rankLabel, rankBg, rankColor;
+    if (pct >= 50) { rank=0; rankLabel='得意'; rankBg='#EAF3DE'; rankColor='#27500A'; }
+    else if (pct >= 20) { rank=1; rankLabel='伸び中'; rankBg='#FEF3E2'; rankColor='#BA7517'; }
+    else { rank=2; rankLabel='強化中'; rankBg='#FCEBEB'; rankColor='#A32D2D'; }
+    return { id:s.id, name:s.name, icon:meta.icon, color:meta.color, border:meta.border, bg:meta.bg, pct, midPct, lv3, lv12, tot, rank, rankLabel, rankBg, rankColor };
+  }).filter(Boolean);
+
+  // 得意→伸び中→強化中の順にソート
+  rows.sort((a,b) => a.rank !== b.rank ? a.rank - b.rank : b.pct - a.pct);
+
+  area.innerHTML = rows.map(r => `
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
+        <span style="font-size:18px;">${r.icon}</span>
+        <span style="font-size:13px;font-weight:600;color:${r.color};flex:1;">${r.name}</span>
+        <span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:99px;background:${r.rankBg};color:${r.rankColor};">${r.rankLabel}</span>
+        <span style="font-size:12px;font-weight:700;color:${r.rankColor};">${r.pct}%</span>
+      </div>
+      <div style="background:#E0DED6;border-radius:99px;height:12px;overflow:hidden;position:relative;">
+        <div style="height:100%;border-radius:99px;background:#E8D5A0;position:absolute;top:0;left:0;width:${r.pct+r.midPct}%;transition:width 0.5s;"></div>
+        <div style="height:100%;border-radius:99px;background:${r.rankColor === '#27500A' ? '#3B6D11' : r.rankColor};position:absolute;top:0;left:0;width:${r.pct}%;transition:width 0.6s;opacity:0.85;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:#888;margin-top:3px;">
+        <span>✔ ${r.lv3}項目習得済み　📖 ${r.lv12}項目習得中</span>
+        <span>${r.lv3+r.lv12}/${r.tot}</span>
+      </div>
+    </div>
+  `).join('');
+
+  // 総評メッセージ
+  const best  = rows.find(r=>r.rank===0);
+  const weak  = [...rows].reverse().find(r=>r.lv3+r.lv12 > 0 && r.rank > 0) || rows[rows.length-1];
+  const total = rows.reduce((a,r)=>a+r.lv3,0);
+  const allTot = rows.reduce((a,r)=>a+r.tot,0);
+  const overallPct = allTot ? Math.round(total/allTot*100) : 0;
+  let summary = '';
+  if (best)  summary += `<strong>${best.name}</strong>が最も習熟しています（${best.pct}%）。`;
+  if (weak && weak.name !== best?.name)  summary += ` <strong>${weak.name}</strong>はもう一伸びが期待できます。`;
+  summary += ` 全体習得率は<strong>${overallPct}%</strong>です。`;
+
+  const summaryDiv = document.createElement('div');
+  summaryDiv.style.cssText = 'background:#F0F4F8;border-radius:8px;padding:10px 14px;font-size:12px;color:#2E4057;line-height:1.8;margin-top:6px;border-left:3px solid #2E4057;';
+  summaryDiv.innerHTML = '📝 ' + summary;
+  area.appendChild(summaryDiv);
+}
+
 function renderReport() {
   const all  = Object.values(SKILLS).flat();
-  const lv3  = all.filter(s=>getLv(s.id)===3).length;
-  const lv12 = all.filter(s=>getLv(s.id)>=1&&getLv(s.id)<3).length;
+  const lv3  = all.filter(s=>getLv(s.id)===2).length;
+  const lv12 = all.filter(s=>getLv(s.id)>=1&&getLv(s.id)<2).length;
   const tot  = all.length;
 
   document.getElementById('reportSummary').innerHTML = `
@@ -2910,7 +3031,6 @@ function renderReport() {
     <div class="tabs">
       <button class="tab active" onclick="swTab('today',this)">📝 今日の記録</button>
       <button class="tab" onclick="swTab('growth',this)">📈 マイ成長</button>
-      <button class="tab" onclick="swTab('cert',this)">🏆 検定対策</button>
     </div>
 
     <!-- ════ タブ① 今日の記録 ════ -->
@@ -2980,25 +3100,23 @@ function renderReport() {
         <div class="comment-box" id="reportComment"></div>
       </div>
 
-    </div>
-
-    <!-- ════ タブ③ 検定対策 ════ -->
-    <div class="tab-panel" id="panel-cert">
-
-      <!-- 合格予測ゲージ -->
+      <!-- 週次習得グラフ -->
       <div class="card">
-        <div class="card-title">🎯 合格予測ゲージ</div>
-        <div class="cert-gauges" id="certGauges"></div>
+        <div class="card-title">📊 週ごとの習得数</div>
+        <p style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.7">訓練開始からの週ごとに、新たにマスターした項目数を表示します。</p>
+        <canvas id="weeklyBarChart" height="130"></canvas>
       </div>
 
-      <!-- 検定ダッシュボード（試験概要） -->
+      <!-- 得意・苦手 科目分析 -->
       <div class="card">
-        <div class="card-title">📖 検定試験 概要・出題範囲</div>
-        <div class="cert-db-tabs" id="certDbTabs" style="margin-bottom:1rem"></div>
-        <div id="certDbContent"></div>
+        <div class="card-title">🎯 得意・苦手 科目分析</div>
+        <p style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.7">習熟度50%以上を<span style="color:#27500A;font-weight:600">得意</span>、20%以上を<span style="color:#BA7517;font-weight:600">伸び中</span>、20%未満を<span style="color:#A32D2D;font-weight:600">強化中</span>として分類しています。</p>
+        <div id="subjectStrengthArea"></div>
       </div>
 
     </div>
+
+
 
   </div>
 </div>
