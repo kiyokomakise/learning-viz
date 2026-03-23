@@ -332,6 +332,23 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
 .log-item-del { margin-left:auto; font-size:11px; color:#aaa; background:none; border:none; cursor:pointer; padding:2px 6px; border-radius:4px; }
 .log-item-del:hover { color:#A32D2D; background:#FCEBEB; }
 .log-empty { text-align:center; padding:1.5rem; color:#aaa; font-size:13px; }
+
+/* ─── 問題集記録 全画面一覧 ─── */
+.mondai-fullscreen { position:fixed; inset:0; background:#F5F5F2; z-index:2000; display:none; flex-direction:column; }
+.mondai-fullscreen.open { display:flex; }
+.mondai-fs-head { background:#2E4057; padding:0 1.25rem; height:52px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.mondai-fs-title { font-size:15px; font-weight:700; color:#fff; flex:1; }
+.mondai-fs-close { font-size:13px; color:rgba(255,255,255,0.75); background:none; border:1px solid rgba(255,255,255,0.3); border-radius:99px; padding:5px 14px; cursor:pointer; font-family:inherit; }
+.mondai-fs-body { flex:1; overflow-y:auto; padding:1rem; }
+.mondai-fs-filter { display:flex; gap:8px; margin-bottom:1rem; flex-wrap:wrap; align-items:center; }
+.mondai-fs-filter-btn { font-size:12px; padding:5px 14px; border-radius:99px; border:1px solid #D3D1C7; background:#fff; color:#888; cursor:pointer; font-family:inherit; transition:all 0.12s; }
+.mondai-fs-filter-btn.active { background:#2E4057; color:#fff; border-color:#2E4057; }
+.mondai-fs-table { width:100%; border-collapse:collapse; font-size:13px; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+.mondai-fs-table thead tr { background:#2E4057; color:#fff; }
+.mondai-fs-table th { padding:10px 12px; text-align:left; font-weight:600; white-space:nowrap; }
+.mondai-fs-table td { padding:9px 12px; border-bottom:1px solid #F0EEE8; vertical-align:middle; }
+.mondai-fs-table tbody tr:last-child td { border-bottom:none; }
+.mondai-fs-table tbody tr:hover { background:#F9F8FE; }
 </style>
 </head>
 <body>
@@ -3190,22 +3207,21 @@ const MONDAI_SUBJECT_META = {
 
 function setMondaiView(v) {
   mondaiView = v;
-  const btnList  = document.getElementById('viewTabList');
-  const btnGroup = document.getElementById('viewTabGroup');
-  const title    = document.getElementById('mondaiListTitle');
-  if (btnList) {
-    btnList.style.background  = v==='list' ? '#534AB7' : '#fff';
-    btnList.style.color       = v==='list' ? '#fff'    : '#888';
-    btnList.style.borderColor = v==='list' ? '#534AB7' : '#D3D1C7';
-  }
-  if (btnGroup) {
-    btnGroup.style.background  = v==='group' ? '#534AB7' : '#fff';
-    btnGroup.style.color       = v==='group' ? '#fff'    : '#888';
-    btnGroup.style.borderColor = v==='group' ? '#534AB7' : '#D3D1C7';
-  }
-  if (title) title.textContent = v==='list'
-    ? '📅 これまでの記録（時系列）'
-    : '📚 科目別・問題別（複数回の比較）';
+  const tabs = ['list','subject','group'];
+  const labels = {'list':'📅 時系列','subject':'📚 科目別一覧','group':'🔁 問題別（複数回比較）'};
+  tabs.forEach(function(t) {
+    const btn = document.getElementById('viewTab'+t.charAt(0).toUpperCase()+t.slice(1));
+    if (!btn) return;
+    const active = t === v;
+    btn.style.background  = active ? '#534AB7' : '#fff';
+    btn.style.color       = active ? '#fff'    : '#888';
+    btn.style.borderColor = active ? '#534AB7' : '#D3D1C7';
+  });
+  const title = document.getElementById('mondaiListTitle');
+  if (title) title.textContent =
+    v==='list'    ? '📅 これまでの記録（時系列）' :
+    v==='subject' ? '📚 科目別一覧' :
+                    '🔁 問題別（複数回の比較）';
   renderMondaiList();
 }
 
@@ -3243,6 +3259,63 @@ function renderMondaiList() {
   if (!list) return;
   if (!mondaiData.length) {
     list.innerHTML = '<div class="log-empty">まだ記録がありません</div>';
+    return;
+  }
+
+  if (mondaiView === 'subject') {
+    // ── 科目別一覧（各科目を縦に並べてテーブル表示）──
+    const bySubj = {};
+    mondaiData.forEach(function(d) {
+      const s = d.subject || '（科目未設定）';
+      if (!bySubj[s]) bySubj[s] = [];
+      bySubj[s].push(d);
+    });
+    const ordSubs = MONDAI_SUBJECTS.filter(function(s){ return bySubj[s]; });
+    if (bySubj['（科目未設定）']) ordSubs.push('（科目未設定）');
+
+    if (!ordSubs.length) { list.innerHTML='<div class="log-empty">まだ記録がありません</div>'; return; }
+
+    let html = '';
+    ordSubs.forEach(function(subj) {
+      const sm = MONDAI_SUBJECT_META[subj];
+      const sc = sm ? sm.color : '#555';
+      const sb = sm ? sm.bg    : '#F5F5F2';
+      const si = sm ? sm.icon  : '📋';
+      const rows = bySubj[subj].slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+
+      html += '<div style="margin-bottom:14px;border-radius:10px;overflow:hidden;border:1px solid #E0DED6;">';
+      // 科目ヘッダー
+      html += '<div style="padding:9px 14px;background:'+sc+';display:flex;align-items:center;gap:8px;">';
+      html += '<span style="font-size:16px;">'+si+'</span>';
+      html += '<span style="font-size:13px;font-weight:700;color:#fff;flex:1;">'+subj+'</span>';
+      html += '<span style="font-size:11px;color:rgba(255,255,255,0.8);">'+rows.length+'件</span></div>';
+      // テーブル
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      html += '<thead><tr style="background:'+sb+';color:'+sc+';font-size:11px;font-weight:700;">';
+      html += '<th style="padding:6px 10px;text-align:left;white-space:nowrap;">日にち</th>';
+      html += '<th style="padding:6px 10px;text-align:left;">問題番号・範囲</th>';
+      html += '<th style="padding:6px 10px;text-align:center;white-space:nowrap;">時間</th>';
+      html += '<th style="padding:6px 10px;text-align:center;white-space:nowrap;">結果</th>';
+      html += '<th style="padding:6px 10px;text-align:left;">備考</th>';
+      html += '<th></th></tr></thead><tbody>';
+      rows.forEach(function(d, i) {
+        const dp = d.date ? d.date.slice(5).replace('-','/') : '';
+        const rowBg = i%2===0 ? '#fff' : sb+'44';
+        const scoreHtml = d.score
+          ? '<span style="background:#EAF3DE;color:#27500A;padding:2px 8px;border-radius:99px;font-weight:600;">'+d.score+'</span>'
+          : '<span style="color:#ccc;">-</span>';
+        html += '<tr style="background:'+rowBg+';border-bottom:1px solid #F0EEE8;">';
+        html += '<td style="padding:6px 10px;white-space:nowrap;color:'+sc+';font-weight:600;">'+dp+'</td>';
+        html += '<td style="padding:6px 10px;">'+d.num+'</td>';
+        html += '<td style="padding:6px 10px;text-align:center;color:#888;">'+(d.time ? d.time+'分' : '-')+'</td>';
+        html += '<td style="padding:6px 10px;text-align:center;">'+scoreHtml+'</td>';
+        html += '<td style="padding:6px 10px;color:#555;font-size:11px;">'+(d.note||'')+'</td>';
+        html += '<td style="padding:6px 4px;text-align:center;"><button onclick="deleteMondai('+d.id+')" style="font-size:11px;color:#ccc;background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#A32D2D'" onmouseout="this.style.color='#ccc'">✕</button></td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table></div></div>';
+    });
+    list.innerHTML = html;
     return;
   }
 
@@ -6705,8 +6778,121 @@ function renderMondaiList() {
     list.innerHTML = html;
   }
 }
+
+// ─── 問題集記録 全画面一覧 ───────────────────────
+let mondaiFsFilter = '';
+
+function openMondaiFullscreen() {
+  document.getElementById('mondaiFullscreen').classList.add('open');
+  renderMondaiFsTable();
+}
+
+function closeMondaiFullscreen() {
+  document.getElementById('mondaiFullscreen').classList.remove('open');
+}
+
+function filterMondaiFs(subject) {
+  mondaiFsFilter = subject;
+  // ボタン状態更新
+  document.querySelectorAll('.mondai-fs-filter-btn').forEach(function(btn) {
+    btn.classList.remove('active');
+  });
+  const activeId = subject ? 'fsf-' + (subject === 'ビジマナ・就職' ? 'manner' : subject) : 'fsf-all';
+  const activeBtn = document.getElementById(activeId);
+  if (activeBtn) activeBtn.classList.add('active');
+  renderMondaiFsTable();
+}
+
+function renderMondaiFsTable() {
+  const tbody = document.getElementById('mondaiFsBody');
+  const countEl = document.getElementById('mondaiFsCount');
+  if (!tbody) return;
+
+  const filtered = mondaiFsFilter
+    ? mondaiData.filter(function(d){ return d.subject === mondaiFsFilter; })
+    : mondaiData.slice();
+  filtered.sort(function(a,b){ return b.date.localeCompare(a.date); });
+
+  if (countEl) countEl.textContent = filtered.length + '件';
+
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#aaa;">記録がありません</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(function(d, i) {
+    const dp = d.date ? d.date.slice(5).replace('-','/') : '';
+    const sm = d.subject ? MONDAI_SUBJECT_META[d.subject] : null;
+    const subjHtml = sm
+      ? '<span style="display:inline-block;background:'+sm.bg+';color:'+sm.color+';padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap;">'+sm.icon+' '+d.subject+'</span>'
+      : '<span style="color:#ccc;font-size:11px;">-</span>';
+    const scoreHtml = d.score
+      ? '<span style="background:#EAF3DE;color:#27500A;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;">'+d.score+'</span>'
+      : '<span style="color:#ccc;">-</span>';
+    const rowBg = i%2===0 ? '' : 'background:#FAFAFA;';
+    return '<tr style="'+rowBg+'">'
+      + '<td style="color:#534AB7;font-weight:600;white-space:nowrap;">'+dp+'</td>'
+      + '<td>'+subjHtml+'</td>'
+      + '<td>'+d.num+'</td>'
+      + '<td style="text-align:center;color:#888;">'+(d.time ? d.time+'分' : '-')+'</td>'
+      + '<td style="text-align:center;">'+scoreHtml+'</td>'
+      + '<td style="color:#555;font-size:12px;">'+(d.note||'')+'</td>'
+      + '<td style="text-align:center;"><button onclick="deleteMondaiFsItem('+d.id+')" style="font-size:12px;color:#ccc;background:none;border:none;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color='#A32D2D'" onmouseout="this.style.color='#ccc'">✕</button></td>'
+      + '</tr>';
+  }).join('');
+}
+
+function deleteMondaiFsItem(id) {
+  mondaiData = mondaiData.filter(function(d){ return d.id !== id; });
+  localStorage.setItem(lsKey('mondai'), JSON.stringify(mondaiData));
+  updateMondaiCnt();
+  renderMondaiFsTable();
+  renderMondaiList();
+}
+
 </script>
 
+
+<!-- ══ 問題集記録 全画面一覧 ══ -->
+<div class="mondai-fullscreen" id="mondaiFullscreen">
+  <div class="mondai-fs-head">
+    <span style="font-size:18px;">📋</span>
+    <span class="mondai-fs-title">問題集記録 一覧</span>
+    <span id="mondaiFsCount" style="font-size:12px;color:rgba(255,255,255,0.7);"></span>
+    <button class="mondai-fs-close" onclick="closeMondaiFullscreen()">✕ 閉じる</button>
+  </div>
+  <div class="mondai-fs-body">
+    <!-- 科目フィルター -->
+    <div class="mondai-fs-filter">
+      <span style="font-size:12px;color:#888;font-weight:600;">科目：</span>
+      <button class="mondai-fs-filter-btn active" onclick="filterMondaiFs('')" id="fsf-all">すべて</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Word')" id="fsf-Word">✍️ Word</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Excel')" id="fsf-Excel">📊 Excel</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('PowerPoint')" id="fsf-PowerPoint">🎨 PowerPoint</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Illustrator')" id="fsf-Illustrator">✏️ Illustrator</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Photoshop')" id="fsf-Photoshop">📷 Photoshop</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Web')" id="fsf-Web">🌐 Web</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('ビジマナ・就職')" id="fsf-manner">🤝 ビジマナ・就職</button>
+    </div>
+    <!-- テーブル -->
+    <div style="overflow-x:auto;">
+      <table class="mondai-fs-table" id="mondaiFsTable">
+        <thead>
+          <tr>
+            <th style="width:70px;">日にち</th>
+            <th style="width:110px;">科目</th>
+            <th>問題番号・範囲</th>
+            <th style="width:70px;text-align:center;">時間</th>
+            <th style="width:110px;text-align:center;">結果・正答率</th>
+            <th>備考・メモ</th>
+            <th style="width:30px;"></th>
+          </tr>
+        </thead>
+        <tbody id="mondaiFsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <!-- ══ 問題集記録 モーダル ══ -->
 <div class="modal-overlay" id="mondaiModal" onclick="if(event.target===this)closeMondaiModal()">
@@ -6759,15 +6945,20 @@ function renderMondaiList() {
       <button class="modal-submit" onclick="saveMondai()">記録する</button>
 
       <!-- 表示切替タブ -->
-      <div style="margin-top:20px;display:flex;gap:6px;margin-bottom:10px;">
+      <div style="margin-top:20px;display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
         <button id="viewTabList" onclick="setMondaiView('list')"
           style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #534AB7;background:#534AB7;color:#fff;cursor:pointer;font-family:inherit;">📅 時系列</button>
+        <button id="viewTabSubject" onclick="setMondaiView('subject')"
+          style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #D3D1C7;background:#fff;color:#888;cursor:pointer;font-family:inherit;">📚 科目別一覧</button>
         <button id="viewTabGroup" onclick="setMondaiView('group')"
           style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #D3D1C7;background:#fff;color:#888;cursor:pointer;font-family:inherit;">🔁 問題別（複数回比較）</button>
       </div>
 
       <!-- 記録一覧 -->
-      <div class="modal-section-title" id="mondaiListTitle">📅 これまでの記録（時系列）</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div class="modal-section-title" id="mondaiListTitle" style="margin-bottom:0;flex:1;border-bottom:none;padding-bottom:0;">📅 これまでの記録（時系列）</div>
+        <button onclick="openMondaiFullscreen()" style="font-size:11px;padding:4px 12px;border-radius:99px;border:1px solid #2E4057;background:#fff;color:#2E4057;cursor:pointer;font-family:inherit;white-space:nowrap;">📋 全画面で見る</button>
+      </div>
       <div id="mondaiList"></div>
     </div>
   </div>
