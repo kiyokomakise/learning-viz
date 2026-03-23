@@ -296,6 +296,42 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
   .tabs,.header,.logout-btn { display:none!important; }
   .tab-panel { display:block!important; }
 }
+
+/* ─── 問題集記録 モーダル ─── */
+.mondai-btn { display:flex; align-items:center; gap:10px; padding:14px 18px; background:#fff; border:2px solid #CECBF6; border-radius:12px; cursor:pointer; font-family:inherit; width:100%; text-align:left; transition:all 0.15s; margin-bottom:1rem; }
+.mondai-btn:hover { background:#EEEDFE; border-color:#534AB7; }
+.mondai-btn-icon { font-size:22px; }
+.mondai-btn-left { flex:1; }
+.mondai-btn-title { font-size:14px; font-weight:700; color:#534AB7; }
+.mondai-btn-sub { font-size:11px; color:#888; margin-top:2px; }
+.mondai-btn-cnt { font-size:12px; font-weight:600; color:#534AB7; background:#EEEDFE; padding:3px 10px; border-radius:99px; }
+
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; display:none; align-items:center; justify-content:center; padding:1rem; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:#fff; border-radius:16px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; box-shadow:0 8px 40px rgba(0,0,0,0.2); }
+.modal-head { padding:18px 20px 14px; border-bottom:1px solid #E0DED6; display:flex; align-items:center; gap:10px; }
+.modal-head-title { font-size:15px; font-weight:700; color:#2E4057; flex:1; }
+.modal-close { font-size:18px; color:#888; background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:6px; }
+.modal-close:hover { background:#F1EFE8; }
+.modal-body { padding:16px 20px; }
+.modal-section-title { font-size:12px; font-weight:700; color:#2E4057; letter-spacing:.05em; margin-bottom:10px; padding-bottom:5px; border-bottom:2px solid #EEEDFE; }
+.modal-form-row { margin-bottom:12px; }
+.modal-label { font-size:12px; font-weight:600; color:#555; margin-bottom:4px; display:block; }
+.modal-input { width:100%; padding:9px 12px; border:1px solid #D3D1C7; border-radius:8px; font-size:13px; font-family:inherit; outline:none; }
+.modal-input:focus { border-color:#534AB7; }
+.modal-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.modal-submit { width:100%; padding:12px; background:#534AB7; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:4px; }
+.modal-submit:hover { background:#3C3489; }
+
+.log-item { padding:10px 12px; border-radius:8px; background:#F9F8FE; border:1px solid #EEEDFE; margin-bottom:6px; }
+.log-item-head { display:flex; align-items:center; gap:8px; margin-bottom:3px; }
+.log-item-date { font-size:11px; font-weight:600; color:#534AB7; }
+.log-item-num { font-size:11px; background:#534AB7; color:#fff; padding:1px 8px; border-radius:99px; }
+.log-item-time { font-size:11px; color:#888; }
+.log-item-note { font-size:12px; color:#555; line-height:1.5; }
+.log-item-del { margin-left:auto; font-size:11px; color:#aaa; background:none; border:none; cursor:pointer; padding:2px 6px; border-radius:4px; }
+.log-item-del:hover { color:#A32D2D; background:#FCEBEB; }
+.log-empty { text-align:center; padding:1.5rem; color:#aaa; font-size:13px; }
 </style>
 </head>
 <body>
@@ -1185,6 +1221,7 @@ function renderAll() {
   renderAllSubjects();
   renderWeeklyBar();
   renderStrengthMap();
+  initMondai();
   renderDashboard();
   renderReport();
 }
@@ -3109,7 +3146,128 @@ function renderReport() {
   msg += `<br><br><span style="font-size:11px;color:#888">【アンケート記入時の参考】このレポートを見ながら「テキストなしでできる項目」と「まだテキストが必要な項目」を具体的に記入できます。</span>`;
   document.getElementById('reportComment').innerHTML = msg;
 }
+
+// ─── 問題集記録 ─────────────────────────────────
+let mondaiData = [];
+
+function initMondai() {
+  try { mondaiData = JSON.parse(localStorage.getItem(lsKey('mondai')) || '[]'); } catch(e){ mondaiData=[]; }
+  updateMondaiCnt();
+}
+
+function updateMondaiCnt() {
+  const el = document.getElementById('mondaiCnt');
+  if (el) el.textContent = mondaiData.length + '件';
+}
+
+function openMondaiModal() {
+  // 今日の日付をデフォルトセット
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('mDate').value = today;
+  document.getElementById('mTime').value = '';
+  document.getElementById('mNum').value = '';
+  document.getElementById('mNote').value = '';
+  renderMondaiList();
+  document.getElementById('mondaiModal').classList.add('open');
+}
+
+function closeMondaiModal() {
+  document.getElementById('mondaiModal').classList.remove('open');
+}
+
+function saveMondai() {
+  const date = document.getElementById('mDate').value;
+  const num  = document.getElementById('mNum').value.trim();
+  const time = document.getElementById('mTime').value;
+  const note = document.getElementById('mNote').value.trim();
+
+  if (!date) { alert('日にちを入力してください'); return; }
+  if (!num)  { alert('問題番号・範囲を入力してください'); return; }
+
+  const entry = { id: Date.now(), date, num, time: time||'', note };
+  mondaiData.unshift(entry); // 新しい順
+  mondaiData = mondaiData.slice(0, 200); // 最大200件
+  localStorage.setItem(lsKey('mondai'), JSON.stringify(mondaiData));
+
+  updateMondaiCnt();
+  renderMondaiList();
+
+  // 入力欄リセット（日付はそのまま）
+  document.getElementById('mNum').value = '';
+  document.getElementById('mTime').value = '';
+  document.getElementById('mNote').value = '';
+}
+
+function deleteMondai(id) {
+  mondaiData = mondaiData.filter(d => d.id !== id);
+  localStorage.setItem(lsKey('mondai'), JSON.stringify(mondaiData));
+  updateMondaiCnt();
+  renderMondaiList();
+}
+
+function renderMondaiList() {
+  const list = document.getElementById('mondaiList');
+  if (!list) return;
+  if (!mondaiData.length) {
+    list.innerHTML = '<div class="log-empty">まだ記録がありません</div>';
+    return;
+  }
+  list.innerHTML = mondaiData.map(d => {
+    const dp = d.date ? d.date.slice(5).replace('-','/') : '';
+    return `<div class="log-item">
+      <div class="log-item-head">
+        <span class="log-item-date">📅 ${dp}</span>
+        <span class="log-item-num">${d.num}</span>
+        ${d.time ? `<span class="log-item-time">⏱ ${d.time}分</span>` : ''}
+        <button class="log-item-del" onclick="deleteMondai(${d.id})">✕</button>
+      </div>
+      ${d.note ? `<div class="log-item-note">${d.note}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
 </script>
+
+
+<!-- ══ 問題集記録 モーダル ══ -->
+<div class="modal-overlay" id="mondaiModal" onclick="if(event.target===this)closeMondaiModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span style="font-size:20px;">📋</span>
+      <span class="modal-head-title">問題集記録</span>
+      <button class="modal-close" onclick="closeMondaiModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- 入力フォーム -->
+      <div class="modal-section-title">📝 新しい記録を追加</div>
+      <div class="modal-row2">
+        <div class="modal-form-row">
+          <label class="modal-label">日にち</label>
+          <input class="modal-input" id="mDate" type="date">
+        </div>
+        <div class="modal-form-row">
+          <label class="modal-label">所要時間（分）</label>
+          <input class="modal-input" id="mTime" type="number" min="1" max="999" placeholder="例：30">
+        </div>
+      </div>
+      <div class="modal-form-row">
+        <label class="modal-label">問題番号・範囲</label>
+        <input class="modal-input" id="mNum" type="text" placeholder="例：Word 3級 問1〜10">
+      </div>
+      <div class="modal-form-row">
+        <label class="modal-label">備考・メモ</label>
+        <input class="modal-input" id="mNote" type="text" placeholder="例：表の操作が苦手。再チェック必要">
+      </div>
+      <button class="modal-submit" onclick="saveMondai()">記録する</button>
+
+      <!-- 記録一覧 -->
+      <div style="margin-top:20px;">
+        <div class="modal-section-title">📅 これまでの記録</div>
+        <div id="mondaiList"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- 達成バッジポップアップ -->
 <div class="badge-overlay" id="badgeOverlay" onclick="closeBadge()"></div>
@@ -3176,6 +3334,17 @@ function renderReport() {
 
       <!-- 選択科目のチェックリスト -->
       <div id="dashSkillArea"></div>
+
+
+      <!-- 問題集記録ボタン -->
+      <button class="mondai-btn" onclick="openMondaiModal()">
+        <span class="mondai-btn-icon">📋</span>
+        <div class="mondai-btn-left">
+          <div class="mondai-btn-title">問題集記録</div>
+          <div class="mondai-btn-sub">検定問題集・過去問を解いた日の記録</div>
+        </div>
+        <span class="mondai-btn-cnt" id="mondaiCnt">0件</span>
+      </button>
 
       <!-- 全科目一覧 (スクロールで確認可能) -->
       <div id="allSubjectsArea"></div>
