@@ -3324,6 +3324,18 @@ function renderMondaiList() {
     <!-- ════ タブ① 今日の記録 ════ -->
     <div class="tab-panel active" id="panel-today">
 
+      <!-- 問題集記録 ボタン（タブ直下） -->
+      <div style="border-bottom:2px solid #2E4057;margin-bottom:1rem;padding-bottom:1rem;">
+        <button class="mondai-btn" onclick="openMondaiModal()">
+          <span class="mondai-btn-icon">📋</span>
+          <div class="mondai-btn-left">
+            <div class="mondai-btn-title">問題集記録</div>
+            <div class="mondai-btn-sub">検定問題集・過去問を解いた日の記録</div>
+          </div>
+          <span class="mondai-btn-cnt" id="mondaiCnt">0件</span>
+        </button>
+      </div>
+
       <div class="card">
         <div class="card-title">📚 授業 学習チェックリスト</div>
         <p style="font-size:12px;color:#888;margin-bottom:14px;line-height:1.7">
@@ -3334,17 +3346,6 @@ function renderMondaiList() {
 
       <!-- 選択科目のチェックリスト -->
       <div id="dashSkillArea"></div>
-
-
-      <!-- 問題集記録ボタン -->
-      <button class="mondai-btn" onclick="openMondaiModal()">
-        <span class="mondai-btn-icon">📋</span>
-        <div class="mondai-btn-left">
-          <div class="mondai-btn-title">問題集記録</div>
-          <div class="mondai-btn-sub">検定問題集・過去問を解いた日の記録</div>
-        </div>
-        <span class="mondai-btn-cnt" id="mondaiCnt">0件</span>
-      </button>
 
       <!-- 全科目一覧 (スクロールで確認可能) -->
       <div id="allSubjectsArea"></div>
