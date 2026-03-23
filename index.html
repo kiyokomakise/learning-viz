@@ -3184,7 +3184,8 @@ function openMondaiModal() {
   document.getElementById('mTime').value = '';
   document.getElementById('mNum').value = '';
   document.getElementById('mNote').value = '';
-  renderMondaiList();
+  if (mondaiView !== 'list' && mondaiView !== 'subject') mondaiView = 'list';
+  setMondaiView(mondaiView);
   document.getElementById('mondaiModal').classList.add('open');
 }
 
@@ -3207,9 +3208,7 @@ const MONDAI_SUBJECT_META = {
 
 function setMondaiView(v) {
   mondaiView = v;
-  const tabs = ['list','subject','group'];
-  const labels = {'list':'📅 時系列','subject':'📚 科目別一覧','group':'🔁 問題別（複数回比較）'};
-  tabs.forEach(function(t) {
+  ['list','subject'].forEach(function(t) {
     const btn = document.getElementById('viewTab'+t.charAt(0).toUpperCase()+t.slice(1));
     if (!btn) return;
     const active = t === v;
@@ -3218,10 +3217,7 @@ function setMondaiView(v) {
     btn.style.borderColor = active ? '#534AB7' : '#D3D1C7';
   });
   const title = document.getElementById('mondaiListTitle');
-  if (title) title.textContent =
-    v==='list'    ? '📅 これまでの記録（時系列）' :
-    v==='subject' ? '📚 科目別一覧' :
-                    '🔁 問題別（複数回の比較）';
+  if (title) title.textContent = v==='list' ? '📅 これまでの記録（時系列）' : '📚 科目別一覧';
   renderMondaiList();
 }
 
@@ -3337,7 +3333,7 @@ function renderMondaiList() {
       const sm = d.subject ? MONDAI_SUBJECT_META[d.subject] : null;
       const subjHtml = sm
         ? '<span style="background:'+sm.bg+';color:'+sm.color+';padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap;">'+sm.icon+' '+d.subject+'</span>'
-        : '<span style="color:#ccc;">-</span>';
+        : (d.subject ? '<span style="color:#888;font-size:11px;">'+d.subject+'</span>' : '<span style="color:#D3D1C7;font-size:11px;">未設定</span>');
       const scoreHtml = d.score
         ? '<span style="background:#EAF3DE;color:#27500A;padding:2px 8px;border-radius:99px;font-weight:600;">'+d.score+'</span>'
         : '<span style="color:#ccc;">-</span>';
@@ -6825,7 +6821,7 @@ function renderMondaiFsTable() {
     const sm = d.subject ? MONDAI_SUBJECT_META[d.subject] : null;
     const subjHtml = sm
       ? '<span style="display:inline-block;background:'+sm.bg+';color:'+sm.color+';padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap;">'+sm.icon+' '+d.subject+'</span>'
-      : '<span style="color:#ccc;font-size:11px;">-</span>';
+      : (d.subject ? '<span style="color:#888;font-size:11px;">'+d.subject+'</span>' : '<span style="color:#D3D1C7;font-size:11px;">未設定</span>');
     const scoreHtml = d.score
       ? '<span style="background:#EAF3DE;color:#27500A;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;">'+d.score+'</span>'
       : '<span style="color:#ccc;">-</span>';
@@ -6950,8 +6946,6 @@ function deleteMondaiFsItem(id) {
           style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #534AB7;background:#534AB7;color:#fff;cursor:pointer;font-family:inherit;">📅 時系列</button>
         <button id="viewTabSubject" onclick="setMondaiView('subject')"
           style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #D3D1C7;background:#fff;color:#888;cursor:pointer;font-family:inherit;">📚 科目別一覧</button>
-        <button id="viewTabGroup" onclick="setMondaiView('group')"
-          style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #D3D1C7;background:#fff;color:#888;cursor:pointer;font-family:inherit;">🔁 問題別（複数回比較）</button>
       </div>
 
       <!-- 記録一覧 -->
