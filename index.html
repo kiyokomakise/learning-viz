@@ -2689,11 +2689,7 @@ function renderThisWeekBanner() {
   const weekdays = ['日','月','火','水','木','金','土'];
   const wdStr = weekdays[today.getDay()];
   const banner = document.getElementById('thisweekBanner');
-  banner.innerHTML = `
-    <span class="tw-label">${dateStr}（${wdStr}）　第${w}週</span>
-    <div class="tw-subjects">
-      ${tw.map(s=>`<span class="tw-tag">${s.name}</span>`).join('')}
-    </div>`;
+  banner.innerHTML = `<span class="tw-label">${dateStr}（${wdStr}）</span>`;
 }
 
 // ─── ダッシュボード ────────────────────────────
