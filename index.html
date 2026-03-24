@@ -296,6 +296,58 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
   .tabs,.header,.logout-btn { display:none!important; }
   .tab-panel { display:block!important; }
 }
+/* ─── 問題集記録 モーダル ─── */
+.mondai-btn { display:flex; align-items:center; gap:10px; padding:14px 18px; background:#fff; border:2px solid #CECBF6; border-radius:12px; cursor:pointer; font-family:inherit; width:100%; text-align:left; transition:all 0.15s; margin-bottom:1rem; }
+.mondai-btn:hover { background:#EEEDFE; border-color:#534AB7; }
+.mondai-btn-icon { font-size:22px; }
+.mondai-btn-left { flex:1; }
+.mondai-btn-title { font-size:14px; font-weight:700; color:#534AB7; }
+.mondai-btn-sub { font-size:11px; color:#888; margin-top:2px; }
+.mondai-btn-cnt { font-size:12px; font-weight:600; color:#534AB7; background:#EEEDFE; padding:3px 10px; border-radius:99px; }
+
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; display:none; align-items:center; justify-content:center; padding:1rem; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:#fff; border-radius:16px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; box-shadow:0 8px 40px rgba(0,0,0,0.2); }
+.modal-head { padding:18px 20px 14px; border-bottom:1px solid #E0DED6; display:flex; align-items:center; gap:10px; }
+.modal-head-title { font-size:15px; font-weight:700; color:#2E4057; flex:1; }
+.modal-close { font-size:18px; color:#888; background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:6px; }
+.modal-close:hover { background:#F1EFE8; }
+.modal-body { padding:16px 20px; }
+.modal-section-title { font-size:12px; font-weight:700; color:#2E4057; letter-spacing:.05em; margin-bottom:10px; padding-bottom:5px; border-bottom:2px solid #EEEDFE; }
+.modal-form-row { margin-bottom:12px; }
+.modal-label { font-size:12px; font-weight:600; color:#555; margin-bottom:4px; display:block; }
+.modal-input { width:100%; padding:9px 12px; border:1px solid #D3D1C7; border-radius:8px; font-size:13px; font-family:inherit; outline:none; }
+.modal-input:focus { border-color:#534AB7; }
+.modal-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.modal-submit { width:100%; padding:12px; background:#534AB7; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:4px; }
+.modal-submit:hover { background:#3C3489; }
+
+.log-item { padding:10px 12px; border-radius:8px; background:#F9F8FE; border:1px solid #EEEDFE; margin-bottom:6px; }
+.log-item-head { display:flex; align-items:center; gap:8px; margin-bottom:3px; }
+.log-item-date { font-size:11px; font-weight:600; color:#534AB7; }
+.log-item-num { font-size:11px; background:#534AB7; color:#fff; padding:1px 8px; border-radius:99px; }
+.log-item-time { font-size:11px; color:#888; }
+.log-item-note { font-size:12px; color:#555; line-height:1.5; }
+.log-item-del { margin-left:auto; font-size:11px; color:#aaa; background:none; border:none; cursor:pointer; padding:2px 6px; border-radius:4px; }
+.log-item-del:hover { color:#A32D2D; background:#FCEBEB; }
+.log-empty { text-align:center; padding:1.5rem; color:#aaa; font-size:13px; }
+
+/* ─── 問題集記録 全画面一覧 ─── */
+.mondai-fullscreen { position:fixed; inset:0; background:#F5F5F2; z-index:2000; display:none; flex-direction:column; }
+.mondai-fullscreen.open { display:flex; }
+.mondai-fs-head { background:#2E4057; padding:0 1.25rem; height:52px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.mondai-fs-title { font-size:15px; font-weight:700; color:#fff; flex:1; }
+.mondai-fs-close { font-size:13px; color:rgba(255,255,255,0.75); background:none; border:1px solid rgba(255,255,255,0.3); border-radius:99px; padding:5px 14px; cursor:pointer; font-family:inherit; }
+.mondai-fs-body { flex:1; overflow-y:auto; padding:1rem; }
+.mondai-fs-filter { display:flex; gap:8px; margin-bottom:1rem; flex-wrap:wrap; align-items:center; }
+.mondai-fs-filter-btn { font-size:12px; padding:5px 14px; border-radius:99px; border:1px solid #D3D1C7; background:#fff; color:#888; cursor:pointer; font-family:inherit; transition:all 0.12s; }
+.mondai-fs-filter-btn.active { background:#2E4057; color:#fff; border-color:#2E4057; }
+.mondai-fs-table { width:100%; border-collapse:collapse; font-size:13px; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+.mondai-fs-table thead tr { background:#2E4057; color:#fff; }
+.mondai-fs-table th { padding:10px 12px; text-align:left; font-weight:600; white-space:nowrap; }
+.mondai-fs-table td { padding:9px 12px; border-bottom:1px solid #F0EEE8; vertical-align:middle; }
+.mondai-fs-table tbody tr:last-child td { border-bottom:none; }
+.mondai-fs-table tbody tr:hover { background:#F9F8FE; }
 </style>
 </head>
 <body>
@@ -1423,22 +1475,31 @@ function allSetLv(id, lv, btn) {
 
 // ─── 案A：10問ごとの達成バッジ ─────────────────────────
 const BADGE_MILESTONES = [
-  { count:10,  icon:'🌱', title:'10項目達成！',   sub:'最初の10歩！この調子で続けましょう' },
-  { count:20,  icon:'📖', title:'20項目達成！',   sub:'テキストなしで20項目できます！' },
-  { count:30,  icon:'⭐', title:'30項目達成！',   sub:'30項目！確実に力がついています' },
-  { count:50,  icon:'🔥', title:'50項目達成！',   sub:'50項目突破！すごい成長です！' },
-  { count:75,  icon:'💪', title:'75項目達成！',   sub:'もう半分以上！合格が見えてきました' },
-  { count:100, icon:'🏆', title:'100項目達成！',  sub:'100項目習得！検定合格まであと少し！' },
-  { count:150, icon:'🎯', title:'150項目達成！',  sub:'圧倒的な実力です！全科目制覇へ！' },
+  { count:5,   icon:'📖', title:'5項目！よくやった！',    sub:'最初の一歩が一番大切です。この積み重ねが力になります' },
+  { count:10,  icon:'✨', title:'10項目達成！',           sub:'続けていることが、一番の才能です' },
+  { count:15,  icon:'📖', title:'15項目達成！',           sub:'コツコツ積み重ねたことが、本物の力になります' },
+  { count:20,  icon:'🌱', title:'20項目達成！',           sub:'少しずつ、確実に根が張ってきています' },
+  { count:25,  icon:'📖', title:'25項目達成！',           sub:'ここまで来たのはあなたの努力のおかげです' },
+  { count:30,  icon:'⭐', title:'30項目達成！',           sub:'気づけばここまで来ました。すごい積み重ねです' },
+  { count:50,  icon:'💪', title:'50項目達成！',           sub:'半分近くまで来ました！この調子です' },
+  { count:75,  icon:'🔥', title:'75項目達成！',           sub:'もう半分以上！合格が見えてきました' },
+  { count:100, icon:'🏆', title:'100項目達成！',          sub:'あなたの努力は本物です。検定合格まであと少し！' },
+  { count:150, icon:'🎯', title:'150項目達成！',          sub:'圧倒的な実力です！全科目制覇へ！' },
 ];
 
 let lastBadgeCount = 0;
 
 function checkBadge(prevLv3, newLv3) {
-  // 新たにlv3になった場合のみチェック
   if (newLv3 <= prevLv3) return;
   const milestone = BADGE_MILESTONES.slice().reverse().find(m => prevLv3 < m.count && newLv3 >= m.count);
-  if (milestone) showBadge(milestone);
+  if (milestone) { showBadge(milestone); return; }
+  // 5の倍数ごとに汎用メッセージ（30以下）
+  for (let n = prevLv3 + 1; n <= newLv3; n++) {
+    if (n % 5 === 0 && n <= 30) {
+      const ms = BADGE_MILESTONES.find(m => m.count === n);
+      if (ms) { showBadge(ms); return; }
+    }
+  }
 }
 
 function showBadge(milestone) {
@@ -1968,7 +2029,663 @@ function renderReport() {
   msg += `<br><br><span style="font-size:11px;color:#888">【アンケート記入時の参考】このレポートを見ながら「テキストなしでできる項目」と「まだテキストが必要な項目」を具体的に記入できます。</span>`;
   document.getElementById('reportComment').innerHTML = msg;
 }
+// ─── 問題集記録 ─────────────────────────────────
+let mondaiData = [];
+
+function initMondai() {
+  try { mondaiData = JSON.parse(localStorage.getItem(lsKey('mondai')) || '[]'); } catch(e){ mondaiData=[]; }
+  updateMondaiCnt();
+}
+
+function updateMondaiCnt() {
+  const el = document.getElementById('mondaiCnt');
+  if (el) el.textContent = mondaiData.length + '件';
+}
+
+function openMondaiModal() {
+  // 今日の日付をデフォルトセット
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('mDate').value = today;
+  document.getElementById('mTime').value = '';
+  document.getElementById('mNum').value = '';
+  document.getElementById('mNote').value = '';
+  if (mondaiView !== 'list' && mondaiView !== 'subject') mondaiView = 'list';
+  setMondaiView(mondaiView);
+  document.getElementById('mondaiModal').classList.add('open');
+}
+
+function closeMondaiModal() {
+  document.getElementById('mondaiModal').classList.remove('open');
+}
+
+let mondaiView = 'list';
+
+const MONDAI_SUBJECTS = ['Word','Excel','PowerPoint','Illustrator','Photoshop','Web','ビジマナ・就職'];
+const MONDAI_SUBJECT_META = {
+  'Word':       { icon:'✍️', color:'#0C447C', bg:'#E6F1FB' },
+  'Excel':      { icon:'📊', color:'#3B6D11', bg:'#EAF3DE' },
+  'PowerPoint': { icon:'🎨', color:'#993C1D', bg:'#FAECE7' },
+  'Illustrator':{ icon:'✏️', color:'#534AB7', bg:'#EEEDFE' },
+  'Photoshop':  { icon:'📷', color:'#0F6E56', bg:'#E1F5EE' },
+  'Web':        { icon:'🌐', color:'#185FA5', bg:'#E6F1FB' },
+  'ビジマナ・就職':{ icon:'🤝', color:'#72243E', bg:'#FBEAF0' },
+};
+
+function setMondaiView(v) {
+  mondaiView = v;
+  // ボタンのアクティブ状態
+  ['list','subject'].forEach(function(t) {
+    const btn = document.getElementById('viewTab'+t.charAt(0).toUpperCase()+t.slice(1));
+    if (!btn) return;
+    const active = t === v;
+    btn.style.background  = active ? '#534AB7' : '#fff';
+    btn.style.color       = active ? '#fff'    : '#888';
+    btn.style.borderColor = active ? '#534AB7' : '#D3D1C7';
+  });
+  // 科目プルダウンの表示切替
+  const sel = document.getElementById('mondaiSubjectFilter');
+  if (sel) sel.style.display = v === 'subject' ? 'inline-block' : 'none';
+  const title = document.getElementById('mondaiListTitle');
+  if (title) title.textContent = v === 'list' ? '📅 これまでの記録（時系列・新しい順）' : '📚 科目別（日にち昇順）';
+  renderMondaiList();
+}
+
+function onMondaiSubjectChange(subject) {
+  renderMondaiList();
+}
+
+function saveMondai() {
+  const date    = document.getElementById('mDate').value;
+  const subject = document.getElementById('mSubject') ? document.getElementById('mSubject').value : '';
+  const num     = document.getElementById('mNum').value.trim();
+  const time    = document.getElementById('mTime').value;
+  const score   = document.getElementById('mScore') ? document.getElementById('mScore').value.trim() : '';
+  const note    = document.getElementById('mNote').value.trim();
+  if (!date) { alert('日にちを入力してください'); return; }
+  if (!num)  { alert('問題番号・範囲を入力してください'); return; }
+  const entry = { id: Date.now(), date, subject: subject||'', num, time: time||'', score: score||'', note };
+  mondaiData.unshift(entry);
+  mondaiData = mondaiData.slice(0, 300);
+  localStorage.setItem(lsKey('mondai'), JSON.stringify(mondaiData));
+  updateMondaiCnt();
+  renderMondaiList();
+  if (document.getElementById('mSubject')) document.getElementById('mSubject').value = '';
+  document.getElementById('mNum').value  = '';
+  document.getElementById('mTime').value = '';
+  if (document.getElementById('mScore')) document.getElementById('mScore').value = '';
+  document.getElementById('mNote').value = '';
+}
+
+function deleteMondai(id) {
+  mondaiData = mondaiData.filter(function(d){ return d.id !== id; });
+  localStorage.setItem(lsKey('mondai'), JSON.stringify(mondaiData));
+  updateMondaiCnt();
+  renderMondaiList();
+}
+
+function renderMondaiList() {
+  const list = document.getElementById('mondaiList');
+  if (!list) return;
+  if (!mondaiData.length) {
+    list.innerHTML = '<div class="log-empty">まだ記録がありません</div>';
+    return;
+  }
+
+  if (mondaiView === 'subject') {
+    const sel = document.getElementById('mondaiSubjectFilter');
+    const selectedSubj = sel ? sel.value : '';
+    if (!selectedSubj) {
+      list.innerHTML = '<div style="text-align:center;padding:2rem;color:#888;">上のプルダウンから科目を選んでください</div>';
+      return;
+    }
+    const sm = MONDAI_SUBJECT_META[selectedSubj];
+    const sc = sm ? sm.color : '#2E4057';
+    const sb = sm ? sm.bg    : '#F5F5F2';
+    const si = sm ? sm.icon  : '📋';
+    const rows = mondaiData.filter(function(d){ return d.subject === selectedSubj; })
+                           .sort(function(a,b){ return a.date.localeCompare(b.date); });
+    if (!rows.length) {
+      list.innerHTML = '<div style="text-align:center;padding:2rem;color:#888;">'+si+' '+selectedSubj+'の記録はまだありません</div>';
+      return;
+    }
+    let html = '<div style="overflow-x:auto;max-height:480px;overflow-y:auto;">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr style="background:'+sc+';color:#fff;">';
+    html += '<th style="padding:8px 10px;text-align:left;white-space:nowrap;">日にち</th>';
+    html += '<th style="padding:8px 10px;text-align:left;">問題番号・範囲</th>';
+    html += '<th style="padding:8px 10px;text-align:center;white-space:nowrap;">時間</th>';
+    html += '<th style="padding:8px 10px;text-align:center;white-space:nowrap;">結果</th>';
+    html += '<th style="padding:8px 10px;text-align:left;">備考</th>';
+    html += '<th></th></tr></thead><tbody>';
+    rows.forEach(function(d, i) {
+      const dp = d.date ? d.date.slice(5).replace('-','/') : '';
+      const rowBg = i%2===0 ? '#fff' : sb;
+      const scoreHtml = d.score ? '<span style="background:#EAF3DE;color:#27500A;padding:2px 8px;border-radius:99px;font-weight:600;">'+d.score+'</span>' : '<span style="color:#ccc;">-</span>';
+      html += '<tr style="background:'+rowBg+';border-bottom:1px solid #F0EEE8;">';
+      html += '<td style="padding:7px 10px;white-space:nowrap;color:'+sc+';font-weight:600;">'+dp+'</td>';
+      html += '<td style="padding:7px 10px;">'+d.num+'</td>';
+      html += '<td style="padding:7px 10px;text-align:center;color:#888;">'+(d.time ? d.time+'分' : '-')+'</td>';
+      html += '<td style="padding:7px 10px;text-align:center;">'+scoreHtml+'</td>';
+      html += '<td style="padding:7px 10px;color:#555;font-size:11px;">'+(d.note||'')+'</td>';
+      html += '<td><button onclick="deleteMondai('+d.id+')" style="font-size:11px;color:#ccc;background:none;border:none;cursor:pointer;">✕</button></td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    list.innerHTML = html;
+    return;
+  }
+}
 </script>
+
+
+<!-- ══ 問題集記録 全画面一覧 ══ -->
+<div class="mondai-fullscreen" id="mondaiFullscreen">
+  <div class="mondai-fs-head">
+    <span style="font-size:18px;">📋</span>
+    <span class="mondai-fs-title">問題集記録 一覧</span>
+    <span id="mondaiFsCount" style="font-size:12px;color:rgba(255,255,255,0.7);"></span>
+    <button class="mondai-fs-close" onclick="closeMondaiFullscreen()">✕ 閉じる</button>
+  </div>
+  <div class="mondai-fs-body">
+    <!-- 科目フィルター -->
+    <div class="mondai-fs-filter">
+      <span style="font-size:12px;color:#888;font-weight:600;">科目：</span>
+      <button class="mondai-fs-filter-btn active" onclick="filterMondaiFs('')" id="fsf-all">すべて</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Word')" id="fsf-Word">✍️ Word</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Excel')" id="fsf-Excel">📊 Excel</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('PowerPoint')" id="fsf-PowerPoint">🎨 PowerPoint</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Illustrator')" id="fsf-Illustrator">✏️ Illustrator</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Photoshop')" id="fsf-Photoshop">📷 Photoshop</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Web')" id="fsf-Web">🌐 Web</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('ビジマナ・就職')" id="fsf-manner">🤝 ビジマナ・就職</button>
+    </div>
+    <!-- テーブル -->
+    <div style="overflow-x:auto;">
+      <table class="mondai-fs-table" id="mondaiFsTable">
+        <thead>
+          <tr>
+            <th style="width:70px;">日にち</th>
+            <th style="width:110px;">科目</th>
+            <th>問題番号・範囲</th>
+            <th style="width:70px;text-align:center;">時間</th>
+            <th style="width:110px;text-align:center;">結果・正答率</th>
+            <th>備考・メモ</th>
+            <th style="width:30px;"></th>
+          </tr>
+        </thead>
+        <tbody id="mondaiFsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 問題集記録 モーダル ══ -->
+<div class="modal-overlay" id="mondaiModal" onclick="if(event.target===this)closeMondaiModal()">
+  <div class="modal-box" style="max-width:640px;">
+    <div class="modal-head">
+      <span style="font-size:20px;">📋</span>
+      <span class="modal-head-title">問題集記録</span>
+      <button class="modal-close" onclick="closeMondaiModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- 入力フォーム -->
+      <div class="modal-section-title">📝 新しい記録を追加</div>
+      <div class="modal-row2">
+        <div class="modal-form-row">
+          <label class="modal-label">日にち</label>
+          <input class="modal-input" id="mDate" type="date">
+        </div>
+        <div class="modal-form-row">
+          <label class="modal-label">所要時間（分）</label>
+          <input class="modal-input" id="mTime" type="number" min="1" max="999" placeholder="例：30">
+        </div>
+      </div>
+      <div class="modal-row2">
+        <div class="modal-form-row">
+          <label class="modal-label">科目</label>
+          <select class="modal-input" id="mSubject" style="cursor:pointer;">
+            <option value="">-- 選択してください --</option>
+            <option value="Word">✍️ Word</option>
+            <option value="Excel">📊 Excel</option>
+            <option value="PowerPoint">🎨 PowerPoint</option>
+            <option value="Illustrator">✏️ Illustrator</option>
+            <option value="Photoshop">📷 Photoshop</option>
+            <option value="Web">🌐 Web</option>
+            <option value="ビジマナ・就職">🤝 ビジマナ・就職</option>
+          </select>
+        </div>
+        <div class="modal-form-row">
+          <label class="modal-label">結果・正答率</label>
+          <input class="modal-input" id="mScore" type="text" placeholder="例：8/10問 正解">
+        </div>
+      </div>
+      <div class="modal-form-row">
+        <label class="modal-label">問題番号・範囲</label>
+        <input class="modal-input" id="mNum" type="text" placeholder="例：3級 問1〜10 / 過去問2024">
+      </div>
+      <div class="modal-form-row">
+        <label class="modal-label">備考・メモ</label>
+        <input class="modal-input" id="mNote" type="text" placeholder="例：表の操作が苦手。再チェック必要">
+      </div>
+      <button class="modal-submit" onclick="saveMondai()">記録する</button>
+
+      <!-- 表示切替タブ -->
+      <div style="margin-top:20px;display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
+        <button id="viewTabList" onclick="setMondaiView('list')"
+          style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #534AB7;background:#534AB7;color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;">📅 時系列</button>
+        <button id="viewTabSubject" onclick="setMondaiView('subject')"
+          style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #D3D1C7;background:#fff;color:#888;cursor:pointer;font-family:inherit;white-space:nowrap;">📚 科目別</button>
+        <select id="mondaiSubjectFilter" onchange="onMondaiSubjectChange(this.value)"
+          style="display:none;font-size:12px;padding:6px 12px;border-radius:99px;border:1px solid #534AB7;background:#fff;color:#2E4057;cursor:pointer;font-family:inherit;outline:none;">
+          <option value="">── 科目を選択 ──</option>
+          <option value="Word">✍️ Word</option>
+          <option value="Excel">📊 Excel</option>
+          <option value="PowerPoint">🎨 PowerPoint</option>
+          <option value="Illustrator">✏️ Illustrator</option>
+          <option value="Photoshop">📷 Photoshop</option>
+          <option value="Web">🌐 Web</option>
+          <option value="ビジマナ・就職">🤝 ビジマナ・就職</option>
+        </select>
+      </div>
+
+      <!-- 記録一覧 -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div class="modal-section-title" id="mondaiListTitle" style="margin-bottom:0;flex:1;border-bottom:none;padding-bottom:0;">📅 これまでの記録（時系列）</div>
+        <button onclick="openMondaiFullscreen()" style="font-size:11px;padding:4px 12px;border-radius:99px;border:1px solid #2E4057;background:#fff;color:#2E4057;cursor:pointer;font-family:inherit;white-space:nowrap;">📋 全画面で見る</button>
+      </div>
+      <div id="mondaiList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 問題集記録 全画面一覧 ══ -->
+<div class="mondai-fullscreen" id="mondaiFullscreen">
+  <div class="mondai-fs-head">
+    <span style="font-size:18px;">📋</span>
+    <span class="mondai-fs-title">問題集記録 一覧</span>
+    <span id="mondaiFsCount" style="font-size:12px;color:rgba(255,255,255,0.7);"></span>
+    <button class="mondai-fs-close" onclick="closeMondaiFullscreen()">✕ 閉じる</button>
+  </div>
+  <div class="mondai-fs-body">
+    <!-- 科目フィルター -->
+    <div class="mondai-fs-filter">
+      <span style="font-size:12px;color:#888;font-weight:600;">科目：</span>
+      <button class="mondai-fs-filter-btn active" onclick="filterMondaiFs('')" id="fsf-all">すべて</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Word')" id="fsf-Word">✍️ Word</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Excel')" id="fsf-Excel">📊 Excel</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('PowerPoint')" id="fsf-PowerPoint">🎨 PowerPoint</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Illustrator')" id="fsf-Illustrator">✏️ Illustrator</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Photoshop')" id="fsf-Photoshop">📷 Photoshop</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Web')" id="fsf-Web">🌐 Web</button>
+      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('ビジマナ・就職')" id="fsf-manner">🤝 ビジマナ・就職</button>
+    </div>
+    <!-- テーブル -->
+    <div style="overflow-x:auto;">
+      <table class="mondai-fs-table" id="mondaiFsTable">
+        <thead>
+          <tr>
+            <th style="width:70px;">日にち</th>
+            <th style="width:110px;">科目</th>
+            <th>問題番号・範囲</th>
+            <th style="width:70px;text-align:center;">時間</th>
+            <th style="width:110px;text-align:center;">結果・正答率</th>
+            <th>備考・メモ</th>
+            <th style="width:30px;"></th>
+          </tr>
+        </thead>
+        <tbody id="mondaiFsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 問題集記録 モーダル ══ -->
+<div class="modal-overlay" id="mondaiModal" onclick="if(event.target===this)closeMondaiModal()">
+  <div class="modal-box" style="max-width:640px;">
+    <div class="modal-head">
+      <span style="font-size:20px;">📋</span>
+      <span class="modal-head-title">問題集記録</span>
+      <button class="modal-close" onclick="closeMondaiModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- 入力フォーム -->
+      <div class="modal-section-title">📝 新しい記録を追加</div>
+      <div class="modal-row2">
+        <div class="modal-form-row">
+          <label class="modal-label">日にち</label>
+          <input class="modal-input" id="mDate" type="date">
+        </div>
+        <div class="modal-form-row">
+          <label class="modal-label">所要時間（分）</label>
+          <input class="modal-input" id="mTime" type="number" min="1" max="999" placeholder="例：30">
+        </div>
+      </div>
+      <div class="modal-row2">
+        <div class="modal-form-row">
+          <label class="modal-label">科目</label>
+          <select class="modal-input" id="mSubject" style="cursor:pointer;">
+            <option value="">-- 選択してください --</option>
+            <option value="Word">✍️ Word</option>
+            <option value="Excel">📊 Excel</option>
+            <option value="PowerPoint">🎨 PowerPoint</option>
+            <option value="Illustrator">✏️ Illustrator</option>
+            <option value="Photoshop">📷 Photoshop</option>
+            <option value="Web">🌐 Web</option>
+            <option value="ビジマナ・就職">🤝 ビジマナ・就職</option>
+          </select>
+        </div>
+        <div class="modal-form-row">
+          <label class="modal-label">結果・正答率</label>
+          <input class="modal-input" id="mScore" type="text" placeholder="例：8/10問 正解">
+        </div>
+      </div>
+      <div class="modal-form-row">
+        <label class="modal-label">問題番号・範囲</label>
+        <input class="modal-input" id="mNum" type="text" placeholder="例：3級 問1〜10 / 過去問2024">
+      </div>
+      <div class="modal-form-row">
+        <label class="modal-label">備考・メモ</label>
+        <input class="modal-input" id="mNote" type="text" placeholder="例：表の操作が苦手。再チェック必要">
+      </div>
+      <button class="modal-submit" onclick="saveMondai()">記録する</button>
+
+      <!-- 表示切替タブ -->
+      <div style="margin-top:20px;display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
+        <button id="viewTabList" onclick="setMondaiView('list')"
+          style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #534AB7;background:#534AB7;color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;">📅 時系列</button>
+        <button id="viewTabSubject" onclick="setMondaiView('subject')"
+          style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #D3D1C7;background:#fff;color:#888;cursor:pointer;font-family:inherit;white-space:nowrap;">📚 科目別</button>
+        <select id="mondaiSubjectFilter" onchange="onMondaiSubjectChange(this.value)"
+          style="display:none;font-size:12px;padding:6px 12px;border-radius:99px;border:1px solid #534AB7;background:#fff;color:#2E4057;cursor:pointer;font-family:inherit;outline:none;">
+          <option value="">── 科目を選択 ──</option>
+          <option value="Word">✍️ Word</option>
+          <option value="Excel">📊 Excel</option>
+          <option value="PowerPoint">🎨 PowerPoint</option>
+          <option value="Illustrator">✏️ Illustrator</option>
+          <option value="Photoshop">📷 Photoshop</option>
+          <option value="Web">🌐 Web</option>
+          <option value="ビジマナ・就職">🤝 ビジマナ・就職</option>
+        </select>
+      </div>
+
+      <!-- 記録一覧 -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div class="modal-section-title" id="mondaiListTitle" style="margin-bottom:0;flex:1;border-bottom:none;padding-bottom:0;">📅 これまでの記録（時系列）</div>
+        <button onclick="openMondaiFullscreen()" style="font-size:11px;padding:4px 12px;border-radius:99px;border:1px solid #2E4057;background:#fff;color:#2E4057;cursor:pointer;font-family:inherit;white-space:nowrap;">📋 全画面で見る</button>
+      </div>
+      <div id="mondaiList"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 達成バッジポップアップ -->
+<div class="badge-overlay" id="badgeOverlay" onclick="closeBadge()"></div>
+<div class="badge-popup" id="badgePopup">
+  <div class="badge-popup-icon" id="badgeIcon">🎉</div>
+  <div class="badge-popup-title" id="badgeTitle"></div>
+  <div class="badge-popup-sub" id="badgeSub"></div>
+</div>
+
+<!-- ログイン -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">📈</div>
+    <div class="login-title">学習成長記録システム</div>
+    <div class="login-sub">ITビジネス・Webデザイン養成科<br>令和8年度 4月7日〜9月4日</div>
+    <label class="login-label">受講生番号</label>
+    <input class="login-input" id="sid" type="text" placeholder="例：01" maxlength="2" inputmode="numeric">
+    <label class="login-label">氏名</label>
+    <input class="login-input" id="sname" type="text" placeholder="例：山田 太郎">
+    <button class="login-btn" onclick="doLogin()">ログイン</button>
+    <div style="font-size:12px;color:#888;margin-top:8px;text-align:center;display:none" id="loginLoading">確認中...</div>
+    <div class="login-motto">
+      📖 テキストを見ながらできれば、今日は合格！<br>
+      繰り返すうちに、自然とテキストなしでできるようになります。<br>
+      <strong>1週間後・1か月後・3か月後・5か月後の<br>自分の成長を楽しみましょう 😊</strong>
+    </div>
+  </div>
+</div>
+
+<!-- メイン画面 -->
+<div id="mainScreen">
+  <div class="header">
+    <div class="header-title">学習成長記録</div>
+    <div class="header-right">
+      <span class="header-name" id="headerName"></span>
+      <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="motto-bar" id="dailyMotto"></div>
+
+    <!-- 検定カウントダウン（非表示） -->
+    
+
+    <!-- 今週のバナー -->
+    <div class="thisweek-banner" id="thisweekBanner"></div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="swTab('today',this)">📝 今日の記録</button>
+      <button class="tab" onclick="openMondaiModal()" style="border-color:#CECBF6;color:#534AB7;">📋 問題集記録</button>
+      <button class="tab" onclick="swTab('growth',this)">📈 マイ成長</button>
+    </div>
+
+    <!-- ════ タブ① 今日の記録 ════ -->
+    <div class="tab-panel active" id="panel-today">
+
+      <div class="card">
+        <div class="card-title">📚 授業 学習チェックリスト</div>
+        <p style="font-size:12px;color:#888;margin-bottom:14px;line-height:1.7">
+          授業テキストの学習内容です。科目をタップするとチェックリストが展開されます。
+        </p>
+        <div class="subject-btn-grid" id="subjectBtnGrid"></div>
+      </div>
+
+      <!-- 選択科目のチェックリスト -->
+      <div id="dashSkillArea"></div>
+
+      <!-- 全科目一覧 (スクロールで確認可能) -->
+      <div id="allSubjectsArea"></div>
+
+      <!-- マイ成長ボタン -->
+      <div style="text-align:center;margin:1.5rem 0 0.5rem">
+        <button onclick="document.querySelector('[onclick*=growth]').click()"
+          style="padding:14px 40px;background:#2E4057;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">
+          📈 マイ成長を確認する
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ════ タブ② マイ成長 ════ -->
+    <div class="tab-panel" id="panel-growth">
+
+      <!-- 成長タイムライン -->
+      <div class="card">
+        <div class="card-title">🌱 成長タイムライン</div>
+        <div class="timeline">
+          <div class="tl-card tl-1w"><div class="tl-label">現在</div><div class="tl-num" id="tl1w">0</div><div class="tl-unit">項目習得済み</div></div>
+          <div class="tl-card tl-1m"><div class="tl-label">1か月後（予測）</div><div class="tl-num" id="tl1m">-</div><div class="tl-unit">項目習得済み</div></div>
+          <div class="tl-card tl-3m"><div class="tl-label">3か月後（予測）</div><div class="tl-num" id="tl3m">-</div><div class="tl-unit">項目習得済み</div></div>
+          <div class="tl-card tl-5m"><div class="tl-label">5か月後（目標）</div><div class="tl-num" id="tl5m">-</div><div class="tl-unit">項目習得済み</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📊 科目別 習熟度マップ</div>
+        <canvas id="radarChart" height="180"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📅 科目別 進捗</div>
+        <div id="weekProgress"></div>
+      </div>
+
+      <!-- 月次レポート（マイ成長の中に統合） -->
+      <div class="card">
+        <div class="card-title">📋 月次成長レポート
+          <button onclick="window.print()" style="margin-left:auto;font-size:11px;padding:5px 14px;border:1px solid #2E4057;border-radius:8px;background:#fff;color:#2E4057;cursor:pointer;">🖨 印刷</button>
+        </div>
+        <div class="report-grid" id="reportSummary"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 習熟度の推移</div>
+        <canvas id="lineChart" height="110"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-title">💬 コメント（アンケート記入時の参考に）</div>
+        <div class="comment-box" id="reportComment"></div>
+      </div>
+
+      <!-- 週次習得グラフ -->
+      <div class="card">
+        <div class="card-title">📊 週ごとの習得数</div>
+        <p style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.7">訓練開始からの週ごとに、新たにマスターした項目数を表示します。</p>
+        <canvas id="weeklyBarChart" height="130"></canvas>
+      </div>
+
+      <!-- 得意・苦手 科目分析 -->
+      <div class="card">
+        <div class="card-title">🎯 得意・苦手 科目分析</div>
+        <p style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.7">習熟度50%以上を<span style="color:#27500A;font-weight:600">得意</span>、20%以上を<span style="color:#BA7517;font-weight:600">伸び中</span>、20%未満を<span style="color:#A32D2D;font-weight:600">強化中</span>として分類しています。</p>
+        <div id="subjectStrengthArea"></div>
+      </div>
+
+    </div>
+
+
+
+  </div>
+</div>
+
+</body>
+</html
+
+
+
+// ─── 問題集記録 表示切替 ───────────────────────
+let mondaiView = 'list';
+
+function setMondaiView(v) {
+  mondaiView = v;
+  ['list','subject'].forEach(function(t) {
+    const btn = document.getElementById('viewTab' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (!btn) return;
+    const active = t === v;
+    btn.style.background  = active ? '#534AB7' : '#fff';
+    btn.style.color       = active ? '#fff'    : '#888';
+    btn.style.borderColor = active ? '#534AB7' : '#D3D1C7';
+  });
+  const sel = document.getElementById('mondaiSubjectFilter');
+  if (sel) sel.style.display = v === 'subject' ? 'inline-block' : 'none';
+  const title = document.getElementById('mondaiListTitle');
+  if (title) title.textContent = v === 'list'
+    ? '📅 これまでの記録（時系列・新しい順）'
+    : '📚 科目別（日にち昇順）';
+  renderMondaiList();
+}
+
+function renderMondaiList() {
+  const list = document.getElementById('mondaiList');
+  if (!list) return;
+  if (!mondaiData.length) {
+    list.innerHTML = '<div class="log-empty">まだ記録がありません</div>';
+    return;
+  }
+
+  if (mondaiView === 'subject') {
+    const sel = document.getElementById('mondaiSubjectFilter');
+    const selectedSubj = sel ? sel.value : '';
+    if (!selectedSubj) {
+      list.innerHTML = '<div style="text-align:center;padding:2rem;color:#888;">上のプルダウンから科目を選んでください</div>';
+      return;
+    }
+    const SMETA = {
+      'Word':        {color:'#0C447C', bg:'#E6F1FB', icon:'✍️'},
+      'Excel':       {color:'#3B6D11', bg:'#EAF3DE', icon:'📊'},
+      'PowerPoint':  {color:'#993C1D', bg:'#FAECE7', icon:'🎨'},
+      'Illustrator': {color:'#534AB7', bg:'#EEEDFE', icon:'✏️'},
+      'Photoshop':   {color:'#0F6E56', bg:'#E1F5EE', icon:'📷'},
+      'Web':         {color:'#185FA5', bg:'#E6F1FB', icon:'🌐'},
+      'ビジマナ・就職':{color:'#72243E', bg:'#FBEAF0', icon:'🤝'},
+    };
+    const sm = SMETA[selectedSubj] || {color:'#2E4057', bg:'#F5F5F2', icon:'📋'};
+    const rows = mondaiData.filter(function(d){ return d.subject === selectedSubj; })
+                           .sort(function(a,b){ return a.date.localeCompare(b.date); });
+    if (!rows.length) {
+      list.innerHTML = '<div style="text-align:center;padding:2rem;color:#888;">' + sm.icon + ' ' + selectedSubj + 'の記録はまだありません</div>';
+      return;
+    }
+    let html = '<div style="overflow-x:auto;max-height:480px;overflow-y:auto;">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr style="background:' + sm.color + ';color:#fff;">';
+    html += '<th style="padding:8px 10px;text-align:left;white-space:nowrap;">日にち</th>';
+    html += '<th style="padding:8px 10px;text-align:left;">問題番号・範囲</th>';
+    html += '<th style="padding:8px 10px;text-align:center;white-space:nowrap;">時間</th>';
+    html += '<th style="padding:8px 10px;text-align:center;white-space:nowrap;">結果</th>';
+    html += '<th style="padding:8px 10px;text-align:left;">備考</th>';
+    html += '<th></th></tr></thead><tbody>';
+    rows.forEach(function(d, i) {
+      const dp = d.date ? d.date.slice(5).replace('-', '/') : '';
+      const rowBg = i % 2 === 0 ? '#fff' : sm.bg;
+      const scoreHtml = d.score
+        ? '<span style="background:#EAF3DE;color:#27500A;padding:2px 8px;border-radius:99px;font-weight:600;">' + d.score + '</span>'
+        : '<span style="color:#ccc;">-</span>';
+      html += '<tr style="background:' + rowBg + ';border-bottom:1px solid #F0EEE8;">';
+      html += '<td style="padding:7px 10px;white-space:nowrap;color:' + sm.color + ';font-weight:600;">' + dp + '</td>';
+      html += '<td style="padding:7px 10px;">' + d.num + '</td>';
+      html += '<td style="padding:7px 10px;text-align:center;color:#888;">' + (d.time ? d.time + '分' : '-') + '</td>';
+      html += '<td style="padding:7px 10px;text-align:center;">' + scoreHtml + '</td>';
+      html += '<td style="padding:7px 10px;color:#555;font-size:11px;">' + (d.note || '') + '</td>';
+      html += '<td><button onclick="deleteMondai(' + d.id + ')" style="font-size:11px;color:#ccc;background:none;border:none;cursor:pointer;">✕</button></td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    list.innerHTML = html;
+    return;
+  }
+
+  // 時系列（デフォルト）- 新しい順
+  const rows = mondaiData.slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+  let html = '<div style="overflow-x:auto;max-height:480px;overflow-y:auto;">';
+  html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+  html += '<thead><tr style="background:#2E4057;color:#fff;">';
+  html += '<th style="padding:8px 10px;text-align:left;white-space:nowrap;">日にち</th>';
+  html += '<th style="padding:8px 10px;text-align:left;white-space:nowrap;">科目</th>';
+  html += '<th style="padding:8px 10px;text-align:left;">問題番号・範囲</th>';
+  html += '<th style="padding:8px 10px;text-align:center;white-space:nowrap;">時間</th>';
+  html += '<th style="padding:8px 10px;text-align:center;white-space:nowrap;">結果</th>';
+  html += '<th style="padding:8px 10px;text-align:left;">備考</th>';
+  html += '<th></th></tr></thead><tbody>';
+  rows.forEach(function(d, i) {
+    const dp = d.date ? d.date.slice(5).replace('-', '/') : '';
+    const bg = i % 2 === 0 ? '#fff' : '#F9F8FE';
+    const SMETA2 = {'Word':'#0C447C','Excel':'#3B6D11','PowerPoint':'#993C1D','Illustrator':'#534AB7','Photoshop':'#0F6E56','Web':'#185FA5','ビジマナ・就職':'#72243E'};
+    const SBGS = {'Word':'#E6F1FB','Excel':'#EAF3DE','PowerPoint':'#FAECE7','Illustrator':'#EEEDFE','Photoshop':'#E1F5EE','Web':'#E6F1FB','ビジマナ・就職':'#FBEAF0'};
+    const sc = d.subject ? (SMETA2[d.subject]||'#888') : '#888';
+    const sbg = d.subject ? (SBGS[d.subject]||'#F5F5F2') : '#F5F5F2';
+    const subjHtml = d.subject
+      ? '<span style="background:'+sbg+';color:'+sc+';padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap;">' + d.subject + '</span>'
+      : '<span style="color:#ccc;font-size:11px;">未設定</span>';
+    const scoreHtml = d.score
+      ? '<span style="background:#EAF3DE;color:#27500A;padding:2px 8px;border-radius:99px;font-weight:600;">' + d.score + '</span>'
+      : '<span style="color:#ccc;">-</span>';
+    html += '<tr style="background:' + bg + ';border-bottom:1px solid #EEEDFE;">';
+    html += '<td style="padding:7px 10px;white-space:nowrap;color:#534AB7;font-weight:600;">' + dp + '</td>';
+    html += '<td style="padding:7px 8px;">' + subjHtml + '</td>';
+    html += '<td style="padding:7px 10px;">' + d.num + '</td>';
+    html += '<td style="padding:7px 10px;text-align:center;color:#888;">' + (d.time ? d.time + '分' : '-') + '</td>';
+    html += '<td style="padding:7px 10px;text-align:center;">' + scoreHtml + '</td>';
+    html += '<td style="padding:7px 10px;color:#555;font-size:11px;">' + (d.note || '') + '</td>';
+    html += '<td><button onclick="deleteMondai(' + d.id + ')" style="font-size:11px;color:#ccc;background:none;border:none;cursor:pointer;">✕</button></td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  list.innerHTML = html;
+}
+
 
 <!-- 達成バッジポップアップ -->
 <div class="badge-overlay" id="badgeOverlay" onclick="closeBadge()"></div>
