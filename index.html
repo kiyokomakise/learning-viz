@@ -296,59 +296,6 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
   .tabs,.header,.logout-btn { display:none!important; }
   .tab-panel { display:block!important; }
 }
-
-/* ─── 問題集記録 モーダル ─── */
-.mondai-btn { display:flex; align-items:center; gap:10px; padding:14px 18px; background:#fff; border:2px solid #CECBF6; border-radius:12px; cursor:pointer; font-family:inherit; width:100%; text-align:left; transition:all 0.15s; margin-bottom:1rem; }
-.mondai-btn:hover { background:#EEEDFE; border-color:#534AB7; }
-.mondai-btn-icon { font-size:22px; }
-.mondai-btn-left { flex:1; }
-.mondai-btn-title { font-size:14px; font-weight:700; color:#534AB7; }
-.mondai-btn-sub { font-size:11px; color:#888; margin-top:2px; }
-.mondai-btn-cnt { font-size:12px; font-weight:600; color:#534AB7; background:#EEEDFE; padding:3px 10px; border-radius:99px; }
-
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; display:none; align-items:center; justify-content:center; padding:1rem; }
-.modal-overlay.open { display:flex; }
-.modal-box { background:#fff; border-radius:16px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; box-shadow:0 8px 40px rgba(0,0,0,0.2); }
-.modal-head { padding:18px 20px 14px; border-bottom:1px solid #E0DED6; display:flex; align-items:center; gap:10px; }
-.modal-head-title { font-size:15px; font-weight:700; color:#2E4057; flex:1; }
-.modal-close { font-size:18px; color:#888; background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:6px; }
-.modal-close:hover { background:#F1EFE8; }
-.modal-body { padding:16px 20px; }
-.modal-section-title { font-size:12px; font-weight:700; color:#2E4057; letter-spacing:.05em; margin-bottom:10px; padding-bottom:5px; border-bottom:2px solid #EEEDFE; }
-.modal-form-row { margin-bottom:12px; }
-.modal-label { font-size:12px; font-weight:600; color:#555; margin-bottom:4px; display:block; }
-.modal-input { width:100%; padding:9px 12px; border:1px solid #D3D1C7; border-radius:8px; font-size:13px; font-family:inherit; outline:none; }
-.modal-input:focus { border-color:#534AB7; }
-.modal-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.modal-submit { width:100%; padding:12px; background:#534AB7; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:4px; }
-.modal-submit:hover { background:#3C3489; }
-
-.log-item { padding:10px 12px; border-radius:8px; background:#F9F8FE; border:1px solid #EEEDFE; margin-bottom:6px; }
-.log-item-head { display:flex; align-items:center; gap:8px; margin-bottom:3px; }
-.log-item-date { font-size:11px; font-weight:600; color:#534AB7; }
-.log-item-num { font-size:11px; background:#534AB7; color:#fff; padding:1px 8px; border-radius:99px; }
-.log-item-time { font-size:11px; color:#888; }
-.log-item-note { font-size:12px; color:#555; line-height:1.5; }
-.log-item-del { margin-left:auto; font-size:11px; color:#aaa; background:none; border:none; cursor:pointer; padding:2px 6px; border-radius:4px; }
-.log-item-del:hover { color:#A32D2D; background:#FCEBEB; }
-.log-empty { text-align:center; padding:1.5rem; color:#aaa; font-size:13px; }
-
-/* ─── 問題集記録 全画面一覧 ─── */
-.mondai-fullscreen { position:fixed; inset:0; background:#F5F5F2; z-index:2000; display:none; flex-direction:column; }
-.mondai-fullscreen.open { display:flex; }
-.mondai-fs-head { background:#2E4057; padding:0 1.25rem; height:52px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
-.mondai-fs-title { font-size:15px; font-weight:700; color:#fff; flex:1; }
-.mondai-fs-close { font-size:13px; color:rgba(255,255,255,0.75); background:none; border:1px solid rgba(255,255,255,0.3); border-radius:99px; padding:5px 14px; cursor:pointer; font-family:inherit; }
-.mondai-fs-body { flex:1; overflow-y:auto; padding:1rem; }
-.mondai-fs-filter { display:flex; gap:8px; margin-bottom:1rem; flex-wrap:wrap; align-items:center; }
-.mondai-fs-filter-btn { font-size:12px; padding:5px 14px; border-radius:99px; border:1px solid #D3D1C7; background:#fff; color:#888; cursor:pointer; font-family:inherit; transition:all 0.12s; }
-.mondai-fs-filter-btn.active { background:#2E4057; color:#fff; border-color:#2E4057; }
-.mondai-fs-table { width:100%; border-collapse:collapse; font-size:13px; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
-.mondai-fs-table thead tr { background:#2E4057; color:#fff; }
-.mondai-fs-table th { padding:10px 12px; text-align:left; font-weight:600; white-space:nowrap; }
-.mondai-fs-table td { padding:9px 12px; border-bottom:1px solid #F0EEE8; vertical-align:middle; }
-.mondai-fs-table tbody tr:last-child td { border-bottom:none; }
-.mondai-fs-table tbody tr:hover { background:#F9F8FE; }
 </style>
 </head>
 <body>
@@ -894,190 +841,76 @@ const SKILLS = {
     { id:'p09',week:18,step:'PowerPoint応用',name:'発表者ツール・スライド印刷ができる',cert:['スタンダード'] },
   ],
   illust: [
-    // ── 序章 ──
-    { id:'i001',week:2,step:'序章：Illustratorとは',name:'Illustratorの特徴がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'i002',week:2,step:'序章：Illustratorとは',name:'ツール一覧がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'i003',week:2,step:'序章：Illustratorとは',name:'ショートカット一覧がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'i004',week:2,step:'序章：Illustratorとは',name:'フォントの種類がわかる',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter1 基本操作 ──
-    { id:'i005',week:2,step:'第1部C1：Illustratorの基本操作',name:'C1-1 Illustratorの起動と作業エリアがわかる',cert:['スタンダード','エキスパート'] },
-    { id:'i006',week:2,step:'第1部C1：Illustratorの基本操作',name:'C1-2 アートワークの表示とプリントができる',cert:['スタンダード','エキスパート'] },
-    { id:'i007',week:2,step:'第1部C1：Illustratorの基本操作',name:'C1-3 環境設定ができる',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter2 オブジェクトの基本操作 ──
-    { id:'i008',week:2,step:'第1部C2：オブジェクトの基本操作',name:'C2-1 塗りと線の設定ができる（ドリルNo.16）',cert:['スタンダード','エキスパート'] },
-    { id:'i009',week:2,step:'第1部C2：オブジェクトの基本操作',name:'C2-2 オブジェクトの描画ができる',cert:['スタンダード','エキスパート'] },
-    { id:'i010',week:2,step:'第1部C2：オブジェクトの基本操作',name:'C2-3 基本的な編集操作ができる',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter3 カラー設定の基本操作 ──
-    { id:'i011',week:3,step:'第1部C3：カラー設定の基本操作',name:'C3-1 カラーパネルによるカラー設定ができる',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter4 オブジェクト編集の基本操作 ──
-    { id:'i012',week:3,step:'第1部C4：オブジェクト編集の基本操作',name:'C4-1 レイヤーが使える',cert:['スタンダード','エキスパート'] },
-    { id:'i013',week:3,step:'第1部C4：オブジェクト編集の基本操作',name:'C4-2 オブジェクトの組み合わせによる編集ができる（ドリルNo.2・11）',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter5 文字編集の基本操作 ──
-    { id:'i014',week:3,step:'第1部C5：文字編集の基本操作',name:'C5-1 文字の作成ができる（ドリルNo.30・31）',cert:['スタンダード','エキスパート'] },
-    { id:'i015',week:3,step:'第1部C5：文字編集の基本操作',name:'C5-2 文字関連の機能が使える',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter6 パスの基本操作 ──
-    { id:'i016',week:4,step:'第1部C6：パスの基本操作',name:'C6-1 パスの基本的な描画ができる（ドリルNo.5・6・7）',cert:['スタンダード','エキスパート'] },
-    { id:'i017',week:4,step:'第1部C6：パスの基本操作',name:'C6-2 パスの編集ができる',cert:['スタンダード','エキスパート'] },
-    // ── 第2部 Chapter1 オブジェクトの応用操作 ──
-    { id:'i018',week:4,step:'第2部C1：オブジェクトの応用操作',name:'C1-1 応用的なオブジェクトの描画ができる',cert:['スタンダード','エキスパート'] },
-    { id:'i019',week:4,step:'第2部C1：オブジェクトの応用操作',name:'C1-2 線の応用設定ができる（ドリルNo.9・10・12）',cert:['スタンダード','エキスパート'] },
-    { id:'i020',week:4,step:'第2部C1：オブジェクトの応用操作',name:'C1-3 レイアウトの補助機能が使える',cert:['スタンダード','エキスパート'] },
-    // ── 第2部 Chapter2 カラー設定の応用操作 ──
-    { id:'i021',week:5,step:'第2部C2：カラー設定の応用操作',name:'C2-1 スウォッチ・パターンが使える（ドリルNo.19・20・21）',cert:['スタンダード','エキスパート'] },
-    { id:'i022',week:5,step:'第2部C2：カラー設定の応用操作',name:'C2-2 グラデーションの応用ができる',cert:['スタンダード','エキスパート'] },
-    { id:'i023',week:5,step:'第2部C2：カラー設定の応用操作',name:'C2-3 アピアランスが使える（ドリルNo.17・18・Expert1）',cert:['スタンダード','エキスパート'] },
-    // ── 第2部 Chapter3 レイヤーの応用操作 ──
-    { id:'i024',week:5,step:'第2部C3：レイヤーの応用操作',name:'C3-1 レイヤーの応用操作ができる',cert:['スタンダード','エキスパート'] },
-    // ── 第2部 Chapter4 文字編集の応用操作 ──
-    { id:'i025',week:5,step:'第2部C4：文字編集の応用操作',name:'C4-1 パス上の文字入力ができる',cert:['スタンダード','エキスパート'] },
-    { id:'i026',week:5,step:'第2部C4：文字編集の応用操作',name:'C4-2 文字の種類がわかる（ドリルNo.33・35）',cert:['スタンダード','エキスパート'] },
-    { id:'i027',week:5,step:'第2部C4：文字編集の応用操作',name:'C4-3 文字関連の応用機能が使える',cert:['スタンダード','エキスパート'] },
-    // ── 第2部 Chapter5 パスの応用操作 ──
-    { id:'i028',week:6,step:'第2部C5：パスの応用操作',name:'C5-1 パスの応用編集ができる（ドリルNo.1・4・28）',cert:['スタンダード','エキスパート'] },
-    // ── 第3部 Chapter1 イラストレーション（エキスパート） ──
-    { id:'i029',week:6,step:'第3部C1：イラストレーション',name:'C1-1 シンボルを使用した桜の木が作れる（ドリルNo.3・22・29・Expert2）',cert:['エキスパート'] },
-    { id:'i030',week:6,step:'第3部C1：イラストレーション',name:'C1-2 グラデーションを使用したイラストが作れる',cert:['エキスパート'] },
-    { id:'i031',week:6,step:'第3部C1：イラストレーション',name:'C1-3 画像トレースを使用した作品が作れる（ドリルNo.8・23・24）',cert:['エキスパート'] },
-    // ── 第3部 Chapter2 ロゴデザイン（エキスパート） ──
-    { id:'i032',week:6,step:'第3部C2：ロゴデザイン',name:'C2-1 動物病院のロゴマークが作れる',cert:['エキスパート'] },
-    { id:'i033',week:6,step:'第3部C2：ロゴデザイン',name:'C2-2 漢字でタイポグラフィーが作れる（ドリルNo.27・36・Expert3）',cert:['エキスパート'] },
-    { id:'i034',week:6,step:'第3部C2：ロゴデザイン',name:'C2-3 アピアランスでロゴデザインができる',cert:['エキスパート'] },
-    // ── 第3部 Chapter3 Webデザイン（エキスパート） ──
-    { id:'i035',week:7,step:'第3部C3：Webデザイン',name:'C3-1 画像をWeb用に保存できる（ドリルNo.12・14）',cert:['エキスパート'] },
-    { id:'i036',week:7,step:'第3部C3：Webデザイン',name:'C3-2 アピアランスでWebパーツをデザインできる',cert:['エキスパート'] },
-    // ── 第3部 Chapter4 グラフ（エキスパート） ──
-    { id:'i037',week:7,step:'第3部C4：グラフを作成する',name:'C4-1 グラフの基本操作ができる（ドリルNo.13・15）',cert:['エキスパート'] },
-    { id:'i038',week:7,step:'第3部C4：グラフを作成する',name:'C4-2 グラフのデザインをカスタマイズできる',cert:['エキスパート'] },
-    // ── 第3部 Chapter5 印刷原稿（エキスパート） ──
-    { id:'i039',week:7,step:'第3部C5：印刷原稿の作成',name:'C5-1 DTPのための環境設定ができる',cert:['エキスパート'] },
-    { id:'i040',week:7,step:'第3部C5：印刷原稿の作成',name:'C5-2 名刺のデザインができる',cert:['エキスパート'] },
-    { id:'i041',week:7,step:'第3部C5：印刷原稿の作成',name:'C5-3 写真を配置したDMが作れる',cert:['エキスパート'] },
-    { id:'i042',week:7,step:'第3部C5：印刷原稿の作成',name:'C5-4 見開きパンフレットのデザインができる',cert:['エキスパート'] },
+    // ── スタンダード（基本操作） ──────────────
+    { id:'i01',week:2, step:'Illustrator基本操作',name:'Illustratorが起動でき画面構成がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'i02',week:2, step:'Illustrator基本操作',name:'新規ドキュメントの作成・保存ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i03',week:2, step:'Illustrator基本操作',name:'選択ツール・ダイレクト選択ツールを使い分けられる',cert:['スタンダード','エキスパート'] },
+    { id:'i04',week:2, step:'Illustrator基本操作',name:'基本図形（長方形・楕円・多角形）が作成できる',cert:['スタンダード','エキスパート'] },
+    { id:'i05',week:2, step:'Illustrator基本操作',name:'オブジェクトの移動・拡大縮小・回転・反転ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i06',week:3, step:'Illustratorカラー',name:'塗りと線の色設定ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i07',week:3, step:'Illustratorカラー',name:'グラデーションの設定ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i08',week:3, step:'Illustratorカラー',name:'スウォッチ・カラーパネルを活用できる',cert:['スタンダード','エキスパート'] },
+    { id:'i09',week:3, step:'Illustratorテキスト',name:'文字ツールでテキストを入力・編集できる',cert:['スタンダード','エキスパート'] },
+    { id:'i10',week:3, step:'Illustratorテキスト',name:'フォント・サイズ・字間・行間の設定ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i11',week:4, step:'Illustratorオブジェクト整理',name:'整列・分布（左右・上下揃え）ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i12',week:4, step:'Illustratorオブジェクト整理',name:'前面・背面の順序変更ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i13',week:4, step:'Illustratorオブジェクト整理',name:'グループ化・解除ができる',cert:['スタンダード','エキスパート'] },
+    { id:'i14',week:4, step:'Illustratorオブジェクト整理',name:'レイヤーの作成・管理ができる',cert:['スタンダード','エキスパート'] },
+    // ── エキスパート（応用） ──────────────
+    { id:'i15',week:5, step:'Illustratorパス（エキスパート）',name:'ペンツールでパスを描ける',cert:['エキスパート'] },
+    { id:'i16',week:5, step:'Illustratorパス（エキスパート）',name:'アンカーポイントの追加・削除・変換ができる',cert:['エキスパート'] },
+    { id:'i17',week:5, step:'Illustratorパス（エキスパート）',name:'パスファインダーで図形を合成・分割できる',cert:['エキスパート'] },
+    { id:'i18',week:6, step:'Illustratorパス（エキスパート）',name:'クリッピングマスクが使える',cert:['エキスパート'] },
+    { id:'i19',week:6, step:'Illustratorパス（エキスパート）',name:'アピアランスパネルを使った効果設定ができる',cert:['エキスパート'] },
+    { id:'i20',week:7, step:'Illustrator入稿・知識（エキスパート）',name:'画像の埋め込み・配置ができる',cert:['エキスパート'] },
+    { id:'i21',week:7, step:'Illustrator入稿・知識（エキスパート）',name:'印刷用PDFとして書き出せる',cert:['エキスパート'] },
+    { id:'i22',week:7, step:'Illustrator入稿・知識（エキスパート）',name:'DTP・印刷の基礎知識がわかる（解像度・色分解等）',cert:['エキスパート'] },
+    { id:'i23',week:7, step:'Illustrator入稿・知識（エキスパート）',name:'Webデザインの基礎知識がわかる',cert:['エキスパート'] },
   ],
   photo: [
-    // ── 序章 ──
-    { id:'ph001',week:7,step:'序章：Photoshopとは',name:'Photoshopの機能概要がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'ph002',week:7,step:'序章：Photoshopとは',name:'ツール一覧がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'ph003',week:7,step:'序章：Photoshopとは',name:'ショートカット一覧がわかる',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter1 基本操作 ──
-    { id:'ph004',week:7,step:'第1部C1：Photoshopの基本操作',name:'C1-1 起動とファイル操作ができる',cert:['スタンダード','エキスパート'] },
-    { id:'ph005',week:7,step:'第1部C1：Photoshopの基本操作',name:'C1-2 作業エリアがわかる',cert:['スタンダード','エキスパート'] },
-    { id:'ph006',week:7,step:'第1部C1：Photoshopの基本操作',name:'C1-3 画面表示と色の選択ができる',cert:['スタンダード','エキスパート'] },
-    { id:'ph007',week:7,step:'第1部C1：Photoshopの基本操作',name:'C1-4 環境設定ができる',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter2 選択範囲の作成 ──
-    { id:'ph008',week:7,step:'第1部C2：選択範囲の作成',name:'C2-1 選択ツールが使える（ドリルNo.8・13・9・12・14）',cert:['スタンダード','エキスパート'] },
-    { id:'ph009',week:7,step:'第1部C2：選択範囲の作成',name:'C2-2 その他の選択方法が使える',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter3 画像の移動と変形 ──
-    { id:'ph010',week:8,step:'第1部C3：画像の移動と変形',name:'C3-1 画像解像度とサイズ変更ができる（ドリルNo.6）',cert:['スタンダード','エキスパート'] },
-    { id:'ph011',week:8,step:'第1部C3：画像の移動と変形',name:'C3-2 画像のコピー＆ペーストができる',cert:['スタンダード','エキスパート'] },
-    { id:'ph012',week:8,step:'第1部C3：画像の移動と変形',name:'C3-3 画像の変形ができる',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter4 カラーモードと色調調整 ──
-    { id:'ph013',week:8,step:'第1部C4：カラーモードと色調調整',name:'C4-1 カラーモードがわかる（ドリルNo.7・2・5・11）',cert:['スタンダード','エキスパート'] },
-    { id:'ph014',week:8,step:'第1部C4：カラーモードと色調調整',name:'C4-2 色調調整ができる',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter5 ペイント ──
-    { id:'ph015',week:9,step:'第1部C5：ペイント',name:'C5-1 ペイント系のツールが使える（ドリルNo.24・23・1・27）',cert:['スタンダード','エキスパート'] },
-    { id:'ph016',week:9,step:'第1部C5：ペイント',name:'C5-2 レタッチ系のツールが使える',cert:['スタンダード','エキスパート'] },
-    { id:'ph017',week:9,step:'第1部C5：ペイント',name:'C5-3 ペイント系のコマンドが使える',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter6 レイヤー操作 ──
-    { id:'ph018',week:11,step:'第1部C6：レイヤー操作',name:'C6-1 レイヤーの基本操作ができる（ドリルNo.33・3・10・36）',cert:['スタンダード','エキスパート'] },
-    { id:'ph019',week:11,step:'第1部C6：レイヤー操作',name:'C6-2 その他の機能（調整レイヤー・レイヤースタイルなど）が使える',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter7 パスとシェイプ ──
-    { id:'ph020',week:12,step:'第1部C7：パスとシェイプ',name:'C7-1 パスの作成と編集ができる（ドリルNo.21）',cert:['スタンダード','エキスパート'] },
-    { id:'ph021',week:12,step:'第1部C7：パスとシェイプ',name:'C7-2 シェイプが使える',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter8 テキスト ──
-    { id:'ph022',week:12,step:'第1部C8：テキスト',name:'C8-1 テキストの入力と編集ができる（ドリルNo.8・17・35・19）',cert:['スタンダード','エキスパート'] },
-    { id:'ph023',week:12,step:'第1部C8：テキスト',name:'C8-2 文字の加工ができる',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter9 フィルター ──
-    { id:'ph024',week:14,step:'第1部C9：フィルター',name:'C9-1 フィルターの概要と使用ができる（ドリルNo.25・31・32）',cert:['スタンダード','エキスパート'] },
-    // ── 第1部 Chapter10 画像の入出力 ──
-    { id:'ph025',week:14,step:'第1部C10：画像の入出力',name:'C10-1 保存形式がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'ph026',week:14,step:'第1部C10：画像の入出力',name:'C10-2 プリントとスキャナーが使える',cert:['スタンダード','エキスパート'] },
-    // ── 第2部 Chapter1 フォトレタッチ（エキスパート） ──
-    { id:'ph027',week:14,step:'第2部C1：フォトレタッチ',name:'C1-1 色調補正ツールの基本ワザができる（ドリルNo.30・26・Expert1）',cert:['エキスパート'] },
-    { id:'ph028',week:14,step:'第2部C1：フォトレタッチ',name:'C1-2 食べ物の写真を補正できる',cert:['エキスパート'] },
-    { id:'ph029',week:14,step:'第2部C1：フォトレタッチ',name:'C1-3 曇天の裏路地を夕暮れに変える作品が作れる',cert:['エキスパート'] },
-    // ── 第2部 Chapter2 ロゴデザイン（エキスパート） ──
-    { id:'ph030',week:14,step:'第2部C2：ロゴデザイン',name:'C2-1 ロゴデザインができる',cert:['エキスパート'] },
-    { id:'ph031',week:14,step:'第2部C2：ロゴデザイン',name:'C2-2 シェイプとスタイルで製作できる',cert:['エキスパート'] },
-    { id:'ph032',week:14,step:'第2部C2：ロゴデザイン',name:'C2-3 すすけたナンバープレートが作れる',cert:['エキスパート'] },
-    // ── 第2部 Chapter3 カード＆ステーショナリー（エキスパート） ──
-    { id:'ph033',week:14,step:'第2部C3：カード＆ステーショナリー',name:'C3-1 アクションで製作するカードが作れる（ドリルNo.29・15）',cert:['エキスパート'] },
-    { id:'ph034',week:14,step:'第2部C3：カード＆ステーショナリー',name:'C3-2 写真から制作する立体ポップが作れる',cert:['エキスパート'] },
-    { id:'ph035',week:14,step:'第2部C3：カード＆ステーショナリー',name:'C3-3 フィルターで製作するカバーが作れる',cert:['エキスパート'] },
-    // ── 第2部 Chapter4 フォトコラージュ（エキスパート） ──
-    { id:'ph036',week:18,step:'第2部C4：フォトコラージュ',name:'C4-1 連続写真を1枚に合成できる（ドリルNo.16・20）',cert:['エキスパート'] },
-    { id:'ph037',week:18,step:'第2部C4：フォトコラージュ',name:'C4-2 旅のコラージュポストカードが作れる',cert:['エキスパート'] },
-    { id:'ph038',week:18,step:'第2部C4：フォトコラージュ',name:'C4-3 イラストと背景写真の合成ができる',cert:['エキスパート'] },
-    // ── 第2部 Chapter5 Webサイトのデザイン（エキスパート） ──
-    { id:'ph039',week:19,step:'第2部C5：Webサイトのデザイン',name:'C5-1 Webページの制作ができる（ドリルNo.34）',cert:['エキスパート'] },
-    { id:'ph040',week:19,step:'第2部C5：Webサイトのデザイン',name:'C5-2 Web用画像の保存・書き出しができる',cert:['エキスパート'] },
-    { id:'ph041',week:19,step:'第2部C5：Webサイトのデザイン',name:'C5-3 レイヤーカンプの作成ができる',cert:['エキスパート'] },
+    // ── スタンダード（基本操作） ──────────────
+    { id:'ph01',week:7, step:'Photoshop基本操作',name:'Photoshopが起動でき画面構成がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'ph02',week:7, step:'Photoshop基本操作',name:'新規ドキュメントの作成・保存ができる',cert:['スタンダード','エキスパート'] },
+    { id:'ph03',week:7, step:'Photoshop基本操作',name:'画像の切り抜き（トリミング）ができる',cert:['スタンダード','エキスパート'] },
+    { id:'ph04',week:7, step:'Photoshop基本操作',name:'明るさ・コントラスト・色調補正ができる',cert:['スタンダード','エキスパート'] },
+    { id:'ph05',week:8, step:'Photoshop基本操作',name:'選択ツール（矩形・なげなわ・クイック）を使える',cert:['スタンダード','エキスパート'] },
+    { id:'ph06',week:8, step:'Photoshop基本操作',name:'塗りつぶし・グラデーションツールが使える',cert:['スタンダード','エキスパート'] },
+    { id:'ph07',week:8, step:'Photoshop基本操作',name:'文字ツールでテキストを入力・編集できる',cert:['スタンダード','エキスパート'] },
+    { id:'ph08',week:8, step:'Photoshop基本操作',name:'ブラシ・消しゴムツールが使える',cert:['スタンダード','エキスパート'] },
+    // ── エキスパート（応用） ──────────────
+    { id:'ph09',week:9, step:'Photoshopレイヤー（エキスパート）',name:'レイヤーの概念がわかり作成・管理ができる',cert:['エキスパート'] },
+    { id:'ph10',week:9, step:'Photoshopレイヤー（エキスパート）',name:'レイヤーマスクが使える',cert:['エキスパート'] },
+    { id:'ph11',week:9, step:'Photoshopレイヤー（エキスパート）',name:'描画モード（乗算・スクリーン等）が使える',cert:['エキスパート'] },
+    { id:'ph12',week:9, step:'Photoshopレイヤー（エキスパート）',name:'調整レイヤーを使った非破壊編集ができる',cert:['エキスパート'] },
+    { id:'ph13',week:11,step:'Photoshop応用（エキスパート）',name:'フィルター・アート効果が使える',cert:['エキスパート'] },
+    { id:'ph14',week:11,step:'Photoshop応用（エキスパート）',name:'スマートオブジェクトが使える',cert:['エキスパート'] },
+    { id:'ph15',week:12,step:'Photoshop応用（エキスパート）',name:'クリッピングマスクが使える',cert:['エキスパート'] },
+    { id:'ph16',week:14,step:'Photoshop書き出し（エキスパート）',name:'Web用の適切な形式（JPEG・PNG・GIF）で書き出せる',cert:['エキスパート'] },
+    { id:'ph17',week:14,step:'Photoshop書き出し（エキスパート）',name:'解像度・カラーモード（RGB・CMYK）の知識がわかる',cert:['エキスパート'] },
   ],
   web: [
-    // ── Webサイトの基礎 ──
-    { id:'wb001',week:14,step:'Webサイトの基礎',name:'Webサイトの基礎知識がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb002',week:14,step:'Webサイトの基礎',name:'HTML Living Standardの特徴がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb003',week:14,step:'Webサイトの基礎',name:'HTMLファイルを作成できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb004',week:14,step:'Webサイトの基礎',name:'HTMLファイルの基本構造を記述できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb005',week:14,step:'Webサイトの基礎',name:'Webページの本体を作成できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb006',week:14,step:'Webサイトの基礎',name:'CSS3の概要がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb007',week:14,step:'Webサイトの基礎',name:'HTMLファイルにCSSファイルを関連付けることができる',cert:['スタンダード','エキスパート'] },
-    { id:'wb008',week:14,step:'Webサイトの基礎',name:'スタイルを設定できる',cert:['スタンダード','エキスパート'] },
-    // ── Webサイト構築の流れ ──
-    { id:'wb009',week:14,step:'Webサイト構築の流れ',name:'Webサイト構築の流れがわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb010',week:14,step:'Webサイト構築の流れ',name:'Webサイト開設の準備がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb011',week:14,step:'Webサイト構築の流れ',name:'Webサイトの設計がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb012',week:14,step:'Webサイト構築の流れ',name:'Webサイトの基本デザインを検討できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb013',week:14,step:'Webサイト構築の流れ',name:'Webページを作成する方法がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb014',week:14,step:'Webサイト構築の流れ',name:'Webサイトを転送する方法がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb015',week:14,step:'Webサイト構築の流れ',name:'Webサイトを運用・更新する方法がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb016',week:14,step:'Webサイト構築の流れ',name:'作成するWebサイトを確認できる',cert:['スタンダード','エキスパート'] },
-    // ── テキスト・画像・ボックス ──
-    { id:'wb017',week:15,step:'テキスト・画像・ボックス',name:'文字列のスタイルを設定できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb018',week:15,step:'テキスト・画像・ボックス',name:'画像を挿入できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb019',week:15,step:'テキスト・画像・ボックス',name:'ボックスのスタイルを設定できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb020',week:15,step:'テキスト・画像・ボックス',name:'要素の表示位置を変更できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb021',week:15,step:'テキスト・画像・ボックス',name:'リストを作成できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb022',week:15,step:'テキスト・画像・ボックス',name:'ナビゲーションメニューを作成できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb023',week:15,step:'テキスト・画像・ボックス',name:'レスポンシブWebデザインに対応できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb024',week:15,step:'テキスト・画像・ボックス',name:'作成するWebページを確認できる',cert:['スタンダード','エキスパート'] },
-    // ── 背景・画像装飾 ──
-    { id:'wb025',week:15,step:'背景・画像装飾',name:'背景を設定できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb026',week:15,step:'背景・画像装飾',name:'リストの行頭文字を画像にできる',cert:['スタンダード','エキスパート'] },
-    { id:'wb027',week:15,step:'背景・画像装飾',name:'画像を装飾できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb028',week:15,step:'背景・画像装飾',name:'パンくずリストを作成できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb029',week:15,step:'背景・画像装飾',name:'レスポンシブWebデザインに対応させることができる',cert:['スタンダード','エキスパート'] },
-    // ── リンク・検証・SEO ──
-    { id:'wb030',week:16,step:'リンク・検証・SEO',name:'リンクの概要がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb031',week:16,step:'リンク・検証・SEO',name:'別のWebページへのリンクを設定できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb032',week:16,step:'リンク・検証・SEO',name:'特定の場所へのリンクを設定できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb033',week:16,step:'リンク・検証・SEO',name:'リンクのスタイルを設定できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb034',week:16,step:'リンク・検証・SEO',name:'検証する内容がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb035',week:16,step:'リンク・検証・SEO',name:'SEO対策がわかる',cert:['エキスパート'] },
-    { id:'wb036',week:16,step:'リンク・検証・SEO',name:'Webアクセシビリティがわかる',cert:['エキスパート'] },
-    { id:'wb037',week:16,step:'リンク・検証・SEO',name:'様々なブラウザーで表示を確認できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb038',week:16,step:'リンク・検証・SEO',name:'印刷用にカスタマイズできる',cert:['エキスパート'] },
-    { id:'wb039',week:16,step:'リンク・検証・SEO',name:'作成するWebページを確認できる',cert:['スタンダード','エキスパート'] },
-    // ── 表 ──
-    { id:'wb040',week:16,step:'表',name:'表を挿入できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb041',week:16,step:'表',name:'表にスタイルを設定できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb042',week:16,step:'表',name:'表のレスポンシブWebデザインに対応させることができる',cert:['スタンダード','エキスパート'] },
-    { id:'wb043',week:16,step:'表',name:'作成するWebページを確認できる（表）',cert:['スタンダード','エキスパート'] },
-    // ── サイドメニュー ──
-    { id:'wb044',week:17,step:'サイドメニュー',name:'サイドメニューを作成できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb045',week:17,step:'サイドメニュー',name:'サイドメニューを編集できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb046',week:17,step:'サイドメニュー',name:'サイドメニューの配置を設定できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb047',week:17,step:'サイドメニュー',name:'サイドメニューのレスポンシブWebデザインに対応させることができる',cert:['スタンダード','エキスパート'] },
-    { id:'wb048',week:17,step:'サイドメニュー',name:'作成するWebページを確認できる（サイドメニュー）',cert:['スタンダード','エキスパート'] },
-    // ── 動画・マップ ──
-    { id:'wb049',week:18,step:'動画・マップ',name:'動画を挿入できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb050',week:18,step:'動画・マップ',name:'マップを挿入できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb051',week:18,step:'動画・マップ',name:'作成するWebページを確認できる（動画・マップ）',cert:['スタンダード','エキスパート'] },
-    // ── フォーム ──
-    { id:'wb052',week:19,step:'フォーム',name:'フォームの仕組みと構成要素がわかる',cert:['スタンダード','エキスパート'] },
-    { id:'wb053',week:19,step:'フォーム',name:'フォームを作成できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb054',week:19,step:'フォーム',name:'フォームのスタイルを設定できる',cert:['スタンダード','エキスパート'] },
-    { id:'wb055',week:19,step:'フォーム',name:'フォームの送受信を設定できる',cert:['スタンダード','エキスパート'] },
+    // ── スタンダード（HTML・CSS基本） ──────────────
+    { id:'wb01',week:14,step:'HTML基本（スタンダード）',name:'HTMLの基本構造（DOCTYPE・html・head・body）がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'wb02',week:14,step:'HTML基本（スタンダード）',name:'見出し（h1〜h6）・段落（p）タグが使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb03',week:14,step:'HTML基本（スタンダード）',name:'リスト（ul・ol・li）タグが使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb04',week:14,step:'HTML基本（スタンダード）',name:'リンク（a href）・画像（img）タグが使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb05',week:14,step:'HTML基本（スタンダード）',name:'テーブル（table・tr・th・td）タグが使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb06',week:14,step:'HTML基本（スタンダード）',name:'div・span・セマンティックタグ（header・nav等）が使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb07',week:15,step:'CSS基本（スタンダード）',name:'CSSの基本構文（セレクタ・プロパティ・値）がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'wb08',week:15,step:'CSS基本（スタンダード）',name:'フォント・色・背景のスタイルが設定できる',cert:['スタンダード','エキスパート'] },
+    { id:'wb09',week:15,step:'CSS基本（スタンダード）',name:'ボックスモデル（margin・padding・border）がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'wb10',week:15,step:'CSS基本（スタンダード）',name:'class・idセレクタの使い方がわかる',cert:['スタンダード','エキスパート'] },
+    { id:'wb11',week:16,step:'CSSレイアウト（スタンダード）',name:'displayプロパティ（block・inline・flex）が使える',cert:['スタンダード','エキスパート'] },
+    { id:'wb12',week:16,step:'CSSレイアウト（スタンダード）',name:'floatを使ったレイアウトができる',cert:['スタンダード'] },
+    // ── エキスパート（応用） ──────────────
+    { id:'wb13',week:17,step:'CSSレイアウト（エキスパート）',name:'Flexboxを使ったレイアウトができる',cert:['エキスパート'] },
+    { id:'wb14',week:17,step:'CSSレイアウト（エキスパート）',name:'positionプロパティ（relative・absolute）が使える',cert:['エキスパート'] },
+    { id:'wb15',week:17,step:'レスポンシブ（エキスパート）',name:'メディアクエリを使ったレスポンシブデザインができる',cert:['エキスパート'] },
+    { id:'wb16',week:17,step:'レスポンシブ（エキスパート）',name:'viewport設定がわかる',cert:['エキスパート'] },
+    { id:'wb17',week:18,step:'Web知識・JavaScript（エキスパート）',name:'JavaScriptの読み込み・基本構文がわかる',cert:['エキスパート'] },
+    { id:'wb18',week:18,step:'Web知識・JavaScript（エキスパート）',name:'デザインカンプ（Webデザインの設計図）が読める',cert:['エキスパート'] },
+    { id:'wb19',week:19,step:'Web知識・JavaScript（エキスパート）',name:'ユニバーサルデザイン・アクセシビリティの知識がある',cert:['エキスパート'] },
+    { id:'wb20',week:19,step:'Web知識・JavaScript（エキスパート）',name:'色彩・レイアウトのWebデザイン知識がある',cert:['エキスパート'] },
   ],
   manner: [
     { id:'m01',week:1,step:'ビジネスマナー',name:'名刺交換のマナーがわかる',cert:[] },
@@ -1182,10 +1015,7 @@ async function doLogin() {
 
   if (GAS_URL) {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒タイムアウト
-      const res  = await fetch(GAS_URL+'?action=getStudent&studentId='+currentUser, {signal: controller.signal});
-      clearTimeout(timeoutId);
+      const res  = await fetch(GAS_URL+'?action=getStudent&studentId='+currentUser);
       const data = await res.json();
       if (data.status==='ok' && data.skillData) {
         skillData  = data.skillData;
@@ -1193,7 +1023,7 @@ async function doLogin() {
         lsSave('skills',  skillData);
         lsSave('history', logHistory);
       }
-    } catch(e){ console.log('GAS fetch skipped:', e.message); }
+    } catch(e){}
   }
 
   document.getElementById('loginScreen').style.display = 'none';
@@ -1205,14 +1035,7 @@ async function doLogin() {
   const tw = getThisWeekSubjects();
   if (tw.length > 0) currentSubject = tw[0].id;
 
-  try {
-    renderAll();
-  } catch(e) {
-    console.error('renderAll error:', e);
-    // エラーがあっても最低限の表示を行う
-    try { renderThisWeekBanner(); } catch(e2){}
-    try { renderSubjectBtns(); } catch(e3){}
-  }
+  renderAll();
 }
 
 function doLogout() {
@@ -1235,7 +1058,7 @@ function swTab(id, btn) {
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   btn.classList.add('active');
-  if (id==='growth') { renderDashboard(); renderReport(); renderWeeklyBar(); renderStrengthMap(); }
+  if (id==='growth') { renderDashboard(); renderReport(); }
   if (id==='cert')   { renderCertDb(); renderCountdown(); }
 }
 
@@ -1246,9 +1069,6 @@ function renderAll() {
   renderThisWeekBanner();
   renderSubjectBtns();
   renderAllSubjects();
-  renderWeeklyBar();
-  renderStrengthMap();
-  initMondai();
   renderDashboard();
   renderReport();
 }
@@ -1453,26 +1273,17 @@ function renderAllSubjects() {
   if (!area) return;
   area.innerHTML = '';
 
-  // ── 区切り線・タイトル ──
+  // 区切りラベル
+  const divLabel = document.createElement('div');
+  divLabel.style.cssText = 'font-size:12px;font-weight:600;color:#2E4057;padding:4px 2px 8px;letter-spacing:.05em';
+  // 区切り線
   const divider = document.createElement('div');
   divider.style.cssText = 'border-top:2px solid #2E4057;margin:1.5rem 0 1rem;';
   area.appendChild(divider);
-  const divLabel = document.createElement('div');
   divLabel.style.cssText = 'font-size:14px;font-weight:700;color:#2E4057;padding:4px 2px 10px;letter-spacing:.05em;display:flex;align-items:center;gap:8px';
   divLabel.innerHTML = '📋 検定試験 理解度チェックリスト <span style="font-size:11px;font-weight:400;color:#888;">（検定出題範囲ベース）</span>';
   area.appendChild(divLabel);
 
-  // ── カード型グリッド（授業チェックリストと同形式） ──
-  const certGrid = document.createElement('div');
-  certGrid.id = 'certBtnGrid';
-  certGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:1rem;';
-  area.appendChild(certGrid);
-
-  // カード描画関数（renderAllSubjectsから呼べるよう即時実行）
-
-  renderCertBtns();
-
-  // ── 科目セクション（アコーディオン） ──
   SUBJECTS.forEach(s => {
     const meta  = SUBJECT_META[s.id];
     const items = SKILLS[s.id] || [];
@@ -1480,24 +1291,22 @@ function renderAllSubjects() {
 
     const filteredItems = items;
 
-    const lv3  = filteredItems.filter(i=>getLv(i.id)>=1).length;
-    const lv12 = 0; // 統合済み
+    const lv3  = filteredItems.filter(i=>getLv(i.id)===2).length;
+    const lv12 = filteredItems.filter(i=>getLv(i.id)>=1&&getLv(i.id)<3).length;
     const total = filteredItems.length;
     const pct  = total ? Math.round(lv3/total*100) : 0;
 
     const section = document.createElement('div');
     section.className = 'all-subject-section';
     section.id = 'allsec-' + s.id;
-    section.dataset.open = '0';
-    section.style.display = 'none'; // 初期は非表示、カードクリックで展開
 
-    // ヘッダー（クローズボタン付き）
+    // ヘッダー
     const head = document.createElement('div');
     head.className = 'all-subject-head';
     head.style.cssText = `background:${meta.bg};border-color:${meta.border};color:${meta.color}`;
     head.innerHTML = `
       <div class="all-subject-head-left">
-        <span class="all-subject-icon" style="font-size:24px;">${meta.icon}</span>
+        <span class="all-subject-icon">${meta.icon}</span>
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div class="all-subject-name" style="color:${meta.color}">${s.name}</div>
@@ -1507,8 +1316,9 @@ function renderAllSubjects() {
             <span class="all-subject-stats" style="color:${meta.color}">✔ ${lv3}/${total}項目（${pct}%）${lv12>0?`　📖 ${lv12}項目習得中`:''}</span>
           </div>
         </div>
+
       </div>
-      <span class="all-subject-arrow open">▼</span>`;
+      <span class="all-subject-arrow">▶</span>`;
 
     // ボディ
     const body = document.createElement('div');
@@ -1528,7 +1338,7 @@ function renderAllSubjects() {
     filteredItems.forEach(i=>{ if(!groups[i.step]) groups[i.step]=[]; groups[i.step].push(i); });
 
     Object.entries(groups).forEach(([step, skills]) => {
-      const stepDone = skills.filter(sk=>getLv(sk.id)>=1).length;
+      const stepDone = skills.filter(sk=>getLv(sk.id)===3).length;
       const sh = document.createElement('div');
       sh.className = 'all-step-head';
       sh.textContent = step + '　' + stepDone + '/' + skills.length;
@@ -1545,7 +1355,7 @@ function renderAllSubjects() {
           <div class="all-item-left">
             <div class="all-item-name">${sk.name}</div>
             ${certHtml?`<div class="all-item-tags">${certHtml}</div>`:''}
-            ${date&&lv===2?`<div class="all-date">✔ ${date.slice(5)} 習得</div>`:''}
+            ${date&&lv===3?`<div class="all-date">✔ ${date.slice(5)} 習得</div>`:''}
           </div>
           <div class="all-lv-btns">
             ${[0,1,2].map(l=>`
@@ -1558,917 +1368,20 @@ function renderAllSubjects() {
       });
     });
 
-    // ヘッダークリック → 閉じる
-    head.onclick = () => toggleCertSection(s.id);
+    // 開閉トグル（デフォルトは全部閉じた状態）
+    let open = false;
+    body.style.display = 'none';
+    head.onclick = () => {
+      open = !open;
+      body.style.display = open ? 'block' : 'none';
+      head.querySelector('.all-subject-arrow').classList.toggle('open', open);
+    };
 
     section.appendChild(head);
     section.appendChild(body);
     area.appendChild(section);
   });
-
-
-
-  // ─── 検定出題範囲 ────────────────────────────────────
-  const scopeDivider = document.createElement('div');
-  scopeDivider.style.cssText = 'border-top:2px solid #2E4057;margin:1.5rem 0 1rem;';
-  area.appendChild(scopeDivider);
-
-  const scopeLabel = document.createElement('div');
-  scopeLabel.style.cssText = 'font-size:14px;font-weight:700;color:#2E4057;padding:4px 2px 10px;letter-spacing:.05em;display:flex;align-items:center;gap:8px';
-  scopeLabel.innerHTML = '📋 検定出題範囲 <span style="font-size:11px;font-weight:400;color:#888;">（出題範囲一覧）</span>';
-  area.appendChild(scopeLabel);
-
-  // 科目タブ
-  const scopeTabWrap = document.createElement('div');
-  scopeTabWrap.style.cssText = 'display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;';
-  const SCOPE_TAB_INFO = {
-    word:   {label:'✍️ Word',        color:'#185FA5', bg:'#E6F1FB', border:'#B5D4F4'},
-    excel:  {label:'📊 Excel',       color:'#27500A', bg:'#EAF3DE', border:'#A0CC70'},
-    illust: {label:'✏️ Illustrator', color:'#534AB7', bg:'#EEEDFE', border:'#CECBF6'},
-    photo:  {label:'📷 Photoshop',   color:'#0F6E56', bg:'#E1F5EE', border:'#9FE1CB'},
-    web:    {label:'🌐 Web',         color:'#185FA5', bg:'#E6F1FB', border:'#85B7EB'},
-  };
-  const SCOPE_SUBS = ['word','excel','illust','photo','web'];
-  SCOPE_SUBS.forEach((sub,i) => {
-    const inf = SCOPE_TAB_INFO[sub];
-    const btn = document.createElement('button');
-    btn.id = 'scopetab-'+sub;
-    btn.style.cssText = `font-size:13px;font-weight:600;padding:9px 18px;border-radius:10px;border:2px solid ${i===0?'#2E4057':inf.border};background:${i===0?'#2E4057':inf.bg};color:${i===0?'#fff':inf.color};cursor:pointer;font-family:inherit;transition:all 0.15s;`;
-    btn.textContent = inf.label;
-    btn.onclick = () => {
-      SCOPE_SUBS.forEach(s => {
-        const b = document.getElementById('scopetab-'+s);
-        const p = document.getElementById('scopepanel-'+s);
-        const ii = SCOPE_TAB_INFO[s];
-        const act = s===sub;
-        b.style.background = act ? '#2E4057' : ii.bg;
-        b.style.color = act ? '#fff' : ii.color;
-        b.style.borderColor = act ? '#2E4057' : ii.border;
-        p.style.display = act ? 'block' : 'none';
-      });
-    };
-    scopeTabWrap.appendChild(btn);
-  });
-  area.appendChild(scopeTabWrap);
-
-  // ── 出題範囲データ ──────────────────────────────────────
-  // Word/Excel: {name, g3, g2}  /  Illust/Photo/Web: {name, gs, ge}
-  const SCOPE_DATA = {
-    word:[
-      {step:'作業環境（基礎知識）',items:[
-        {name:'Wordの画面要素の名称と役割（ドキュメント・スクロールバー・ステータスバー・クイックアクセスツールバー・リボン）',g3:true,g2:true},
-        {name:'各タブ（ファイル・ホーム・挿入・デザイン・レイアウト・参考資料・差し込み文書・校閲・表示）の役割',g3:true,g2:true},
-        {name:'ダイアログボックス起動ツールの使い方',g3:true,g2:true},
-        {name:'ルーラーの使い方',g3:true,g2:true},
-        {name:'ショートカットメニューの使い方',g3:true,g2:true},
-        {name:'ミニツールバーの使い方',g3:true,g2:true},
-        {name:'作業ウィンドウの使い方',g3:true,g2:true},
-        {name:'クリップボードの使い方',g3:true,g2:true},
-      ]},
-      {step:'文書の表示とウィンドウ',items:[
-        {name:'文書の表示形式（印刷レイアウト・閲覧モード・Webレイアウト・アウトライン・下書き）の切り替え',g3:true,g2:true},
-        {name:'表示/非表示（ルーラー・グリッド線・ナビゲーションウィンドウ）の設定',g3:true,g2:true},
-        {name:'ズームの変更',g3:true,g2:true},
-        {name:'ウィンドウ（新しいウィンドウを開く・整列・分割・切り替え）の操作',g3:false,g2:true},
-      ]},
-      {step:'環境の設定と変更',items:[
-        {name:'ステータスバーのユーザー設定',g3:false,g2:true},
-        {name:'Wordのオプション（基本設定・表示・文章校正・文字体裁・詳細設定）',g3:false,g2:true},
-        {name:'リボンのユーザー設定・クイックアクセスツールバーのカスタマイズ',g3:false,g2:true},
-      ]},
-      {step:'文字書式',items:[
-        {name:'フォントの種類とサイズ（日本語用・英数字用・フォントサイズ）の設定',g3:true,g2:true},
-        {name:'太字・斜体の設定',g3:true,g2:true},
-        {name:'フォントの色の設定',g3:true,g2:true},
-        {name:'下線の設定',g3:true,g2:true},
-        {name:'傍点の設定',g3:false,g2:true},
-        {name:'囲み線の設定',g3:false,g2:true},
-        {name:'文字の網かけの設定',g3:false,g2:true},
-        {name:'蛍光ペンの色の設定',g3:false,g2:true},
-        {name:'ドロップキャップの設定',g3:false,g2:true},
-        {name:'文字飾り（取り消し線・二重取り消し線・隠し文字・上付き・下付き・小型英大文字・すべて大文字）',g3:false,g2:true},
-        {name:'文字幅と間隔（倍率・文字間隔・位置・カーニング）の設定',g3:false,g2:true},
-        {name:'文字の効果（塗りつぶし・輪郭・影・反射・光彩・ぼかし・3-D書式）の設定',g3:true,g2:true},
-        {name:'ルビの設定',g3:false,g2:true},
-        {name:'囲い文字の設定',g3:false,g2:true},
-        {name:'拡張書式（縦中横・組み文字・割注・文字の均等割り付け）',g3:false,g2:true},
-      ]},
-      {step:'段落書式',items:[
-        {name:'配置（左揃え・中央揃え・右揃え・両端揃え・均等割り付け）',g3:true,g2:true},
-        {name:'インデント（左右のインデント・字下げ・ぶら下げ）',g3:true,g2:true},
-        {name:'段落前後の間隔・行間の設定',g3:true,g2:true},
-        {name:'体裁（改行時の処理・文字幅と間隔）の設定',g3:true,g2:true},
-        {name:'タブとリーダーの設定',g3:true,g2:true},
-        {name:'箇条書きの設定',g3:true,g2:true},
-        {name:'段落番号の設定',g3:true,g2:true},
-      ]},
-      {step:'段組み・スタイル',items:[
-        {name:'段組みの設定と解除（種類・段数・段の幅と間隔・設定対象）',g3:false,g2:true},
-        {name:'スタイルの作成と変更',g3:false,g2:true},
-        {name:'スタイルの適用',g3:false,g2:true},
-        {name:'スタイルの削除',g3:false,g2:true},
-      ]},
-      {step:'ページ設定・印刷',items:[
-        {name:'用紙サイズ・余白・文字数と行数・印刷の向き・ヘッダーとフッターの距離の設定',g3:true,g2:true},
-        {name:'文字方向・段数・先頭ページのみ別指定・奇数/偶数ページ別指定・複数ページの印刷設定・設定対象',g3:false,g2:true},
-        {name:'印刷設定',g3:true,g2:true},
-        {name:'印刷プレビュー',g3:true,g2:true},
-      ]},
-      {step:'ファイル操作',items:[
-        {name:'新規作成・開く・閉じる',g3:true,g2:true},
-        {name:'上書き保存',g3:true,g2:true},
-        {name:'名前を付けて保存',g3:true,g2:true},
-        {name:'Word文書（*.docx）・Word97-2003文書（*.doc）形式で保存',g3:true,g2:true},
-        {name:'PDF・Webページ・リッチテキスト（RTF）・書式なし（*.txt）形式で保存',g3:false,g2:true},
-        {name:'Wordテンプレート（*.dotx）・マクロ有効文書（*.docm・*.dotm）形式で保存',g3:false,g2:false},
-      ]},
-      {step:'デザイン',items:[
-        {name:'テーマ（テーマ・配色・フォント・効果）の設定',g3:false,g2:true},
-        {name:'ページの背景（透かし・ページの色・ページ罫線）の設定',g3:false,g2:false},
-      ]},
-      {step:'テキスト編集',items:[
-        {name:'文字・行・段落・文書全体の選択と解除',g3:true,g2:true},
-        {name:'Enter・Delete・BackSpace・Ctrl・Alt・Shiftキーの役割',g3:true,g2:true},
-        {name:'文字列の削除・切り取り・コピー・貼り付け・挿入',g3:true,g2:true},
-        {name:'元に戻す・やり直し・繰り返し',g3:true,g2:true},
-        {name:'クリックアンドタイプ',g3:true,g2:true},
-        {name:'文字種の変換',g3:true,g2:true},
-        {name:'書式のコピー/貼り付け',g3:true,g2:true},
-        {name:'書式のクリア',g3:true,g2:true},
-        {name:'検索',g3:false,g2:true},
-        {name:'置換',g3:false,g2:true},
-        {name:'ジャンプ',g3:false,g2:true},
-        {name:'テキスト文書・Word文書の挿入',g3:false,g2:true},
-      ]},
-      {step:'改ページ・セクション',items:[
-        {name:'改ページの挿入と削除',g3:true,g2:true},
-        {name:'セクション区切り',g3:true,g2:true},
-        {name:'段区切り・文字列の折り返し',g3:false,g2:true},
-      ]},
-      {step:'文章校正・コメント・変更履歴',items:[
-        {name:'スペルチェックと文章校正・文字カウント・スマート検索・表記ゆれチェック',g3:false,g2:false},
-        {name:'コメントの挿入・削除',g3:false,g2:true},
-        {name:'変更履歴の記録・変更箇所の承諾・元に戻す',g3:false,g2:false},
-      ]},
-      {step:'参考資料・ヘッダーとフッター',items:[
-        {name:'脚注と文末脚注の挿入・設定',g3:false,g2:false},
-        {name:'図表番号の挿入・設定',g3:false,g2:false},
-        {name:'目次の作成と変更（アウトラインレベルの設定・目次の更新）',g3:false,g2:false},
-        {name:'ヘッダーの設定',g3:true,g2:true},
-        {name:'フッターの設定',g3:true,g2:true},
-        {name:'ページ番号の設定',g3:true,g2:true},
-        {name:'先頭ページのみ別指定・奇数/偶数ページ別指定',g3:false,g2:true},
-        {name:'表紙の挿入',g3:false,g2:true},
-      ]},
-      {step:'表の作成と操作',items:[
-        {name:'セル・行・列・表の選択',g3:true,g2:true},
-        {name:'キー操作によるセル間の移動',g3:true,g2:true},
-        {name:'クイックスタイルからの表スタイル設定',g3:true,g2:true},
-        {name:'罫線のスタイル・ペンの色・太さ・罫線の書式設定（飾り枠）',g3:true,g2:true},
-        {name:'セルの塗りつぶし',g3:true,g2:true},
-        {name:'罫線を引く・罫線の削除',g3:true,g2:true},
-        {name:'行・列の挿入',g3:true,g2:true},
-        {name:'セル・列・行・表の削除',g3:true,g2:true},
-        {name:'行の高さ・列の幅・セルのサイズ設定',g3:true,g2:true},
-        {name:'セルの結合と分割',g3:true,g2:true},
-        {name:'セル内の文字列の配置・文字の方向設定',g3:true,g2:true},
-        {name:'表の配置と文字列の折り返し・表のオプション',g3:false,g2:true},
-        {name:'並べ替え',g3:false,g2:true},
-        {name:'タイトル行の繰り返し',g3:false,g2:true},
-        {name:'表内で計算式を使う（MAX・MIN・AVERAGE・SUM）',g3:false,g2:false},
-        {name:'文字列を表にする・表の解除',g3:true,g2:true},
-      ]},
-      {step:'図形・オブジェクト',items:[
-        {name:'各種図形（線・四角形・基本図形・フローチャートなど）の描画',g3:true,g2:true},
-        {name:'描画キャンバスの使用',g3:false,g2:true},
-        {name:'テキストボックス（横書き・縦書き）の挿入',g3:true,g2:true},
-        {name:'図形のスタイル（クイックスタイル・塗りつぶし・枠線・効果）の設定',g3:true,g2:true},
-        {name:'図形の編集（頂点の編集・図形の変更）',g3:false,g2:true},
-        {name:'テキストボックス内の文字の配置',g3:true,g2:true},
-        {name:'文字列の方向・リンクの作成',g3:false,g2:true},
-        {name:'SmartArtの挿入と編集',g3:true,g2:true},
-        {name:'ワードアートの挿入と編集',g3:false,g2:true},
-        {name:'画像の挿入',g3:true,g2:true},
-        {name:'図のスタイル（クイックスタイル・図の枠線・図の効果）の設定',g3:true,g2:true},
-        {name:'図の調整（修整・色・アート効果・図の圧縮・図の変更・図のリセット）',g3:false,g2:true},
-        {name:'背景の削除',g3:false,g2:false},
-        {name:'サイズ変更',g3:true,g2:true},
-        {name:'トリミング',g3:false,g2:true},
-        {name:'位置・文字列の折り返しの設定',g3:true,g2:true},
-        {name:'前面へ移動・背面へ移動',g3:true,g2:true},
-        {name:'配置・整列',g3:true,g2:true},
-        {name:'オブジェクトの選択と表示',g3:true,g2:true},
-        {name:'グループ化・回転・反転',g3:true,g2:true},
-        {name:'オブジェクトのコピー・貼り付け',g3:true,g2:true},
-        {name:'Excelワークシートの挿入・Excelの表やグラフの貼り付け',g3:false,g2:true},
-      ]},
-      {step:'セキュリティ',items:[
-        {name:'読み取りパスワード・書き込みパスワードの設定',g3:false,g2:true},
-        {name:'文書の保護',g3:false,g2:true},
-      ]},
-    ],
-    excel:[
-      {step:'Excel基本操作',items:[
-        {name:'Excelの起動ができる',g3:true,g2:true},
-        {name:'Excelの画面構成がわかる',g3:true,g2:true},
-        {name:'文字の入力ができる',g3:true,g2:true},
-        {name:'数字の入力ができる',g3:true,g2:true},
-        {name:'SUM関数が使える',g3:true,g2:true},
-        {name:'オートフィルができる',g3:true,g2:true},
-        {name:'四則演算ができる',g3:true,g2:true},
-        {name:'再計算機能が使える',g3:true,g2:true},
-        {name:'印刷イメージの確認ができる',g3:true,g2:true},
-        {name:'ページ設定ができる',g3:true,g2:true},
-        {name:'名前を付けて保存ができる',g3:true,g2:true},
-        {name:'上書き保存ができる',g3:true,g2:true},
-        {name:'ブックを開くことができる',g3:true,g2:true},
-        {name:'新しいブックを作成できる',g3:true,g2:true},
-      ]},
-      {step:'行・列操作',items:[
-        {name:'行の挿入ができる',g3:true,g2:true},
-        {name:'行の削除ができる',g3:true,g2:true},
-        {name:'列の挿入ができる',g3:true,g2:true},
-        {name:'列の削除ができる',g3:true,g2:true},
-        {name:'割合を求めることができる',g3:true,g2:true},
-        {name:'AVERAGE関数が使える',g3:true,g2:true},
-        {name:'MAX・MIN関数が使える',g3:true,g2:true},
-      ]},
-      {step:'書式設定',items:[
-        {name:'桁区切りスタイルが設定できる',g3:true,g2:true},
-        {name:'通貨表示形式が設定できる',g3:true,g2:true},
-        {name:'パーセントスタイルが設定できる',g3:true,g2:true},
-        {name:'小数点以下の表示が設定できる',g3:true,g2:true},
-        {name:'表示形式の解除ができる',g3:true,g2:true},
-        {name:'文字位置の設定ができる',g3:true,g2:true},
-        {name:'列幅と行の高さの設定ができる',g3:true,g2:true},
-        {name:'数値を指定して行の高さを変更できる',g3:true,g2:true},
-        {name:'ダブルクリックによる列幅の自動調整ができる',g3:true,g2:true},
-        {name:'罫線・塗りつぶしの設定ができる',g3:true,g2:true},
-        {name:'点線を引くことができる',g3:true,g2:true},
-        {name:'二重線を引くことができる',g3:true,g2:true},
-        {name:'斜線を引くことができる',g3:true,g2:true},
-        {name:'リボンから塗りつぶしの設定ができる',g3:true,g2:true},
-        {name:'文字のフォントとサイズの設定ができる',g3:true,g2:true},
-        {name:'オートコンプリートができる',g3:true,g2:true},
-        {name:'表示形式の詳細設定ができる',g3:false,g2:true},
-      ]},
-      {step:'データ操作',items:[
-        {name:'コピーができる',g3:true,g2:true},
-        {name:'移動ができる',g3:true,g2:true},
-        {name:'ショートカットメニューでの移動・コピーができる',g3:true,g2:true},
-        {name:'ショートカットキー一覧表がわかる',g3:true,g2:true},
-        {name:'ウィンドウ枠の固定ができる',g3:true,g2:true},
-        {name:'表示モードの切り替えができる',g3:true,g2:true},
-        {name:'改ページプレビューができる',g3:true,g2:true},
-        {name:'検索ができる',g3:true,g2:true},
-        {name:'セルの書式設定での文字配置ができる',g3:true,g2:true},
-        {name:'セル内の縦書きができる',g3:true,g2:true},
-        {name:'セルの書式設定での文字方向の設定ができる',g3:true,g2:true},
-        {name:'ユーザー定義の設定ができる',g3:false,g2:true},
-        {name:'記号を使った入力ができる',g3:false,g2:true},
-        {name:'置換ができる',g3:false,g2:true},
-      ]},
-      {step:'グラフ',items:[
-        {name:'グラフタイトルの設定ができる',g3:true,g2:true},
-        {name:'グラフの移動とサイズ変更ができる',g3:true,g2:true},
-        {name:'グラフ内のフォントサイズを変えることができる',g3:true,g2:true},
-        {name:'軸ラベルを表示できる',g3:true,g2:true},
-        {name:'目盛間隔を変更できる',g3:true,g2:true},
-        {name:'グラフのデータ範囲を変更できる',g3:true,g2:true},
-        {name:'グラフの種類を変更できる',g3:true,g2:true},
-        {name:'グラフの色の変更ができる',g3:true,g2:true},
-        {name:'グラフスタイルの変更ができる',g3:true,g2:true},
-        {name:'折れ線グラフの構成要素の名称がわかる',g3:true,g2:true},
-        {name:'主なグラフの種類とポイントがわかる',g3:true,g2:true},
-        {name:'離れたセル範囲のグラフの作成ができる',g3:true,g2:true},
-        {name:'凡例の編集ができる',g3:true,g2:true},
-        {name:'凡例の色を設定できる',g3:true,g2:true},
-        {name:'複合グラフの作成ができる',g3:false,g2:true},
-      ]},
-      {step:'データベース機能',items:[
-        {name:'並べ替えができる',g3:true,g2:true},
-        {name:'フィルターでのデータ抽出ができる',g3:true,g2:true},
-        {name:'フィルターの解除ができる',g3:true,g2:true},
-        {name:'スパークラインの種類の変更ができる',g3:true,g2:true},
-        {name:'スパークラインのスタイルの変更ができる',g3:true,g2:true},
-        {name:'スパークラインの色・マーカーの色が設定できる',g3:true,g2:true},
-        {name:'スパークラインの削除ができる',g3:true,g2:true},
-        {name:'複数キーによる並べ替えができる',g3:false,g2:true},
-        {name:'数値フィルターでのデータ抽出ができる',g3:false,g2:true},
-        {name:'テキストフィルターでのデータ抽出ができる',g3:false,g2:true},
-        {name:'複数条件での抽出ができる',g3:false,g2:true},
-        {name:'ワイルドカードがわかる',g3:false,g2:true},
-        {name:'テーブルスタイルの変更ができる',g3:false,g2:true},
-        {name:'集計行の表示ができる',g3:false,g2:true},
-        {name:'テーブルとスタイルの解除ができる',g3:false,g2:true},
-      ]},
-      {step:'関数・計算（応用）',items:[
-        {name:'ROUND関数が使える',g3:true,g2:true},
-        {name:'ROUNDUP・ROUNDDOWN関数が使える',g3:true,g2:true},
-        {name:'構成比を求めることができる',g3:true,g2:true},
-        {name:'相対参照・絶対参照・複合参照が使える',g3:true,g2:true},
-        {name:'RANK.EQ関数が使える',g3:true,g2:true},
-        {name:'RANK.AVG関数が使える',g3:true,g2:true},
-        {name:'COUNT・COUNTA関数が使える',g3:true,g2:true},
-        {name:'ヘッダー・フッターの表示ができる',g3:true,g2:true},
-        {name:'ヘッダー・フッターの要素が設定できる',g3:true,g2:true},
-        {name:'TODAY関数が使える',g3:false,g2:true},
-        {name:'NOW関数が使える',g3:false,g2:true},
-        {name:'WEEKDAY関数が使える',g3:false,g2:true},
-        {name:'日付の表示形式が設定できる',g3:false,g2:true},
-      ]},
-      {step:'IF関数・条件分岐',items:[
-        {name:'IF関数が使える',g3:true,g2:true},
-        {name:'図形の挿入ができる',g3:true,g2:true},
-        {name:'複雑な条件の設定ができる',g3:false,g2:true},
-        {name:'PHONETIC関数が使える',g3:false,g2:true},
-        {name:'ふりがなをひらがなにすることができる',g3:false,g2:true},
-        {name:'文字の上にふりがなをつけることができる',g3:false,g2:true},
-        {name:'表示形式の定義ができる',g3:false,g2:true},
-        {name:'セルの強調表示ルールが設定できる',g3:false,g2:true},
-        {name:'ルールの管理ができる',g3:false,g2:true},
-        {name:'時間給の計算の仕方がわかる',g3:false,g2:true},
-        {name:'COUNTIF関数が使える',g3:false,g2:true},
-        {name:'SUMIF関数が使える',g3:false,g2:true},
-        {name:'MOD関数が使える',g3:false,g2:true},
-        {name:'TRUNC関数が使える',g3:false,g2:true},
-        {name:'IFS関数が使える',g3:false,g2:true},
-        {name:'SWITCH関数が使える',g3:false,g2:true},
-        {name:'MAXIFS関数が使える',g3:false,g2:true},
-        {name:'MINIFS関数が使える',g3:false,g2:true},
-        {name:'CONCAT関数が使える',g3:false,g2:true},
-        {name:'TEXTJOIN関数が使える',g3:false,g2:true},
-      ]},
-      {step:'ピボットテーブル・シート操作',items:[
-        {name:'シート名の変更ができる',g3:true,g2:true},
-        {name:'ワークシートの挿入ができる',g3:true,g2:true},
-        {name:'ワークシートの削除ができる',g3:true,g2:true},
-        {name:'ワークシートの移動ができる',g3:true,g2:true},
-        {name:'ワークシートのコピーができる',g3:true,g2:true},
-        {name:'シート見出しの色の設定ができる',g3:true,g2:true},
-        {name:'フィールドのグループ化ができる',g3:false,g2:true},
-        {name:'データの更新ができる',g3:false,g2:true},
-        {name:'行ラベルの追加ができる',g3:false,g2:true},
-        {name:'ピボットテーブルスタイルの設定ができる',g3:false,g2:true},
-        {name:'ピボットグラフの作成ができる',g3:false,g2:true},
-        {name:'串刺し集計ができる',g3:false,g2:true},
-      ]},
-      {step:'高度なデータ操作',items:[
-        {name:'フィルターオプションの設定ができる',g3:false,g2:true},
-        {name:'集計ができる',g3:false,g2:true},
-        {name:'集計の解除ができる',g3:false,g2:true},
-        {name:'アウトラインの記号がわかる',g3:false,g2:true},
-        {name:'アウトラインの作成ができる',g3:false,g2:true},
-        {name:'アウトラインの解除ができる',g3:false,g2:true},
-        {name:'可視セルのコピーができる',g3:false,g2:true},
-        {name:'ユーザー設定リストでの並べ替えができる',g3:false,g2:true},
-        {name:'半角カタカナの設定ができる',g3:false,g2:true},
-        {name:'リストから選択できる',g3:false,g2:true},
-        {name:'エラーメッセージを表示できる',g3:false,g2:true},
-        {name:'重複データを入力できないように設定できる',g3:false,g2:true},
-      ]},
-      {step:'コメント・SmartArt',items:[
-        {name:'コメントの挿入ができる',g3:false,g2:true},
-        {name:'コメントの編集ができる',g3:false,g2:true},
-        {name:'コメントの削除ができる',g3:false,g2:true},
-        {name:'コメントの表示・非表示ができる',g3:false,g2:true},
-        {name:'SmartArtの挿入ができる',g3:false,g2:true},
-        {name:'ボックス（部下）の追加ができる',g3:false,g2:true},
-        {name:'スタイルの設定ができる',g3:false,g2:true},
-        {name:'ロゴマークの作成ができる',g3:false,g2:true},
-      ]},
-      {step:'VLOOKUP・検索関数',items:[
-        {name:'VLOOKUP関数が使える',g3:false,g2:true},
-        {name:'引数「検索方法」が指定できる',g3:false,g2:true},
-        {name:'IFERRORが使える',g3:false,g2:true},
-        {name:'HLOOKUP関数が使える',g3:false,g2:true},
-        {name:'見積書でVLOOKUP関数を使うことができる',g3:false,g2:true},
-        {name:'LEFT関数が使える',g3:false,g2:true},
-        {name:'RIGHT関数が使える',g3:false,g2:true},
-        {name:'INDEX関数が使える',g3:false,g2:true},
-        {name:'MATCH関数が使える',g3:false,g2:true},
-        {name:'CHOOSE関数が使える',g3:false,g2:true},
-        {name:'ゴールシークが使える',g3:false,g2:true},
-      ]},
-    ],
-    illust:[
-      {step:'ファイル操作',items:[
-        {name:'指定されたファイル形式での保存',gs:true,ge:true},
-        {name:'適切なファイル形式での保存',gs:false,ge:true},
-      ]},
-      {step:'ドキュメント設定・各種パネル',items:[
-        {name:'指定された内容でのドキュメント設定',gs:true,ge:true},
-        {name:'用途や目的に応じたドキュメント設定',gs:false,ge:true},
-        {name:'アウトライン表示/プレビュー表示の切り替え',gs:true,ge:true},
-        {name:'オーバープリントプレビュー/ピクセルプレビューの使用',gs:false,ge:true},
-        {name:'ワークスペースの変更および保存',gs:false,ge:true},
-        {name:'スクリーンモードの変更',gs:true,ge:true},
-        {name:'各種パネルの機能に関する知識',gs:true,ge:true},
-      ]},
-      {step:'プリント',items:[
-        {name:'用紙サイズやプリントサイズの設定',gs:true,ge:true},
-        {name:'プリント分割ツールを使用した印刷領域の指定',gs:true,ge:true},
-        {name:'［プリント］ダイアログボックスの内容に関する知識',gs:false,ge:true},
-      ]},
-      {step:'環境設定',items:[
-        {name:'一般/単位/ガイド・グリッドの設定',gs:true,ge:true},
-        {name:'環境設定に関する知識',gs:false,ge:true},
-      ]},
-      {step:'塗りと線',items:[
-        {name:'ツールバー・カラーピッカー・カラーパネルによるカラーの選択',gs:true,ge:true},
-        {name:'線パネルによる線幅・線端・角の形状・破線の設定',gs:true,ge:true},
-        {name:'スポイトツールによる塗りや線などの属性のコピー',gs:true,ge:true},
-      ]},
-      {step:'オブジェクトの作成',items:[
-        {name:'基本図形ツール（長方形・楕円・多角形・スターなど）による図形の描画',gs:true,ge:true},
-        {name:'フレアツールによるフレアの描画',gs:false,ge:true},
-        {name:'直線・円弧・スパイラルツールによる図形の描画',gs:true,ge:true},
-        {name:'グリッドツールによるグリッドの描画',gs:true,ge:true},
-        {name:'ブラシツールによるオブジェクトの描画',gs:true,ge:true},
-        {name:'ブラシの作成・編集',gs:false,ge:true},
-      ]},
-      {step:'オブジェクトの選択',items:[
-        {name:'自動選択ツール/なげなわツールによるオブジェクトの選択',gs:true,ge:true},
-        {name:'属性を条件にしたオブジェクトの選択',gs:false,ge:true},
-      ]},
-      {step:'基本的な編集操作',items:[
-        {name:'カット/コピー/ペースト/移動コマンドによるオブジェクトの移動・複製',gs:true,ge:true},
-        {name:'重ね順変更コマンドによるオブジェクトの重ね順変更',gs:true,ge:true},
-      ]},
-      {step:'レイアウトの補助機能',items:[
-        {name:'定規やガイド・スナップ・スマートガイドによる正確なレイアウト',gs:true,ge:true},
-        {name:'オブジェクトからのガイドの作成やガイドの解除',gs:true,ge:true},
-        {name:'整列パネルによるオブジェクトの整列・分布',gs:true,ge:true},
-        {name:'特定のオブジェクトを基準とした整列',gs:true,ge:true},
-        {name:'オブジェクトのグループ化/グループ解除',gs:true,ge:true},
-        {name:'オブジェクトのロック・すべてをロック解除',gs:true,ge:true},
-        {name:'オブジェクトの表示・非表示',gs:false,ge:true},
-      ]},
-      {step:'パスの描画',items:[
-        {name:'ペンツール/アンカーポイントツールによるパスの描画・編集',gs:true,ge:true},
-        {name:'鉛筆ツールによるパスの描画',gs:true,ge:true},
-      ]},
-      {step:'パスの編集',items:[
-        {name:'選択ツール/ダイレクト選択ツール/はさみツールによるパスの編集',gs:true,ge:true},
-        {name:'スムーズツール/パス消しゴムツールによるパスの編集',gs:true,ge:true},
-        {name:'［連結］/［平均］コマンドによるパスの編集',gs:true,ge:true},
-        {name:'パスの高度な編集（オブジェクトメニュー）',gs:false,ge:true},
-      ]},
-      {step:'カラーモード',items:[
-        {name:'各カラーモデル（グレースケール/RGB/CMYK）の概念と特徴',gs:false,ge:true},
-        {name:'カラーモードの設定',gs:true,ge:true},
-        {name:'目的や用途に応じたカラーモードの設定',gs:false,ge:true},
-        {name:'Webセーフカラーの選択',gs:false,ge:true},
-      ]},
-      {step:'スウォッチ',items:[
-        {name:'スウォッチパネルによるカラーの管理',gs:true,ge:true},
-        {name:'グローバルプロセスカラーの設定・適用',gs:true,ge:true},
-        {name:'スポットカラー（特色）の設定・適用',gs:false,ge:true},
-        {name:'パターンの作成・適用',gs:true,ge:true},
-      ]},
-      {step:'グラデーション',items:[
-        {name:'グラデーションツールによるグラデーションの適用',gs:true,ge:true},
-        {name:'グラデーションパネルによるグラデーションの設定・編集',gs:true,ge:true},
-        {name:'メッシュツールによる複雑なグラデーションの適用',gs:false,ge:true},
-      ]},
-      {step:'透明・カラーマネジメント',items:[
-        {name:'透明パネルによる不透明度と描画モードの設定',gs:true,ge:true},
-        {name:'不透明マスクの作成・適用',gs:false,ge:true},
-        {name:'カラーマネジメントに関する知識',gs:false,ge:true},
-        {name:'［カラー設定］ダイアログボックスの内容に関する知識',gs:false,ge:true},
-        {name:'［校正設定］/［色の校正］コマンドに関する知識',gs:false,ge:true},
-      ]},
-      {step:'アピアランス',items:[
-        {name:'複数のアピアランスの適用',gs:true,ge:true},
-        {name:'グループやレイヤーに対するアピアランスの設定',gs:false,ge:true},
-        {name:'アピアランスの分割',gs:true,ge:true},
-      ]},
-      {step:'オブジェクトの変形',items:[
-        {name:'回転・リフレクト・拡大縮小・シアー・自由変形ツールによる編集',gs:true,ge:true},
-        {name:'リキッドツール/リシェイプツールによるオブジェクトの編集',gs:true,ge:true},
-        {name:'［エンベロープ］コマンドによるオブジェクトの編集',gs:true,ge:true},
-        {name:'［個別に変形］コマンドや変形パネルによるオブジェクトの編集',gs:false,ge:true},
-        {name:'［変形の繰り返し］コマンドの使用',gs:true,ge:true},
-      ]},
-      {step:'複数オブジェクトの組み合わせ',items:[
-        {name:'ブレンドオブジェクトの作成・編集',gs:true,ge:true},
-        {name:'クリッピングマスクの作成',gs:true,ge:true},
-        {name:'［複合パス］コマンドによるオブジェクトの編集',gs:true,ge:true},
-        {name:'パスファインダーパネルによる複合シェイプの作成',gs:true,ge:true},
-        {name:'シンボルパネルとシンボルツールによるインスタンスの編集',gs:false,ge:true},
-        {name:'シンボルパネルによるシンボルの管理',gs:false,ge:true},
-      ]},
-      {step:'グラフィックスタイル・効果',items:[
-        {name:'グラフィックスタイルの適用',gs:true,ge:true},
-        {name:'グラフィックスタイルパネルへの登録・変更',gs:false,ge:true},
-        {name:'［効果］メニューによるオブジェクトの編集（スタイライズ/パスなど）',gs:true,ge:true},
-        {name:'その他の効果によるオブジェクトの編集',gs:false,ge:true},
-        {name:'オブジェクトのラスタライズ',gs:false,ge:true},
-      ]},
-      {step:'レイヤー',items:[
-        {name:'レイヤーの作成/ロック/表示/削除/移動/サブレイヤーによる管理',gs:true,ge:true},
-        {name:'テンプレートレイヤーの利用',gs:false,ge:true},
-        {name:'レイヤーを使用したクリッピングマスクの作成',gs:false,ge:true},
-      ]},
-      {step:'テキストの入力と編集',items:[
-        {name:'文字ツール各種による文字入力・フォント/サイズ/行揃え/カラーの設定',gs:true,ge:true},
-        {name:'行送り・垂直水平比率・トラッキング・カーニングの設定',gs:true,ge:true},
-        {name:'上記以外の設定による文字の編集',gs:false,ge:true},
-        {name:'行揃え・インデント・禁則処理・文字組みの設定',gs:true,ge:true},
-        {name:'テキストの回り込み設定',gs:false,ge:true},
-        {name:'スレッドテキストオプションによるテキストのリンク設定',gs:true,ge:true},
-        {name:'エリア内文字オプションによる段組みの設定',gs:false,ge:true},
-        {name:'タブパネルによるタブやリーダーの設定',gs:false,ge:true},
-        {name:'OpenTypeパネルや字形パネルに関する知識',gs:false,ge:true},
-        {name:'フォントの検索・置換',gs:false,ge:true},
-        {name:'アウトライン化による形状の編集',gs:true,ge:true},
-        {name:'合成フォントの作成',gs:false,ge:true},
-      ]},
-      {step:'グラフ・アクション・スクリプト',items:[
-        {name:'グラフツールによるグラフの作成',gs:false,ge:true},
-        {name:'グラフ設定ダイアログボックスによる設定',gs:false,ge:true},
-        {name:'アクションの再生/作成/編集/保存',gs:false,ge:true},
-        {name:'スクリプトによる一括処理',gs:false,ge:true},
-      ]},
-      {step:'データの入出力',items:[
-        {name:'［配置］コマンドによる画像の配置',gs:true,ge:true},
-        {name:'リンクパネルによる画像ファイルの管理',gs:false,ge:true},
-        {name:'目的に応じたファイル形式での書き出し',gs:false,ge:true},
-        {name:'Web用画像の保存',gs:true,ge:true},
-        {name:'スライス画像の書き出し',gs:false,ge:true},
-        {name:'スライスツールによるスライスの編集',gs:false,ge:true},
-      ]},
-      {step:'DTP・Webデザイン基本知識',items:[
-        {name:'PDFの形式と特徴',gs:false,ge:true},
-        {name:'画像解像度（dpi・ppi）の知識',gs:false,ge:true},
-        {name:'色分解の知識',gs:false,ge:true},
-        {name:'プロファイル・ガンマ補正の知識',gs:false,ge:true},
-        {name:'オーバープリント/トラッピング/レジストレーションカラーの知識',gs:false,ge:true},
-        {name:'トリムエリア（トンボ）/トリムマーク・裁ち落としの設定',gs:false,ge:true},
-        {name:'Webデザインのファイル形式の知識',gs:false,ge:true},
-        {name:'オブジェクトへのイメージマップの設定',gs:false,ge:true},
-        {name:'フォントの知識（フォントフォーマット）',gs:false,ge:true},
-        {name:'ベクトルデータ/ビットマップデータの概念',gs:true,ge:true},
-      ]},
-    ],
-    photo:[
-      {step:'ファイル操作・各種パネル',items:[
-        {name:'指定されたファイル形式での保存',gs:true,ge:true},
-        {name:'適切なファイル形式での保存',gs:false,ge:true},
-        {name:'ワークスペースの変更および保存',gs:false,ge:true},
-        {name:'各種パネルの機能に関する知識',gs:true,ge:true},
-      ]},
-      {step:'カラーの選択・変更',items:[
-        {name:'カラー選択ボックス・カラーピッカー・カラーパネルによるカラーの選択',gs:true,ge:true},
-        {name:'スウォッチパネルによるカラーの管理',gs:true,ge:true},
-        {name:'Webセーフカラーの選択',gs:false,ge:true},
-      ]},
-      {step:'環境設定',items:[
-        {name:'一般/単位・定規/ガイド・グリッド・スライスの設定',gs:true,ge:true},
-        {name:'環境設定に関する知識',gs:false,ge:true},
-      ]},
-      {step:'選択ツール',items:[
-        {name:'各選択ツールによる選択範囲の作成',gs:true,ge:true},
-        {name:'選択範囲の移動/変形/反転/解除/再選択',gs:true,ge:true},
-      ]},
-      {step:'選択範囲の保存・編集',items:[
-        {name:'選択範囲の保存/読み込み（アルファチャンネル）',gs:true,ge:true},
-        {name:'クイックマスクによる選択範囲の編集',gs:true,ge:true},
-        {name:'パスによる選択範囲の作成',gs:true,ge:true},
-        {name:'文字マスクツールによる選択範囲の作成',gs:true,ge:true},
-        {name:'［色域指定］コマンドによる選択範囲の作成',gs:false,ge:true},
-      ]},
-      {step:'画像解像度・サイズ変更',items:[
-        {name:'指示内容に従った画像解像度やカンバスサイズへの変更',gs:true,ge:true},
-        {name:'用途や目的に応じた画像解像度やカンバスサイズへの変更',gs:false,ge:true},
-      ]},
-      {step:'画像の移動と変形',items:[
-        {name:'画像の変形（拡大縮小/回転/ゆがみ/遠近法など）',gs:true,ge:true},
-        {name:'切り抜きコマンド/切り抜きツールによる画像の切り抜き',gs:true,ge:true},
-        {name:'カット/コピー/ペーストなどによる画像の複製',gs:true,ge:true},
-        {name:'定規やガイド・スナップによる正確なレイアウト',gs:true,ge:true},
-      ]},
-      {step:'カラーモード・色調補正',items:[
-        {name:'カラーモードの設定（グレースケール・RGB・CMYK）',gs:true,ge:true},
-        {name:'各カラーモードの特徴およびチャンネルパネルの理解',gs:false,ge:true},
-        {name:'8ビット/チャンネル・16ビット/チャンネルの理解',gs:false,ge:true},
-        {name:'自動補正・カラーバランス・明るさ・レベル補正・トーンカーブによる補正',gs:true,ge:true},
-        {name:'カラーマネジメントに関する知識',gs:false,ge:true},
-        {name:'［カラー設定］ダイアログボックスの内容に関する知識',gs:false,ge:true},
-        {name:'校正設定/色の校正/色域外警告コマンドに関する知識',gs:false,ge:true},
-      ]},
-      {step:'ペイント系ツール',items:[
-        {name:'ブラシツール/鉛筆ツールによる描画',gs:true,ge:true},
-        {name:'各種消しゴムツールによる編集',gs:true,ge:true},
-        {name:'ブラシパネルによるブラシの種類変更やカスタマイズ',gs:true,ge:true},
-        {name:'グラデーションツールによるグラデーションの作成',gs:true,ge:true},
-        {name:'コピースタンプツールによる画像の複製',gs:true,ge:true},
-      ]},
-      {step:'レタッチ系ツール',items:[
-        {name:'修復ブラシ/スポット修復ブラシ/パッチツールによる修正',gs:true,ge:true},
-        {name:'覆い焼き/焼き込み/スポンジツールによる修正',gs:true,ge:true},
-        {name:'色の置き換えツールによる画像の編集',gs:true,ge:true},
-        {name:'ヒストリーブラシ/アートヒストリーブラシツールによる編集',gs:false,ge:true},
-      ]},
-      {step:'ペイント系コマンド',items:[
-        {name:'［パターンを定義］コマンドによるパターンの登録',gs:false,ge:true},
-        {name:'［境界線を描く］コマンドによる選択範囲の境界線の描画',gs:true,ge:true},
-      ]},
-      {step:'レイヤーパネル',items:[
-        {name:'レイヤーの作成/複製/削除/移動/リンク/結合による画像の合成・編集',gs:true,ge:true},
-        {name:'レイヤーの描画モード/不透明度/塗りによる画像の合成',gs:true,ge:true},
-        {name:'レイヤースタイルによる非破壊編集',gs:true,ge:true},
-        {name:'レイヤー・グループ作成によるレイヤーの管理',gs:true,ge:true},
-        {name:'レイヤー内の画像の整列・分布',gs:false,ge:true},
-      ]},
-      {step:'レイヤーの応用',items:[
-        {name:'調整レイヤー/塗りつぶしレイヤーによる非破壊編集',gs:true,ge:true},
-        {name:'レイヤーマスク/ベクトルマスクによる画像の合成',gs:true,ge:true},
-        {name:'クリッピングマスクの作成',gs:true,ge:true},
-        {name:'［マッティング］コマンドによる不要部分の削除',gs:true,ge:true},
-        {name:'スタイルパネルによるレイヤースタイルの適用',gs:true,ge:true},
-        {name:'レイヤーカンプによる複数デザイン案の比較',gs:false,ge:true},
-      ]},
-      {step:'パスの作成と編集',items:[
-        {name:'ペンツールによる描画',gs:true,ge:true},
-        {name:'パスコンポーネント選択ツールなどによるパスの編集',gs:true,ge:true},
-        {name:'フリーフォームペンツールによる単純な形状のパスの作成',gs:true,ge:true},
-        {name:'複雑な形状のパスの作成',gs:false,ge:true},
-        {name:'クリッピングパスを利用した画像の保存',gs:false,ge:true},
-      ]},
-      {step:'シェイプ',items:[
-        {name:'シェイプツールによる図形の描画',gs:true,ge:true},
-        {name:'シェイプの拡大縮小・カラーの変更',gs:true,ge:true},
-        {name:'シェイプの合成',gs:true,ge:true},
-        {name:'シェイプの整列・分布',gs:false,ge:true},
-        {name:'カスタムシェイプの登録',gs:false,ge:true},
-      ]},
-      {step:'テキストの入力と編集',items:[
-        {name:'横書き/縦書き文字ツールによる文字入力と各設定',gs:true,ge:true},
-        {name:'テキストレイヤーの拡大縮小/回転/ゆがみ/反転',gs:true,ge:true},
-        {name:'ワープテキストの作成',gs:true,ge:true},
-        {name:'行送り・トラッキング・カーニング・ベースラインシフトの設定',gs:true,ge:true},
-        {name:'上記以外の設定による文字の編集',gs:false,ge:true},
-        {name:'行揃え・インデント・禁則処理・文字組みの設定',gs:true,ge:true},
-        {name:'テキストレイヤーのラスタライズ',gs:true,ge:true},
-        {name:'ポイントテキストと段落テキストの変換',gs:false,ge:true},
-      ]},
-      {step:'フィルター',items:[
-        {name:'フィルターの適用',gs:true,ge:true},
-        {name:'［シャープ］コマンドによる画像の修正',gs:true,ge:true},
-        {name:'［ぼかし］コマンドによるぼかしや動きの表現',gs:true,ge:true},
-        {name:'複数のフィルターの適用',gs:false,ge:true},
-      ]},
-      {step:'画像の入出力・Web用画像・アクション',items:[
-        {name:'用紙サイズやプリントサイズの適切な設定',gs:true,ge:true},
-        {name:'プリントオプションに関する知識',gs:false,ge:true},
-        {name:'入力解像度と出力解像度に関する知識',gs:false,ge:true},
-        {name:'Web用画像の保存',gs:true,ge:true},
-        {name:'スライス画像の書き出し',gs:false,ge:true},
-        {name:'スライスツールによるスライスの編集',gs:false,ge:true},
-        {name:'アクションの再生',gs:true,ge:true},
-        {name:'アクションの作成/編集/保存',gs:false,ge:true},
-        {name:'バッチコマンドによる複数ファイルの一括処理',gs:false,ge:true},
-      ]},
-      {step:'DTP・Webデザイン基本知識',items:[
-        {name:'画像解像度（dpi・ppi）とスクリーン線数（lpi）の知識',gs:true,ge:true},
-        {name:'色分解の知識',gs:false,ge:true},
-        {name:'プロファイル・ガンマ補正の知識',gs:false,ge:true},
-        {name:'トンボ・裁ち落としの知識',gs:false,ge:true},
-        {name:'Webデザインのファイル形式の知識',gs:false,ge:true},
-        {name:'フォントの知識（フォントフォーマット）',gs:false,ge:true},
-        {name:'カラースペース',gs:false,ge:true},
-        {name:'ビットマップデータ/ベクトルデータの概念',gs:false,ge:true},
-      ]},
-    ],
-    web:[
-      {step:'制作環境・ファイルの種類',items:[
-        {name:'ファイルの操作（保存/複製/拡張子/ファイル名）',gs:true,ge:true},
-        {name:'テキスト/ソースの操作（コピー&ペースト/入力/変更/削除）',gs:true,ge:true},
-        {name:'ブラウザー/ドメイン（名称・URL・スキームなど）',gs:true,ge:true},
-        {name:'HTML/CSS言語の特徴・構造とデザインの分離',gs:true,ge:true},
-        {name:'画像ファイル（GIF/JPEG/PNG）の特徴',gs:true,ge:true},
-        {name:'JavaScript言語の特徴・動的コンテンツの特徴',gs:false,ge:true},
-        {name:'SVG/Webフォント（ベクトル形式・フォント表示形式の特徴）',gs:false,ge:true},
-        {name:'動画/音声/リッチコンテンツの特徴',gs:false,ge:true},
-      ]},
-      {step:'ページ構成',items:[
-        {name:'基本ページ/フォーマット',gs:true,ge:true},
-        {name:'トップページ',gs:true,ge:true},
-        {name:'テキストと画像のページ',gs:true,ge:true},
-        {name:'テーブルのページ',gs:true,ge:true},
-        {name:'フォームのページ',gs:true,ge:true},
-        {name:'サムネイルのページ',gs:false,ge:true},
-        {name:'レスポンシブWebデザインの対応',gs:false,ge:true},
-      ]},
-      {step:'レイアウト・パーツ設計・ユーザビリティ',items:[
-        {name:'ヘッダー領域/フッター領域',gs:true,ge:true},
-        {name:'ナビゲーション領域',gs:true,ge:true},
-        {name:'コンテンツ領域/メイン領域/サブ領域',gs:true,ge:true},
-        {name:'バナー/ボタン',gs:true,ge:true},
-        {name:'動的コンテンツ',gs:false,ge:true},
-        {name:'タイトル/見出しの統一',gs:true,ge:true},
-        {name:'文字色と背景色のコントラスト',gs:true,ge:true},
-        {name:'パンくずリスト',gs:false,ge:true},
-        {name:'ページ内リンクの移動',gs:false,ge:true},
-        {name:'ユーザー導線（ファーストビュー/Z軸/F軸など）',gs:false,ge:true},
-        {name:'テキスト/リンク（文字サイズ・下線・未読/既読リンクの明確化）',gs:false,ge:true},
-        {name:'ボタン/アイコン（矢印・メタファー・アフォーダンス）',gs:false,ge:true},
-        {name:'色や形の表示（色に左右されないWebページ）',gs:false,ge:true},
-        {name:'画像のalt属性の配慮・凡例表示の配慮',gs:false,ge:true},
-        {name:'PDF/動画/フォーム/ダウンロードの取り扱い',gs:false,ge:true},
-      ]},
-      {step:'HTML基本構造',items:[
-        {name:'セマンテック/コンテンツモデル/カテゴリーの概念',gs:true,ge:true},
-        {name:'HTML5の移行（HTML4.01/XHTML1.0からの移行）',gs:true,ge:false},
-        {name:'文字参照/実体参照（記号の記述）',gs:true,ge:true},
-        {name:'コメント（<!-- -->）',gs:true,ge:true},
-        {name:'基本構造（文書型宣言・html・head・body・title要素など）',gs:true,ge:true},
-        {name:'外部スタイルシートの読み込み（link要素）',gs:true,ge:true},
-        {name:'メディアクエリー（link要素）',gs:false,ge:true},
-        {name:'汎用コンテナー（div・span要素）',gs:true,ge:true},
-        {name:'ID名/クラス名（id・class属性）',gs:true,ge:true},
-        {name:'見出し/段落/改行（h1〜h6・p・br要素）',gs:true,ge:true},
-        {name:'重要/コピーライト/連絡先（strong・small・address要素）',gs:true,ge:true},
-        {name:'リスト（ul・ol・li・dl・dt・dd要素）',gs:true,ge:true},
-        {name:'ハイパーリンク（フレージングコンテンツ・a要素）',gs:true,ge:true},
-        {name:'ハイパーリンク（フローコンテンツ対応・a要素）',gs:false,ge:true},
-        {name:'画像（img要素・関連する属性）',gs:true,ge:true},
-        {name:'テーブル（行と列・見出しセル・キャプション）',gs:true,ge:true},
-        {name:'テーブルのセル結合（colspan・rowspan属性）',gs:true,ge:true},
-        {name:'表の区分（thead・tbody・tfoot要素）',gs:false,ge:true},
-        {name:'フォームの範囲（form要素）',gs:true,ge:true},
-        {name:'テキストフィールド（input type="text"）',gs:true,ge:true},
-        {name:'テキストエリア（textarea要素）',gs:true,ge:true},
-        {name:'ラベル（label要素）',gs:true,ge:true},
-        {name:'送信ボタン（input type="submit"）',gs:true,ge:true},
-        {name:'指定のある入力フォーム（tel・email型・required属性）',gs:false,ge:true},
-        {name:'選択フォーム（checkbox・radio・select要素）',gs:false,ge:true},
-        {name:'ヘッダー/フッター（header・footer要素）',gs:true,ge:true},
-        {name:'セクション（article・section・nav・aside要素）',gs:true,ge:true},
-        {name:'日時（time要素）',gs:false,ge:true},
-        {name:'図版（figure・figcaption要素）',gs:false,ge:true},
-        {name:'スクリプト（script・noscript要素）',gs:false,ge:true},
-      ]},
-      {step:'CSS基本',items:[
-        {name:'文字エンコード（@charset）',gs:true,ge:true},
-        {name:'コメント（/* */）',gs:true,ge:true},
-        {name:'外部スタイルシート（@import）',gs:true,ge:true},
-        {name:'ユニバーサルセレクター/タイプセレクター',gs:true,ge:true},
-        {name:'IDセレクター/クラスセレクター',gs:true,ge:true},
-        {name:'子孫セレクター/セレクターのグループ化',gs:true,ge:true},
-        {name:'リンク疑似クラス/ユーザーアクション擬似クラス',gs:true,ge:true},
-        {name:'属性セレクター',gs:false,ge:true},
-        {name:'構造疑似クラス',gs:false,ge:true},
-        {name:'CSSの優先順位（詳細度/!important）',gs:false,ge:true},
-        {name:'表示（display・関連する値）',gs:true,ge:true},
-        {name:'リスト（list-style）',gs:true,ge:true},
-        {name:'幅/高さ（width・height）',gs:true,ge:true},
-        {name:'マージン/パディング（margin・padding）',gs:true,ge:true},
-        {name:'ボックス（overflow）',gs:true,ge:true},
-        {name:'ボックスの透明度（opacity）',gs:true,ge:true},
-        {name:'ボーダー（border）',gs:true,ge:true},
-        {name:'配置（position・top・bottom・left・right）',gs:true,ge:true},
-        {name:'フロート/フロートの解除（float・clear）',gs:true,ge:true},
-        {name:'文字色/フォント（color・font）',gs:true,ge:true},
-        {name:'テキスト（text-indent・text-decoration・text-align）',gs:true,ge:true},
-        {name:'テーブル（table-layout・border-collapse）',gs:true,ge:true},
-        {name:'背景・単体指定（background）',gs:true,ge:true},
-        {name:'背景・複数指定（background）',gs:false,ge:true},
-      ]},
-      {step:'CSSスタイリング技法',items:[
-        {name:'リセットCSS/ノーマライズCSS',gs:true,ge:true},
-        {name:'見出し/ボタンのスタイリング',gs:true,ge:true},
-        {name:'マージンによる左右中央揃え',gs:true,ge:true},
-        {name:'clearfix',gs:true,ge:true},
-        {name:'CSSスプライト/CSSシグネチャ',gs:false,ge:true},
-        {name:'交互する背景色',gs:false,ge:true},
-      ]},
-      {step:'ビジュアルデザインと配色・運営と管理',items:[
-        {name:'ビジュアルデザイン（グリッドシステム・タイポグラフィなど）',gs:false,ge:true},
-        {name:'配色（70:25:5の法則・色の三属性など）',gs:false,ge:true},
-        {name:'画像加工の操作（トリミング・リサイズ・カラー補正）',gs:false,ge:true},
-        {name:'プライバシーポリシー/SSL/サイトマップ/バリデート/ファイル転送',gs:false,ge:true},
-      ]},
-    ],
-  };
-
-  // ── パネル生成 ──────────────────────────────────────
-  SCOPE_SUBS.forEach((sub, si) => {
-    const panel = document.createElement('div');
-    panel.id = 'scopepanel-'+sub;
-    panel.style.display = si===0 ? 'block' : 'none';
-
-    const isGraded = sub==='word' || sub==='excel';
-    const colW = isGraded ? '50px' : '72px';
-    const col1Label = isGraded ? '3級' : 'スタンダード';
-    const col2Label = isGraded ? '2級' : 'エキスパート';
-    const col1CircleColor = isGraded ? '#BA7517' : '#27500A';
-    const col2CircleColor = isGraded ? '#185FA5' : '#534AB7';
-    const col1HeadColor = isGraded ? '#FFD580' : '#A5E6B0';
-    const col2HeadColor = isGraded ? '#85B7EB' : '#C4B5F8';
-
-    SCOPE_DATA[sub].forEach(group => {
-      const gh = document.createElement('div');
-      gh.style.cssText = `display:grid;grid-template-columns:1fr ${colW} ${colW};align-items:center;padding:9px 10px 9px 14px;background:#2C2C2A;border-radius:0;cursor:pointer;user-select:none;border:1px solid #2C2C2A;margin-top:2px;`;
-      gh.innerHTML = `
-        <span style="font-size:13px;font-weight:600;color:#fff;">${group.step}</span>
-        <span style="font-size:10px;font-weight:700;color:${col1HeadColor};text-align:center;line-height:1.3;">${col1Label}</span>
-        <span style="font-size:10px;font-weight:700;color:${col2HeadColor};text-align:center;line-height:1.3;">${col2Label}</span>
-      `;
-
-      const gb = document.createElement('div');
-      gb.style.cssText = 'display:none;border-left:1px solid #ccc;border-right:1px solid #ccc;border-bottom:1px solid #ccc;';
-
-      const ch = document.createElement('div');
-      ch.style.cssText = `display:grid;grid-template-columns:1fr ${colW} ${colW};background:#F5F5F2;border-bottom:1px solid #2C2C2A;padding:5px 10px 5px 38px;`;
-      ch.innerHTML = `<div></div><div style="font-size:10px;font-weight:700;color:${col1CircleColor};text-align:center;line-height:1.3;">${col1Label}</div><div style="font-size:10px;font-weight:700;color:${col2CircleColor};text-align:center;line-height:1.3;">${col2Label}</div>`;
-      gb.appendChild(ch);
-
-      group.items.forEach((it, idx) => {
-        const row = document.createElement('div');
-        const isLast = idx === group.items.length - 1;
-        row.style.cssText = `display:grid;grid-template-columns:1fr ${colW} ${colW};align-items:center;padding:8px 10px 8px 10px;background:#fff;${isLast?'':'border-bottom:1px solid #000;'}`;
-        const c1 = isGraded ? it.g3 : it.gs;
-        const c2 = isGraded ? it.g2 : it.ge;
-        const o1 = c1 ? `<span style="color:${col1CircleColor};font-size:20px;line-height:1;display:block;text-align:center;">○</span>` : '';
-        const o2 = c2 ? `<span style="color:${col2CircleColor};font-size:20px;line-height:1;display:block;text-align:center;">○</span>` : '';
-        row.innerHTML = `
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:10px;color:#ccc;width:22px;text-align:right;flex-shrink:0;">${idx+1}</span>
-            <span style="font-size:12px;color:#2C2C2A;line-height:1.55;">${it.name}</span>
-          </div>
-          <div style="text-align:center;">${o1}</div>
-          <div style="text-align:center;">${o2}</div>
-        `;
-        gb.appendChild(row);
-      });
-
-      let open = false;
-      gh.onclick = () => {
-        open = !open;
-        gb.style.display = open ? 'block' : 'none';
-      };
-
-      panel.appendChild(gh);
-      panel.appendChild(gb);
-    });
-
-    area.appendChild(panel);
-  });
 }
-
-// グローバル関数として移動
-function renderCertBtns() {
-    certGrid.innerHTML = '';
-    SUBJECTS.forEach(s => {
-      const meta  = SUBJECT_META[s.id];
-      const items = SKILLS[s.id] || [];
-      if (!items.length) return;
-      const lv3   = items.filter(i=>getLv(i.id)>=1).length;
-      const lv12 = 0; // 統合済み
-      const total = items.length;
-      const pct   = total ? Math.round(lv3/total*100) : 0;
-      const slv   = getSubjectLevel(s.id);
-      const slvBg  = {'slv-0':'#F1EFE8','slv-1':'#FEF3E2','slv-2':'#E6F1FB','slv-3':'#EEEDFE','slv-4':'#EAF3DE'}[slv.cls];
-      const slvCol = {'slv-0':'#888','slv-1':'#633806','slv-2':'#0C447C','slv-3':'#3C3489','slv-4':'#27500A'}[slv.cls];
-
-      const isOpen = document.getElementById('allsec-'+s.id)?.dataset.open === '1';
-      const btn = document.createElement('button');
-      btn.style.cssText = `border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;border:2px solid ${isOpen?meta.color:meta.border};background:${isOpen?meta.color:meta.bg};color:${isOpen?'#fff':meta.color};transition:all 0.15s;font-family:inherit;width:100%;`;
-      btn.innerHTML = `
-        <span style="font-size:24px;margin-bottom:6px;display:block;">${meta.icon}</span>
-        <span style="font-size:13px;font-weight:600;display:block;margin-bottom:4px;">${s.name}</span>
-        <span style="font-size:11px;display:block;color:${isOpen?'rgba(255,255,255,0.85)':meta.color}">${lv3}/${total}（${pct}%）</span>
-        <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:${isOpen?'rgba(255,255,255,0.2)':slvBg};color:${isOpen?'#fff':slvCol};margin-top:5px;display:inline-block;">${slv.label}</span>
-        ${lv12>0?`<span style="font-size:10px;padding:2px 8px;border-radius:99px;background:${isOpen?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.6)'};color:${isOpen?'#fff':meta.color};margin-top:3px;display:inline-block;">📖 ${lv12}習得中</span>`:''}
-      `;
-      btn.onclick = () => toggleCertSection(s.id);
-      btn.id = 'certbtn-'+s.id;
-      certGrid.appendChild(btn);
-    });
-  }
-
-function toggleCertSection(id) {
-    const section = document.getElementById('allsec-'+id);
-    if (!section) return;
-    const isOpen = section.dataset.open === '1';
-    if (isOpen) {
-      section.style.display = 'none';
-      section.dataset.open = '0';
-    } else {
-      SUBJECTS.forEach(s => {
-        const sec = document.getElementById('allsec-'+s.id);
-        if (sec) { sec.style.display = 'none'; sec.dataset.open = '0'; }
-      });
-      section.style.display = 'block';
-      section.dataset.open = '1';
-      setTimeout(() => section.scrollIntoView({ behavior:'smooth', block:'start' }), 50);
-    }
-    renderCertBtns();
-  }
-
-
 
 function setAllSubjectFilter(subId, level) {
   allSubjectFilter[subId] = level;
@@ -2479,10 +1392,10 @@ function allSetLv(id, lv, btn) {
   const today  = new Date().toISOString().slice(0,10);
   const prev   = skillData[id]||{};
   const allItems = Object.values(SKILLS).flat();
-  const prevLv3  = allItems.filter(s=>getLv(s.id)===2).length;
+  const prevLv3  = allItems.filter(s=>getLv(s.id)===3).length;
   skillData[id] = { lv, date: lv===2 ? today : (prev.date||'') };
   lsSave('skills', skillData);
-  const newLv3 = allItems.filter(s=>getLv(s.id)===2).length;
+  const newLv3 = allItems.filter(s=>getLv(s.id)===3).length;
   checkBadge(prevLv3, newLv3);
 
   btn.closest('.all-lv-btns').querySelectorAll('.all-lv-btn').forEach((b,i)=>b.classList.toggle('active',i===lv));
@@ -2490,7 +1403,7 @@ function allSetLv(id, lv, btn) {
   const itemDiv = document.getElementById('all-'+id);
   if (itemDiv) {
     let dateDiv = itemDiv.querySelector('.all-date');
-    if (lv===2) {
+    if (lv===3) {
       if (!dateDiv) { dateDiv=document.createElement('div'); dateDiv.className='all-date'; itemDiv.querySelector('.all-item-left').appendChild(dateDiv); }
       if (lv===2) dateDiv.textContent = '✔ '+today.slice(5)+' できる';
     } else if (dateDiv) dateDiv.textContent='';
@@ -2505,38 +1418,25 @@ function allSetLv(id, lv, btn) {
 
   saveToGAS();
   renderSubjectBtns();
-  if (typeof renderCertBtns === 'function') renderCertBtns();
   renderDashboard();
 }
 
-// ─── 達成バッジ & 励ましメッセージ ─────────────────────────
+// ─── 案A：10問ごとの達成バッジ ─────────────────────────
 const BADGE_MILESTONES = [
-  { count:5,   icon:'📖', title:'5項目！よくやった！',     sub:'最初の一歩が一番大切です。この積み重ねが力になります' },
-  { count:10,  icon:'✨', title:'10項目達成！',            sub:'続けていることが、一番の才能です' },
-  { count:20,  icon:'🌱', title:'20項目達成！',            sub:'少しずつ、確実に根が張ってきています' },
-  { count:30,  icon:'⭐', title:'30項目達成！',            sub:'気づけばここまで来ました。すごい積み重ねです' },
-  { count:50,  icon:'💪', title:'50項目達成！',            sub:'半分近くまで来ました！この調子です' },
-  { count:75,  icon:'🔥', title:'75項目達成！',            sub:'もう半分以上！合格が見えてきました' },
-  { count:100, icon:'🏆', title:'100項目達成！',           sub:'あなたの努力は本物です。検定合格まであと少し！' },
-  { count:150, icon:'🎯', title:'150項目達成！',           sub:'圧倒的な実力です！全科目制覇へ！' },
+  { count:10,  icon:'🌱', title:'10項目達成！',   sub:'最初の10歩！この調子で続けましょう' },
+  { count:20,  icon:'📖', title:'20項目達成！',   sub:'テキストなしで20項目できます！' },
+  { count:30,  icon:'⭐', title:'30項目達成！',   sub:'30項目！確実に力がついています' },
+  { count:50,  icon:'🔥', title:'50項目達成！',   sub:'50項目突破！すごい成長です！' },
+  { count:75,  icon:'💪', title:'75項目達成！',   sub:'もう半分以上！合格が見えてきました' },
+  { count:100, icon:'🏆', title:'100項目達成！',  sub:'100項目習得！検定合格まであと少し！' },
+  { count:150, icon:'🎯', title:'150項目達成！',  sub:'圧倒的な実力です！全科目制覇へ！' },
 ];
 
 let lastBadgeCount = 0;
 
 function checkBadge(prevLv3, newLv3) {
+  // 新たにlv3になった場合のみチェック
   if (newLv3 <= prevLv3) return;
-  // 5ポイントごとのチェック（5の倍数）
-  for (let n = prevLv3 + 1; n <= newLv3; n++) {
-    if (n % 5 === 0 && n <= 20) {
-      // 5,10,15,20は専用メッセージ
-      const milestone = BADGE_MILESTONES.find(m => m.count === n);
-      if (milestone) { showBadge(milestone); return; }
-      // 専用なければ汎用メッセージ
-      showBadge({ icon:'📖', title: n+'項目達成！', sub:'コツコツ積み重ねたことが、本物の力になります' });
-      return;
-    }
-  }
-  // マイルストーンチェック
   const milestone = BADGE_MILESTONES.slice().reverse().find(m => prevLv3 < m.count && newLv3 >= m.count);
   if (milestone) showBadge(milestone);
 }
@@ -2559,7 +1459,7 @@ function closeBadge() {
 function getSubjectLevel(subId) {
   const items = SKILLS[subId] || [];
   if (!items.length) return { level:0, label:'未開始', cls:'slv-0' };
-  const lv3 = items.filter(i=>getLv(i.id)>=1).length;
+  const lv3 = items.filter(i=>getLv(i.id)===3).length;
   const pct  = Math.round(lv3/items.length*100);
   if (pct === 0)  return { level:0, label:'未開始',       cls:'slv-0', pct };
   if (pct < 30)   return { level:1, label:'📖 基礎段階',   cls:'slv-1', pct };
@@ -2590,7 +1490,7 @@ function renderSubjectBtns() {
   SUBJECTS.forEach(s => {
     const meta   = SUBJECT_META[s.id];
     const items  = SKILLS[s.id]||[];
-    const lv3    = items.filter(i=>getLv(i.id)>=1).length;
+    const lv3    = items.filter(i=>getLv(i.id)===3).length;
     const total  = items.length;
     const pct    = total ? Math.round(lv3/total*100) : 0;
     const isThis = tw.includes(s.id);
@@ -2662,7 +1562,7 @@ function renderDashSkills() {
     const filteredItems = allItems;
     const items = filteredItems;
 
-    const lv3  = filteredItems.filter(i=>getLv(i.id)>=1).length;
+    const lv3  = filteredItems.filter(i=>getLv(i.id)===2).length;
     const total = filteredItems.length;
 
     const card = document.createElement('div');
@@ -2683,7 +1583,7 @@ function renderDashSkills() {
         <span class="dash-skill-title" style="color:${meta.color}">${s.name}</span>
         <div style="font-size:11px;color:#888;margin-top:2px">
           <span style="color:${meta.color};font-weight:500">✔ テキストなし</span>：${lv3}/${total}項目　
-          <span style="color:#BA7517;font-weight:500">📖 テキストあり</span>：${filteredItems.filter(i=>getLv(i.id)>=1&&getLv(i.id)<2).length}
+          <span style="color:#BA7517;font-weight:500">📖 テキストあり</span>：${filteredItems.filter(i=>getLv(i.id)>=1&&getLv(i.id)<3).length}
         </div>
         ${filterBtns}
       </div>
@@ -2698,7 +1598,7 @@ function renderDashSkills() {
     filteredItems.forEach(i=>{ if(!groups[i.step]) groups[i.step]=[]; groups[i.step].push(i); });
 
     Object.entries(groups).forEach(([step, skills]) => {
-      const stepDone = skills.filter(s=>getLv(s.id)>=1).length;
+      const stepDone = skills.filter(s=>getLv(s.id)===3).length;
       const stepDiv = document.createElement('div');
       stepDiv.className = 'dash-step-label';
       stepDiv.textContent = step + '（'+stepDone+'/'+skills.length+'）';
@@ -2714,7 +1614,7 @@ function renderDashSkills() {
           <div class="dash-item-left">
             <span class="dash-item-name">${sk.name}</span>
             ${certHtml ? `<div class="dash-item-certs">${certHtml}</div>` : ''}
-            ${date&&lv===2 ? `<span style="font-size:10px;color:#27500A">✔ ${date.slice(5)} 習得</span>` : ''}
+            ${date&&lv===3 ? `<span style="font-size:10px;color:#27500A">✔ ${date.slice(5)} 習得</span>` : ''}
           </div>
           <div class="dash-lv-btns">
             ${[0,1,2].map(l=>`<button class="dash-lv-btn dlb${l}${lv===l?' active':''}" onclick="dashSetLv('${sk.id}',${l},this)">${['✗','📖','✔'][l]}</button>`).join('')}
@@ -2739,10 +1639,10 @@ function dashSetLv(id, lv, btn) {
   const today  = new Date().toISOString().slice(0,10);
   const prev   = skillData[id]||{};
   const allItems = Object.values(SKILLS).flat();
-  const prevLv3  = allItems.filter(s=>getLv(s.id)===2).length;
+  const prevLv3  = allItems.filter(s=>getLv(s.id)===3).length;
   skillData[id] = { lv, date: lv===2 ? today : (prev.date||'') };
   lsSave('skills', skillData);
-  const newLv3 = allItems.filter(s=>getLv(s.id)===2).length;
+  const newLv3 = allItems.filter(s=>getLv(s.id)===3).length;
   checkBadge(prevLv3, newLv3);
 
   // ボタンUI更新
@@ -2753,7 +1653,7 @@ function dashSetLv(id, lv, btn) {
   const leftDiv = itemDiv?.querySelector('.dash-item-left');
   if (leftDiv) {
     let dateSpan = leftDiv.querySelector('span[style*="27500A"]');
-    if (lv===2) {
+    if (lv===3) {
       if (!dateSpan) { dateSpan = document.createElement('span'); dateSpan.style='font-size:10px;color:#27500A'; leftDiv.appendChild(dateSpan); }
       dateSpan.textContent = '✔ '+today.slice(5)+' 習得';
     } else if (dateSpan) { dateSpan.textContent = ''; }
@@ -2811,7 +1711,7 @@ function renderThisWeekBanner() {
 function renderDashboard() {
   const all   = Object.values(SKILLS).flat();
   const today = new Date();
-  const lv3   = all.filter(s=>getLv(s.id)>=1).length;
+  const lv3   = all.filter(s=>getLv(s.id)===2).length;
   const total = all.length;
   const daysPassed = Math.max(1, Math.round((today-TRAIN_START)/86400000));
   const rate  = lv3/daysPassed;
@@ -2823,7 +1723,6 @@ function renderDashboard() {
 
   // レーダーチャート
   const radarData = SUBJECTS.map(s=>subjectPct(s.id));
-  if (!document.getElementById('radarChart')) return;
   if (radarChart) radarChart.destroy();
   radarChart = new Chart(document.getElementById('radarChart'), {
     type:'radar',
@@ -2839,12 +1738,11 @@ function renderDashboard() {
     }
   });
 
+  // 合格予測ゲージ
+  renderCertGauges();
+
   // 検定バナー
   renderCertBanners();
-
-  // 週次グラフ・強弱マップも更新
-  renderWeeklyBar();
-  renderStrengthMap();
 
   // 週次進捗バー
   const wp = document.getElementById('weekProgress');
@@ -2852,8 +1750,8 @@ function renderDashboard() {
   SUBJECTS.forEach(s=>{
     const items = SKILLS[s.id]||[];
     if (!items.length) return;
-    const lv3c = items.filter(i=>getLv(i.id)>=1).length;
-    const mid = 0; // lv3cに統合
+    const lv3c = items.filter(i=>getLv(i.id)===3).length;
+    const mid  = items.filter(i=>getLv(i.id)>=1&&getLv(i.id)<3).length;
     const tot  = items.length;
     const p3   = Math.round(lv3c/tot*100);
     const pm   = Math.round(mid/tot*100);
@@ -2874,7 +1772,6 @@ function renderDashboard() {
 // ─── 合格予測ゲージ ────────────────────────────
 function renderCertGauges() {
   const wrap = document.getElementById('certGauges');
-  if (!wrap) return;
   wrap.innerHTML = '';
 
   const certDefs = [
@@ -2937,7 +1834,7 @@ function renderSkills(subId) {
   container.innerHTML = '';
 
   Object.entries(groups).forEach(([step, skills])=>{
-    const done  = skills.filter(s=>getLv(s.id)>=1).length;
+    const done  = skills.filter(s=>getLv(s.id)===3).length;
     const total = skills.length;
 
     const groupEl = document.createElement('div');
@@ -2963,7 +1860,7 @@ function renderSkills(subId) {
         <div class="skill-item-head">
           <span class="lv-badge lv${lv}" id="badge-${s.id}">${LV_LABELS[lv]}</span>
           <span class="skill-item-name">${s.name}${certHtml?`<span class="cert-tags" style="margin-left:4px">${certHtml}</span>`:''}</span>
-          ${date&&lv===2?`<span class="skill-date">${date.slice(5)}</span>`:''}
+          ${date&&lv===3?`<span class="skill-date">${date.slice(5)}</span>`:''}
         </div>
         <div class="lv-btns">
           ${[0,1,2].map(l=>`<button class="lv-btn lv-btn-${l}${lv===l?' active':''}" onclick="setLv('${s.id}',${l},this)">${LV_SHORT[l]}</button>`).join('')}
@@ -2998,11 +1895,9 @@ function setLv(id, lv, btn) {
   badge.className = `lv-badge lv${lv}`;
   badge.textContent = LV_LABELS[lv];
   const dateEl = btn.closest('.skill-item').querySelector('.skill-date');
-  if (dateEl) dateEl.textContent = lv===2 ? today.slice(5) : '';
+  if (dateEl) dateEl.textContent = lv===3 ? today.slice(5) : '';
 
   saveToGAS();
-  renderSubjectBtns();
-  if (typeof renderCertBtns === 'function') renderCertBtns();
   renderDashboard();
 }
 
@@ -3012,8 +1907,7 @@ function getDate(id)  { return skillData[id]?.date||''; }
 function subjectPct(subId) {
   const items = SKILLS[subId]||[];
   if (!items.length) return 0;
-  const done = items.filter(s=>getLv(s.id)>=1).length;
-  return Math.round(done/items.length*100);
+  return Math.round(items.reduce((a,s)=>a+getLv(s.id),0)/items.length/2*100);
 }
 
 // ─── GAS保存 ───────────────────────────────────
@@ -3021,7 +1915,7 @@ async function saveToGAS() {
   if (!GAS_URL) return;
   const all   = Object.values(SKILLS).flat();
   const today = new Date().toISOString().slice(0,10);
-  const snap  = { date:today, totalLv3:all.filter(s=>getLv(s.id)===2).length, totalLv12:all.filter(s=>getLv(s.id)>=1&&getLv(s.id)<2).length };
+  const snap  = { date:today, totalLv3:all.filter(s=>getLv(s.id)===3).length, totalLv12:all.filter(s=>getLv(s.id)>=1&&getLv(s.id)<3).length };
   const idx   = logHistory.findIndex(h=>h.date===today);
   if (idx>=0) logHistory[idx]=snap; else logHistory.push(snap);
   logHistory.sort((a,b)=>a.date.localeCompare(b.date));
@@ -3036,139 +1930,19 @@ async function saveToGAS() {
 }
 
 // ─── 月次レポート ─────────────────────────────
-let weeklyBarChart = null;
-
-// ─── 週次習得グラフ ──────────────────────────────
-function renderWeeklyBar() {
-  const canvas = document.getElementById('weeklyBarChart');
-  if (!canvas) return;
-
-  // skillDataから日付ごとの習得数を週別に集計
-  const weekCounts = {};
-  const allItems = Object.values(SKILLS).flat();
-  allItems.forEach(sk => {
-    const d = getDate(sk.id);
-    if (!d || getLv(sk.id) < 2) return;
-    const date = new Date(d);
-    const msFromStart = date - TRAIN_START;
-    const weekNum = Math.max(1, Math.ceil(msFromStart / (7*86400000)));
-    weekCounts[weekNum] = (weekCounts[weekNum]||0) + 1;
-  });
-
-  // 現在週まで連続データを生成
-  const today = new Date();
-  const currentWeek = Math.max(1, Math.ceil((today - TRAIN_START) / (7*86400000)));
-  const maxWeek = Math.min(currentWeek, 26); // 最大26週
-  const labels = [], data = [];
-  for (let w = 1; w <= maxWeek; w++) {
-    labels.push('W'+w);
-    data.push(weekCounts[w]||0);
-  }
-
-  if (weeklyBarChart) weeklyBarChart.destroy();
-  weeklyBarChart = new Chart(canvas, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: '新規習得数',
-        data,
-        backgroundColor: data.map(v => v >= 10 ? 'rgba(59,109,17,0.75)' : v >= 5 ? 'rgba(186,117,23,0.75)' : 'rgba(46,64,87,0.55)'),
-        borderRadius: 4,
-        borderSkipped: false,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => `${ctx.parsed.y}項目マスター` } }
-      },
-      scales: {
-        y: { beginAtZero: true, ticks: { stepSize: 5, font: { size: 11 } }, title: { display: true, text: '習得項目数', font: { size: 10 } } },
-        x: { ticks: { font: { size: 10 } } }
-      }
-    }
-  });
-}
-
-// ─── 得意・苦手 科目分析 ─────────────────────────
-function renderStrengthMap() {
-  const area = document.getElementById('subjectStrengthArea');
-  if (!area) return;
-
-  const rows = SUBJECTS.map(s => {
-    const items = SKILLS[s.id]||[];
-    if (!items.length) return null;
-    const lv3  = items.filter(i=>getLv(i.id)>=1).length;
-    const lv12 = 0; // 統合済み
-    const tot  = items.length;
-    const pct  = Math.round(lv3/tot*100);
-    const midPct = Math.round(lv12/tot*100);
-    const meta = SUBJECT_META[s.id];
-    let rank, rankLabel, rankBg, rankColor;
-    if (pct >= 50) { rank=0; rankLabel='得意'; rankBg='#EAF3DE'; rankColor='#27500A'; }
-    else if (pct >= 20) { rank=1; rankLabel='伸び中'; rankBg='#FEF3E2'; rankColor='#BA7517'; }
-    else { rank=2; rankLabel='強化中'; rankBg='#FCEBEB'; rankColor='#A32D2D'; }
-    return { id:s.id, name:s.name, icon:meta.icon, color:meta.color, border:meta.border, bg:meta.bg, pct, midPct, lv3, lv12, tot, rank, rankLabel, rankBg, rankColor };
-  }).filter(Boolean);
-
-  // 得意→伸び中→強化中の順にソート
-  rows.sort((a,b) => a.rank !== b.rank ? a.rank - b.rank : b.pct - a.pct);
-
-  area.innerHTML = rows.map(r => `
-    <div style="margin-bottom:10px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
-        <span style="font-size:18px;">${r.icon}</span>
-        <span style="font-size:13px;font-weight:600;color:${r.color};flex:1;">${r.name}</span>
-        <span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:99px;background:${r.rankBg};color:${r.rankColor};">${r.rankLabel}</span>
-        <span style="font-size:12px;font-weight:700;color:${r.rankColor};">${r.pct}%</span>
-      </div>
-      <div style="background:#E0DED6;border-radius:99px;height:12px;overflow:hidden;position:relative;">
-        <div style="height:100%;border-radius:99px;background:#E8D5A0;position:absolute;top:0;left:0;width:${r.pct+r.midPct}%;transition:width 0.5s;"></div>
-        <div style="height:100%;border-radius:99px;background:${r.rankColor === '#27500A' ? '#3B6D11' : r.rankColor};position:absolute;top:0;left:0;width:${r.pct}%;transition:width 0.6s;opacity:0.85;"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:#888;margin-top:3px;">
-        <span>✔ ${r.lv3}項目習得済み　📖 ${r.lv12}項目習得中</span>
-        <span>${r.lv3+r.lv12}/${r.tot}</span>
-      </div>
-    </div>
-  `).join('');
-
-  // 総評メッセージ
-  const best  = rows.find(r=>r.rank===0);
-  const weak  = [...rows].reverse().find(r=>r.lv3+r.lv12 > 0 && r.rank > 0) || rows[rows.length-1];
-  const total = rows.reduce((a,r)=>a+r.lv3,0);
-  const allTot = rows.reduce((a,r)=>a+r.tot,0);
-  const overallPct = allTot ? Math.round(total/allTot*100) : 0;
-  let summary = '';
-  if (best)  summary += `<strong>${best.name}</strong>が最も習熟しています（${best.pct}%）。`;
-  if (weak && weak.name !== best?.name)  summary += ` <strong>${weak.name}</strong>はもう一伸びが期待できます。`;
-  summary += ` 全体習得率は<strong>${overallPct}%</strong>です。`;
-
-  const summaryDiv = document.createElement('div');
-  summaryDiv.style.cssText = 'background:#F0F4F8;border-radius:8px;padding:10px 14px;font-size:12px;color:#2E4057;line-height:1.8;margin-top:6px;border-left:3px solid #2E4057;';
-  summaryDiv.innerHTML = '📝 ' + summary;
-  area.appendChild(summaryDiv);
-}
-
 function renderReport() {
-  if (!document.getElementById('reportSummary')) return;
   const all  = Object.values(SKILLS).flat();
-  const lv3  = all.filter(s=>getLv(s.id)>=1).length;
-  const lv12 = 0; // 統合済み
+  const lv3  = all.filter(s=>getLv(s.id)===3).length;
+  const lv12 = all.filter(s=>getLv(s.id)>=1&&getLv(s.id)<3).length;
   const tot  = all.length;
 
-  // 完全習得数（✔のみ）を別途カウント
-  const lv3only = all.filter(s=>getLv(s.id)===2).length;
   document.getElementById('reportSummary').innerHTML = `
-    <div class="rg-card"><div class="rg-num">${lv3}</div><div class="rg-label">📖✔ 習得済み合計</div></div>
-    <div class="rg-card"><div class="rg-num">${lv3only}</div><div class="rg-label">✔ テキストなしで習得</div></div>
-    <div class="rg-card"><div class="rg-num">${tot-lv3}</div><div class="rg-label">これから学ぶ項目</div></div>
+    <div class="rg-card"><div class="rg-num">${lv3}</div><div class="rg-label">テキストなしで習得済み</div></div>
+    <div class="rg-card"><div class="rg-num">${lv12}</div><div class="rg-label">習得中（もう少し！）</div></div>
+    <div class="rg-card"><div class="rg-num">${tot-lv3-lv12}</div><div class="rg-label">これから学ぶ項目</div></div>
     <div class="rg-card"><div class="rg-num">${Math.round(lv3/tot*100)}%</div><div class="rg-label">習得率</div></div>`;
 
   const entries = logHistory.slice(-20);
-  if (!document.getElementById('lineChart')) return;
   if (lineChart) lineChart.destroy();
   lineChart = new Chart(document.getElementById('lineChart'), {
     type:'line',
@@ -3194,275 +1968,7 @@ function renderReport() {
   msg += `<br><br><span style="font-size:11px;color:#888">【アンケート記入時の参考】このレポートを見ながら「テキストなしでできる項目」と「まだテキストが必要な項目」を具体的に記入できます。</span>`;
   document.getElementById('reportComment').innerHTML = msg;
 }
-
-// ─── 問題集記録 ─────────────────────────────────
-let mondaiData = [];
-
-function initMondai() {
-  try { mondaiData = JSON.parse(localStorage.getItem(lsKey('mondai')) || '[]'); } catch(e){ mondaiData=[]; }
-  updateMondaiCnt();
-}
-
-function updateMondaiCnt() {
-  const el = document.getElementById('mondaiCnt');
-  if (el) el.textContent = mondaiData.length + '件';
-}
-
-function openMondaiModal() {
-  // 今日の日付をデフォルトセット
-  const today = new Date().toISOString().slice(0,10);
-  document.getElementById('mDate').value = today;
-  document.getElementById('mTime').value = '';
-  document.getElementById('mNum').value = '';
-  document.getElementById('mNote').value = '';
-  if (mondaiView !== 'list' && mondaiView !== 'subject') mondaiView = 'list';
-  setMondaiView(mondaiView);
-  document.getElementById('mondaiModal').classList.add('open');
-}
-
-function closeMondaiModal() {
-  document.getElementById('mondaiModal').classList.remove('open');
-}
-
-let mondaiView = 'list';
-
-const MONDAI_SUBJECTS = ['Word','Excel','PowerPoint','Illustrator','Photoshop','Web','ビジマナ・就職'];
-const MONDAI_SUBJECT_META = {
-  'Word':       { icon:'✍️', color:'#0C447C', bg:'#E6F1FB' },
-  'Excel':      { icon:'📊', color:'#3B6D11', bg:'#EAF3DE' },
-  'PowerPoint': { icon:'🎨', color:'#993C1D', bg:'#FAECE7' },
-  'Illustrator':{ icon:'✏️', color:'#534AB7', bg:'#EEEDFE' },
-  'Photoshop':  { icon:'📷', color:'#0F6E56', bg:'#E1F5EE' },
-  'Web':        { icon:'🌐', color:'#185FA5', bg:'#E6F1FB' },
-  'ビジマナ・就職':{ icon:'🤝', color:'#72243E', bg:'#FBEAF0' },
-};
-
-function setMondaiView(v) {
-  mondaiView = v;
-  // ボタンのアクティブ状態
-  ['list','subject'].forEach(function(t) {
-    const btn = document.getElementById('viewTab'+t.charAt(0).toUpperCase()+t.slice(1));
-    if (!btn) return;
-    const active = t === v;
-    btn.style.background  = active ? '#534AB7' : '#fff';
-    btn.style.color       = active ? '#fff'    : '#888';
-    btn.style.borderColor = active ? '#534AB7' : '#D3D1C7';
-  });
-  // 科目プルダウンの表示切替
-  const sel = document.getElementById('mondaiSubjectFilter');
-  if (sel) sel.style.display = v === 'subject' ? 'inline-block' : 'none';
-  const title = document.getElementById('mondaiListTitle');
-  if (title) title.textContent = v === 'list' ? '📅 これまでの記録（時系列・新しい順）' : '📚 科目別（日にち昇順）';
-  renderMondaiList();
-}
-
-function onMondaiSubjectChange(subject) {
-  renderMondaiList();
-}
-
-function saveMondai() {
-  const date    = document.getElementById('mDate').value;
-  const subject = document.getElementById('mSubject') ? document.getElementById('mSubject').value : '';
-  const num     = document.getElementById('mNum').value.trim();
-  const time    = document.getElementById('mTime').value;
-  const score   = document.getElementById('mScore') ? document.getElementById('mScore').value.trim() : '';
-  const note    = document.getElementById('mNote').value.trim();
-  if (!date) { alert('日にちを入力してください'); return; }
-  if (!num)  { alert('問題番号・範囲を入力してください'); return; }
-  const entry = { id: Date.now(), date, subject: subject||'', num, time: time||'', score: score||'', note };
-  mondaiData.unshift(entry);
-  mondaiData = mondaiData.slice(0, 300);
-  localStorage.setItem(lsKey('mondai'), JSON.stringify(mondaiData));
-  updateMondaiCnt();
-  renderMondaiList();
-  if (document.getElementById('mSubject')) document.getElementById('mSubject').value = '';
-  document.getElementById('mNum').value  = '';
-  document.getElementById('mTime').value = '';
-  if (document.getElementById('mScore')) document.getElementById('mScore').value = '';
-  document.getElementById('mNote').value = '';
-}
-
-function deleteMondai(id) {
-  mondaiData = mondaiData.filter(function(d){ return d.id !== id; });
-  localStorage.setItem(lsKey('mondai'), JSON.stringify(mondaiData));
-  updateMondaiCnt();
-  renderMondaiList();
-}
-
-function renderMondaiList() {
-  const list = document.getElementById('mondaiList');
-  if (!list) return;
-  if (!mondaiData.length) {
-    list.innerHTML = '<div class="log-empty">まだ記録がありません</div>';
-    return;
-  }
-
-  if (mondaiView === 'subject') {
-    const sel = document.getElementById('mondaiSubjectFilter');
-    const selectedSubj = sel ? sel.value : '';
-    if (!selectedSubj) {
-      list.innerHTML = '<div style="text-align:center;padding:2rem;color:#888;">上のプルダウンから科目を選んでください</div>';
-      return;
-    }
-    const sm = MONDAI_SUBJECT_META[selectedSubj];
-    const sc = sm ? sm.color : '#2E4057';
-    const sb = sm ? sm.bg    : '#F5F5F2';
-    const si = sm ? sm.icon  : '📋';
-    const rows = mondaiData.filter(function(d){ return d.subject === selectedSubj; })
-                           .sort(function(a,b){ return a.date.localeCompare(b.date); });
-    if (!rows.length) {
-      list.innerHTML = '<div style="text-align:center;padding:2rem;color:#888;">'+si+' '+selectedSubj+'の記録はまだありません</div>';
-      return;
-    }
-    let html = '<div style="overflow-x:auto;max-height:480px;overflow-y:auto;">';
-    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr style="background:'+sc+';color:#fff;">';
-    html += '<th style="padding:8px 10px;text-align:left;white-space:nowrap;">日にち</th>';
-    html += '<th style="padding:8px 10px;text-align:left;">問題番号・範囲</th>';
-    html += '<th style="padding:8px 10px;text-align:center;white-space:nowrap;">時間</th>';
-    html += '<th style="padding:8px 10px;text-align:center;white-space:nowrap;">結果</th>';
-    html += '<th style="padding:8px 10px;text-align:left;">備考</th>';
-    html += '<th></th></tr></thead><tbody>';
-    rows.forEach(function(d, i) {
-      const dp = d.date ? d.date.slice(5).replace('-','/') : '';
-      const rowBg = i%2===0 ? '#fff' : sb;
-      const scoreHtml = d.score ? '<span style="background:#EAF3DE;color:#27500A;padding:2px 8px;border-radius:99px;font-weight:600;">'+d.score+'</span>' : '<span style="color:#ccc;">-</span>';
-      html += '<tr style="background:'+rowBg+';border-bottom:1px solid #F0EEE8;">';
-      html += '<td style="padding:7px 10px;white-space:nowrap;color:'+sc+';font-weight:600;">'+dp+'</td>';
-      html += '<td style="padding:7px 10px;">'+d.num+'</td>';
-      html += '<td style="padding:7px 10px;text-align:center;color:#888;">'+(d.time ? d.time+'分' : '-')+'</td>';
-      html += '<td style="padding:7px 10px;text-align:center;">'+scoreHtml+'</td>';
-      html += '<td style="padding:7px 10px;color:#555;font-size:11px;">'+(d.note||'')+'</td>';
-      html += '<td><button onclick="deleteMondai('+d.id+')" style="font-size:11px;color:#ccc;background:none;border:none;cursor:pointer;">✕</button></td>';
-      html += '</tr>';
-    });
-    html += '</tbody></table></div>';
-    list.innerHTML = html;
-    return;
-  }
-}
 </script>
-
-
-<!-- ══ 問題集記録 全画面一覧 ══ -->
-<div class="mondai-fullscreen" id="mondaiFullscreen">
-  <div class="mondai-fs-head">
-    <span style="font-size:18px;">📋</span>
-    <span class="mondai-fs-title">問題集記録 一覧</span>
-    <span id="mondaiFsCount" style="font-size:12px;color:rgba(255,255,255,0.7);"></span>
-    <button class="mondai-fs-close" onclick="closeMondaiFullscreen()">✕ 閉じる</button>
-  </div>
-  <div class="mondai-fs-body">
-    <!-- 科目フィルター -->
-    <div class="mondai-fs-filter">
-      <span style="font-size:12px;color:#888;font-weight:600;">科目：</span>
-      <button class="mondai-fs-filter-btn active" onclick="filterMondaiFs('')" id="fsf-all">すべて</button>
-      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Word')" id="fsf-Word">✍️ Word</button>
-      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Excel')" id="fsf-Excel">📊 Excel</button>
-      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('PowerPoint')" id="fsf-PowerPoint">🎨 PowerPoint</button>
-      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Illustrator')" id="fsf-Illustrator">✏️ Illustrator</button>
-      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Photoshop')" id="fsf-Photoshop">📷 Photoshop</button>
-      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('Web')" id="fsf-Web">🌐 Web</button>
-      <button class="mondai-fs-filter-btn" onclick="filterMondaiFs('ビジマナ・就職')" id="fsf-manner">🤝 ビジマナ・就職</button>
-    </div>
-    <!-- テーブル -->
-    <div style="overflow-x:auto;">
-      <table class="mondai-fs-table" id="mondaiFsTable">
-        <thead>
-          <tr>
-            <th style="width:70px;">日にち</th>
-            <th style="width:110px;">科目</th>
-            <th>問題番号・範囲</th>
-            <th style="width:70px;text-align:center;">時間</th>
-            <th style="width:110px;text-align:center;">結果・正答率</th>
-            <th>備考・メモ</th>
-            <th style="width:30px;"></th>
-          </tr>
-        </thead>
-        <tbody id="mondaiFsBody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ══ 問題集記録 モーダル ══ -->
-<div class="modal-overlay" id="mondaiModal" onclick="if(event.target===this)closeMondaiModal()">
-  <div class="modal-box" style="max-width:640px;">
-    <div class="modal-head">
-      <span style="font-size:20px;">📋</span>
-      <span class="modal-head-title">問題集記録</span>
-      <button class="modal-close" onclick="closeMondaiModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <!-- 入力フォーム -->
-      <div class="modal-section-title">📝 新しい記録を追加</div>
-      <div class="modal-row2">
-        <div class="modal-form-row">
-          <label class="modal-label">日にち</label>
-          <input class="modal-input" id="mDate" type="date">
-        </div>
-        <div class="modal-form-row">
-          <label class="modal-label">所要時間（分）</label>
-          <input class="modal-input" id="mTime" type="number" min="1" max="999" placeholder="例：30">
-        </div>
-      </div>
-      <div class="modal-row2">
-        <div class="modal-form-row">
-          <label class="modal-label">科目</label>
-          <select class="modal-input" id="mSubject" style="cursor:pointer;">
-            <option value="">-- 選択してください --</option>
-            <option value="Word">✍️ Word</option>
-            <option value="Excel">📊 Excel</option>
-            <option value="PowerPoint">🎨 PowerPoint</option>
-            <option value="Illustrator">✏️ Illustrator</option>
-            <option value="Photoshop">📷 Photoshop</option>
-            <option value="Web">🌐 Web</option>
-            <option value="ビジマナ・就職">🤝 ビジマナ・就職</option>
-          </select>
-        </div>
-        <div class="modal-form-row">
-          <label class="modal-label">結果・正答率</label>
-          <input class="modal-input" id="mScore" type="text" placeholder="例：8/10問 正解">
-        </div>
-      </div>
-      <div class="modal-form-row">
-        <label class="modal-label">問題番号・範囲</label>
-        <input class="modal-input" id="mNum" type="text" placeholder="例：3級 問1〜10 / 過去問2024">
-      </div>
-      <div class="modal-form-row">
-        <label class="modal-label">備考・メモ</label>
-        <input class="modal-input" id="mNote" type="text" placeholder="例：表の操作が苦手。再チェック必要">
-      </div>
-      <button class="modal-submit" onclick="saveMondai()">記録する</button>
-
-      <!-- 表示切替タブ -->
-      <div style="margin-top:20px;display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
-        <button id="viewTabList" onclick="setMondaiView('list')"
-          style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #534AB7;background:#534AB7;color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;">📅 時系列</button>
-        <button id="viewTabSubject" onclick="setMondaiView('subject')"
-          style="font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid #D3D1C7;background:#fff;color:#888;cursor:pointer;font-family:inherit;white-space:nowrap;">📚 科目別</button>
-        <select id="mondaiSubjectFilter" onchange="onMondaiSubjectChange(this.value)"
-          style="display:none;font-size:12px;padding:6px 12px;border-radius:99px;border:1px solid #534AB7;background:#fff;color:#2E4057;cursor:pointer;font-family:inherit;outline:none;">
-          <option value="">── 科目を選択 ──</option>
-          <option value="Word">✍️ Word</option>
-          <option value="Excel">📊 Excel</option>
-          <option value="PowerPoint">🎨 PowerPoint</option>
-          <option value="Illustrator">✏️ Illustrator</option>
-          <option value="Photoshop">📷 Photoshop</option>
-          <option value="Web">🌐 Web</option>
-          <option value="ビジマナ・就職">🤝 ビジマナ・就職</option>
-        </select>
-      </div>
-
-      <!-- 記録一覧 -->
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-        <div class="modal-section-title" id="mondaiListTitle" style="margin-bottom:0;flex:1;border-bottom:none;padding-bottom:0;">📅 これまでの記録（時系列）</div>
-        <button onclick="openMondaiFullscreen()" style="font-size:11px;padding:4px 12px;border-radius:99px;border:1px solid #2E4057;background:#fff;color:#2E4057;cursor:pointer;font-family:inherit;white-space:nowrap;">📋 全画面で見る</button>
-      </div>
-      <div id="mondaiList"></div>
-    </div>
-  </div>
-</div>
 
 <!-- 達成バッジポップアップ -->
 <div class="badge-overlay" id="badgeOverlay" onclick="closeBadge()"></div>
@@ -3513,8 +2019,8 @@ function renderMondaiList() {
 
     <div class="tabs">
       <button class="tab active" onclick="swTab('today',this)">📝 今日の記録</button>
-      <button class="tab" onclick="openMondaiModal()" style="border-color:#CECBF6;color:#534AB7;">📋 問題集記録</button>
       <button class="tab" onclick="swTab('growth',this)">📈 マイ成長</button>
+      <button class="tab" onclick="swTab('cert',this)">🏆 検定対策</button>
     </div>
 
     <!-- ════ タブ① 今日の記録 ════ -->
@@ -3584,26 +2090,27 @@ function renderMondaiList() {
         <div class="comment-box" id="reportComment"></div>
       </div>
 
-      <!-- 週次習得グラフ -->
+    </div>
+
+    <!-- ════ タブ③ 検定対策 ════ -->
+    <div class="tab-panel" id="panel-cert">
+
+      <!-- 合格予測ゲージ -->
       <div class="card">
-        <div class="card-title">📊 週ごとの習得数</div>
-        <p style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.7">訓練開始からの週ごとに、新たにマスターした項目数を表示します。</p>
-        <canvas id="weeklyBarChart" height="130"></canvas>
+        <div class="card-title">🎯 合格予測ゲージ</div>
+        <div class="cert-gauges" id="certGauges"></div>
       </div>
 
-      <!-- 得意・苦手 科目分析 -->
+      <!-- 検定ダッシュボード（試験概要） -->
       <div class="card">
-        <div class="card-title">🎯 得意・苦手 科目分析</div>
-        <p style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.7">習熟度50%以上を<span style="color:#27500A;font-weight:600">得意</span>、20%以上を<span style="color:#BA7517;font-weight:600">伸び中</span>、20%未満を<span style="color:#A32D2D;font-weight:600">強化中</span>として分類しています。</p>
-        <div id="subjectStrengthArea"></div>
+        <div class="card-title">📖 検定試験 概要・出題範囲</div>
+        <div class="cert-db-tabs" id="certDbTabs" style="margin-bottom:1rem"></div>
+        <div id="certDbContent"></div>
       </div>
 
     </div>
 
-
-
   </div>
 </div>
-
 </body>
 </html>
