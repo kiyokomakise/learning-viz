@@ -1182,10 +1182,7 @@ async function doLogin() {
 
   if (GAS_URL) {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒タイムアウト
-      const res  = await fetch(GAS_URL+'?action=getStudent&studentId='+currentUser, {signal: controller.signal});
-      clearTimeout(timeoutId);
+      const res  = await fetch(GAS_URL+'?action=getStudent&studentId='+currentUser);
       const data = await res.json();
       if (data.status==='ok' && data.skillData) {
         skillData  = data.skillData;
@@ -2240,7 +2237,8 @@ function renderAllSubjects() {
       ]},
     ],
   
-  };;
+  
+  };;;
 
   // ── パネル生成 ──────────────────────────────────────
   SCOPE_SUBS.forEach((sub, si) => {
@@ -2309,6 +2307,8 @@ function renderAllSubjects() {
 
 // グローバル関数として移動
 function renderCertBtns() {
+    const certGrid = document.getElementById('certBtnGrid');
+    if (!certGrid) return;
     certGrid.innerHTML = '';
     SUBJECTS.forEach(s => {
       const meta  = SUBJECT_META[s.id];
