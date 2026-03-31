@@ -2921,7 +2921,7 @@ async function saveToGAS() {
       body:JSON.stringify({ type:'learning3', studentId:currentUser, studentName:currentName, skillData, history:logHistory, mondaiData:mondaiData, savedAt:new Date().toISOString() })
     });
   } catch(e){}
-}}, 3000); // 3秒間操作がなければ送信
+ }, 3000);操作がなければ送信
 }
 
 // ─── 月次レポート ─────────────────────────────
