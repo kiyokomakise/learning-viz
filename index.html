@@ -354,7 +354,7 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
 <body>
 
 <script>
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwK5tTUHTPLmGR_zjDpcexVUmqF5j-qfTb9HzE9EHkVJRIcHXnx67NyDVSvabTnzt9S/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzDWN5Vlb5uQK9nzbn3n8iqqEj9omPXgl4eto6OEyjXRJZwKW3iL48-zrBvqClX6VO_/exec';
 
 // ════════════════════════════════════════════════
 //  訓練スケジュール定義（令和8年度）
@@ -2915,7 +2915,7 @@ async function saveToGAS() {
     await fetch(GAS_URL,{
       method:'POST', mode:'no-cors',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ type:'learning3', studentId:currentUser, studentName:currentName, skillData, history:logHistory, savedAt:new Date().toISOString() })
+      body:JSON.stringify({ type:'learning3', studentId:currentUser, studentName:currentName, skillData, history:logHistory, mondaiData:mondaiData, savedAt:new Date().toISOString() })
     });
   } catch(e){}
 }
@@ -3165,6 +3165,8 @@ function saveMondai() {
   document.getElementById('mTime').value = '';
   if (document.getElementById('mScore')) document.getElementById('mScore').value = '';
   document.getElementById('mNote').value = '';
+  // GASにも同期
+  saveToGAS();
 }
 
 function deleteMondai(id) {
