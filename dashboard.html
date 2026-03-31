@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>講師用 リアルタイム進捗ダッシュボード</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --accent: #4f8ef7;
+    --accent2: #38d9a9;
+    --warn: #ffa94d;
+    --danger: #ff6b6b;
+    --text: #e8eaf0;
+    --text2: #8890aa;
+    --word: #4dabf7;
+    --excel: #38d9a9;
+    --ppt: #f783ac;
+    --ill: #ffa94d;
+    --photo: #a9e34b;
+    --web: #74c0fc;
+    --biz: #da77f2;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ヘッダー */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  h1 span {
+    color: var(--text2);
+    font-weight: 400;
+    font-size: 13px;
+    margin-left: 8px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .refresh-info {
+    font-size: 12px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent2);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .timer-ring {
+    width: 32px;
+    height: 32px;
+  }
+
+  .timer-ring circle {
+    transition: stroke-dashoffset 1s linear;
+  }
+
+  /* 統計バー */
+  .stats-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 28px;
+    display: flex;
+    gap: 32px;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .stat-num {
+    font-size: 24px;
+    font-weight: 900;
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  /* メインコンテンツ */
+  main {
+    padding: 24px 28px;
+  }
+
+  /* 凡例 */
+  .legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .legend-bar {
+    width: 24px;
+    height: 8px;
+    border-radius: 4px;
+  }
+
+  /* 受講生グリッド */
+  .students-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+    gap: 16px;
+  }
+
+  .student-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    transition: border-color 0.2s;
+    animation: fadeIn 0.4s ease both;
+  }
+
+  .student-card:hover {
+    border-color: var(--accent);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .student-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--surface2), var(--border));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .student-name {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .student-id {
+    font-size: 11px;
+    color: var(--text2);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .total-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--accent2);
+    font-weight: 500;
+  }
+
+  /* 科目プログレスバー */
+  .subjects {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .subject-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 80px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .subject-name {
+    font-size: 12px;
+    color: var(--text2);
+    text-align: right;
+  }
+
+  .bar-track {
+    height: 10px;
+    background: var(--surface2);
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 0;
+  }
+
+  .subject-count {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text2);
+    white-space: nowrap;
+  }
+
+  .subject-count .done {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ローディング */
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    gap: 16px;
+    color: var(--text2);
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* エラー */
+  .error-box {
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    color: var(--danger);
+    margin: 40px auto;
+    max-width: 500px;
+  }
+
+  /* 空状態 */
+  .empty-box {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text2);
+  }
+
+  .empty-box .icon { font-size: 48px; margin-bottom: 12px; }
+
+  /* フッター更新時刻 */
+  .last-updated {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text2);
+    padding: 20px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* 手動更新ボタン */
+  .refresh-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .refresh-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* 全体達成率バー */
+  .overall-bar {
+    margin-bottom: 14px;
+  }
+
+  .overall-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text2);
+    margin-bottom: 4px;
+  }
+
+  .overall-pct {
+    color: var(--accent2);
+    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .overall-track {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .overall-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo">📊</div>
+    <h1>リアルタイム進捗ダッシュボード <span>講師用モニター</span></h1>
+  </div>
+  <div class="header-right">
+    <div class="refresh-info">
+      <div class="dot"></div>
+      <span id="countdownLabel">30秒後に更新</span>
+    </div>
+    <svg class="timer-ring" viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="13" fill="none" stroke="#2e3350" stroke-width="3"/>
+      <circle id="timerArc" cx="16" cy="16" r="13" fill="none" stroke="#4f8ef7" stroke-width="3"
+        stroke-dasharray="81.68" stroke-dashoffset="0" stroke-linecap="round"
+        transform="rotate(-90 16 16)"/>
+    </svg>
+    <button class="refresh-btn" onclick="loadData()">🔄 今すぐ更新</button>
+  </div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num" id="statStudents">-</div>
+    <div class="stat-label">受講生</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="statAvg">-</div>
+    <div class="stat-label">平均習得率</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="statTop">-</div>
+    <div class="stat-label">最高習得率</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="statZero">-</div>
+    <div class="stat-label">未着手</div>
+  </div>
+</div>
+
+<main>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-bar" style="background:var(--word)"></div>Word</div>
+    <div class="legend-item"><div class="legend-bar" style="background:var(--excel)"></div>Excel</div>
+    <div class="legend-item"><div class="legend-bar" style="background:var(--ppt)"></div>PowerPoint</div>
+    <div class="legend-item"><div class="legend-bar" style="background:var(--ill)"></div>Illustrator</div>
+    <div class="legend-item"><div class="legend-bar" style="background:var(--photo)"></div>Photoshop</div>
+    <div class="legend-item"><div class="legend-bar" style="background:var(--web)"></div>Web</div>
+    <div class="legend-item"><div class="legend-bar" style="background:var(--biz)"></div>ビジマナ・就職</div>
+  </div>
+
+  <div id="content">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>データを読み込み中...</div>
+    </div>
+  </div>
+</main>
+
+<div class="last-updated" id="lastUpdated"></div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzDWN5Vlb5uQK9nzbn3n8iqqEj9omPXgl4eto6OEyjXRJZwKW3iL48-zrBvqClX6VO_/exec';
+
+const SUBJECTS = [
+  { key: 'word',  label: 'Word',        total: 217, color: 'var(--word)'  },
+  { key: 'excel', label: 'Excel',       total: 253, color: 'var(--excel)' },
+  { key: 'ppt',   label: 'PowerPoint',  total: 9,   color: 'var(--ppt)'   },
+  { key: 'ill',   label: 'Illustrator', total: 42,  color: 'var(--ill)'   },
+  { key: 'photo', label: 'Photoshop',   total: 41,  color: 'var(--photo)' },
+  { key: 'web',   label: 'Web',         total: 55,  color: 'var(--web)'   },
+  { key: 'biz',   label: 'ビジマナ・就職', total: 10, color: 'var(--biz)'  },
+];
+
+const TOTAL_ITEMS = 217+253+9+42+41+55+10;
+
+let countdown = 30;
+let timerInterval = null;
+
+async function loadData() {
+  try {
+    const res = await fetch(`${GAS_URL}?action=getAllStudents`);
+    const json = await res.json();
+
+    if (json.status === 'empty' || !json.students || json.students.length === 0) {
+      document.getElementById('content').innerHTML = `
+        <div class="empty-box">
+          <div class="icon">📭</div>
+          <div>まだデータがありません。<br>受講生がLMSで保存するとここに表示されます。</div>
+        </div>`;
+      updateStats([]);
+      return;
+    }
+
+    renderStudents(json.students);
+    updateStats(json.students);
+    document.getElementById('lastUpdated').textContent =
+      `最終更新：${new Date().toLocaleTimeString('ja-JP')}`;
+
+  } catch(e) {
+    document.getElementById('content').innerHTML = `
+      <div class="error-box">
+        <div style="font-size:24px;margin-bottom:8px">⚠️</div>
+        <div>データの取得に失敗しました。<br>GASのURLまたはネットワークを確認してください。</div>
+        <div style="font-size:11px;margin-top:8px;opacity:0.6">${e.message}</div>
+      </div>`;
+  }
+
+  resetCountdown();
+}
+
+function renderStudents(students) {
+  const sorted = [...students].sort((a, b) => (b.total||0) - (a.total||0));
+
+  const html = `<div class="students-grid">` +
+    sorted.map((s, i) => {
+      const totalPct = Math.round((s.totalLv2||0) / TOTAL_ITEMS * 100);
+      const initials = (s.name||'?').charAt(0);
+
+      const subjectRows = SUBJECTS.map(subj => {
+        const done = Number(s[subj.key]) || 0;
+        const pct = Math.min(Math.round(done / subj.total * 100), 100);
+        return `
+          <div class="subject-row">
+            <div class="subject-name">${subj.label}</div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${pct}%;background:${subj.color}"></div>
+            </div>
+            <div class="subject-count"><span class="done">${done}</span>/${subj.total}（${pct}%）</div>
+          </div>`;
+      }).join('');
+
+      return `
+        <div class="student-card" style="animation-delay:${i*0.05}s">
+          <div class="card-header">
+            <div class="student-info">
+              <div class="avatar">${initials}</div>
+              <div>
+                <div class="student-name">${s.name||'名前なし'}</div>
+                <div class="student-id">No.${s.id}</div>
+              </div>
+            </div>
+            <div class="total-badge">総合 ${totalPct}%</div>
+          </div>
+          <div class="overall-bar">
+            <div class="overall-label">
+              <span>総合進捗</span>
+              <span class="overall-pct">${s.totalLv2||0} / ${TOTAL_ITEMS} 項目</span>
+            </div>
+            <div class="overall-track">
+              <div class="overall-fill" style="width:${totalPct}%"></div>
+            </div>
+          </div>
+          <div class="subjects">${subjectRows}</div>
+        </div>`;
+    }).join('') + `</div>`;
+
+  document.getElementById('content').innerHTML = html;
+}
+
+function updateStats(students) {
+  document.getElementById('statStudents').textContent = students.length;
+  if (students.length === 0) {
+    ['statAvg','statTop','statZero'].forEach(id => document.getElementById(id).textContent = '-');
+    return;
+  }
+  const pcts = students.map(s => Math.round((s.totalLv2||0)/TOTAL_ITEMS*100));
+  const avg = Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length);
+  const top = Math.max(...pcts);
+  const zero = pcts.filter(p=>p===0).length;
+  document.getElementById('statAvg').textContent = avg + '%';
+  document.getElementById('statTop').textContent = top + '%';
+  document.getElementById('statZero').textContent = zero + '人';
+}
+
+function resetCountdown() {
+  countdown = 30;
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    countdown--;
+    document.getElementById('countdownLabel').textContent = `${countdown}秒後に更新`;
+    const offset = 81.68 * (1 - countdown/30);
+    document.getElementById('timerArc').style.strokeDashoffset = offset;
+    if (countdown <= 0) {
+      loadData();
+    }
+  }, 1000);
+}
+
+// 初回読み込み
+loadData();
+</script>
+</body>
+</html>
