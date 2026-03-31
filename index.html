@@ -2902,8 +2902,11 @@ function subjectPct(subId) {
 }
 
 // ─── GAS保存 ───────────────────────────────────
+let saveTimer = null;
 async function saveToGAS() {
   if (!GAS_URL) return;
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
   const all   = Object.values(SKILLS).flat();
   const today = new Date().toISOString().slice(0,10);
   const snap  = { date:today, totalLv3:all.filter(s=>getLv(s.id)===2).length, totalLv12:all.filter(s=>getLv(s.id)>=1&&getLv(s.id)<2).length };
@@ -2918,6 +2921,7 @@ async function saveToGAS() {
       body:JSON.stringify({ type:'learning3', studentId:currentUser, studentName:currentName, skillData, history:logHistory, mondaiData:mondaiData, savedAt:new Date().toISOString() })
     });
   } catch(e){}
+}}, 3000); // 3秒間操作がなければ送信
 }
 
 // ─── 月次レポート ─────────────────────────────
