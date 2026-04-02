@@ -370,6 +370,7 @@ const SUBJECT_WEEKS = {
   photo:   { start:7,  end:20 }, // W7-14, W18-19
   web:     { start:14, end:20 },
   manner:  { start:1,  end:20 },
+  sec:    { start:1, end:20 },
 };
 
 // 検定試験日程（実際のスケジュールから）
@@ -1091,6 +1092,36 @@ const SKILLS = {
     { id:'m09',week:14,step:'就職支援',name:'面接対策（志望動機・自己PR）ができている',cert:[] },
     { id:'m10',week:17,step:'就職支援',name:'求人票の見方・応募書類の準備ができている',cert:[] },
   ],
+  sec: [
+    // — ネットリテラシー —
+    { id:'sec01',week:1,step:'ネットリテラシー',name:'SNSのつきあい方がわかる',cert:[] },
+    { id:'sec02',week:1,step:'ネットリテラシー',name:'フィルタリング・ペアレンタルコントロールがわかる',cert:[] },
+    { id:'sec03',week:1,step:'ネットリテラシー',name:'不正ログインの手口がわかる',cert:[] },
+    { id:'sec04',week:1,step:'ネットリテラシー',name:'公衆Wi-Fi利用時の注意点がわかる',cert:[] },
+    { id:'sec05',week:1,step:'ネットリテラシー',name:'偽警告・フィッシングメールの手口と対策がわかる',cert:[] },
+    { id:'sec06',week:1,step:'ネットリテラシー',name:'インターネットの基礎知識がわかる',cert:[] },
+    // — 法律・権利 —
+    { id:'sec07',week:2,step:'法律・権利',name:'損害賠償請求がわかる',cert:[] },
+    { id:'sec08',week:2,step:'法律・権利',name:'著作権侵害がわかる',cert:[] },
+    { id:'sec09',week:2,step:'法律・権利',name:'肖像権侵害がわかる',cert:[] },
+    { id:'sec10',week:2,step:'法律・権利',name:'パブリシティ権侵害がわかる',cert:[] },
+    { id:'sec11',week:2,step:'法律・権利',name:'プライバシー権侵害がわかる',cert:[] },
+    { id:'sec12',week:2,step:'法律・権利',name:'個人情報保護法違反がわかる',cert:[] },
+    { id:'sec13',week:2,step:'法律・権利',name:'商標権侵害がわかる',cert:[] },
+    // — 刑事罰 —
+    { id:'sec14',week:3,step:'刑事罰',name:'不正アクセス禁止法違反がわかる',cert:[] },
+    { id:'sec15',week:3,step:'刑事罰',name:'児童ポルノ禁止法違反がわかる',cert:[] },
+    { id:'sec16',week:3,step:'刑事罰',name:'リベンジポルノ防止法違反がわかる',cert:[] },
+    { id:'sec17',week:3,step:'刑事罰',name:'ストーカー規制法違反がわかる',cert:[] },
+    { id:'sec18',week:3,step:'刑事罰',name:'侮辱罪がわかる',cert:[] },
+    { id:'sec19',week:3,step:'刑事罰',name:'名誉毀損罪がわかる',cert:[] },
+    { id:'sec20',week:3,step:'刑事罰',name:'信用毀損罪がわかる',cert:[] },
+    { id:'sec21',week:3,step:'刑事罰',name:'業務妨害罪がわかる',cert:[] },
+    { id:'sec22',week:3,step:'刑事罰',name:'器物損壊罪がわかる',cert:[] },
+    { id:'sec23',week:3,step:'刑事罰',name:'脅迫罪がわかる',cert:[] },
+    { id:'sec24',week:3,step:'刑事罰',name:'詐欺罪がわかる',cert:[] },
+    { id:'sec25',week:3,step:'刑事罰',name:'窃盗罪がわかる',cert:[] },
+  ],
 };
 
 const SUBJECTS = [
@@ -1101,6 +1132,7 @@ const SUBJECTS = [
   { id:'photo',  name:'Photoshop',    color:'#0F6E56' },
   { id:'web',    name:'Web',          color:'#185FA5' },
   { id:'manner', name:'ビジマナ・就職',color:'#72243E' },
+  { id:'sec',    name:'情報セキュリティ', color:'#E05252' },
 ];
 
 const LV_LABELS = ['テキストを見てもできない','テキストを見てできる','できる'];
