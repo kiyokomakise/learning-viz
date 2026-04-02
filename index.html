@@ -1136,6 +1136,7 @@ const SUBJECTS = [
 ];
 
 const LV_LABELS = ['テキストを見てもできない','テキストを見てできる','できる'];
+  
 const LV_SHORT  = ['✗','📖','✔'];
 
 const MOTTOS = [
@@ -2613,7 +2614,7 @@ function renderDashSkills() {
 
     const body = document.createElement('div');
     body.className = 'dash-skill-body';
-    body.innerHTML = `<div class="lv-hint">タップして記録 → ✗ テキストを見てもできない　📖 テキストを見てできる　✔ できる</div>`;
+    body.innerHTML = `<div class="lv-hint">タップして記録 → X ${subId==='sec'?'理解できない':'テキストを見てもできない'}　📋 ${subId==='sec'?'理解できた':'テキストを見てできる'}　✓ ${subId==='sec'?'説明ができる':'できる'}</div>`;
 
     // STEPごとにグループ化（フィルター済みアイテム）
     const groups = {};
