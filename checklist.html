@@ -6,17 +6,10 @@
 <title>自己理解・仕事理解チェックリスト</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
-/* ============================================================
-   【設定】GAS デプロイ URL をここに貼り付けてください
-   GAS_URL = 'https://script.google.com/macros/s/XXXX/exec'
-   ============================================================ */
-
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Yu Gothic','Hiragino Sans',sans-serif;font-size:14px;background:#f0f0ee;min-height:100vh}
 .card{background:#fff;border:0.5px solid rgba(0,0,0,0.12);border-radius:12px;padding:16px}
-input[type=text],input[type=password],input[type=email]{
-  width:100%;padding:8px 12px;border:0.5px solid rgba(0,0,0,0.2);
-  border-radius:8px;background:#fff;color:#1a1a1a;font-size:14px;font-family:inherit}
+input[type=text],input[type=password],input[type=email]{width:100%;padding:8px 12px;border:0.5px solid rgba(0,0,0,0.2);border-radius:8px;background:#fff;color:#1a1a1a;font-size:14px;font-family:inherit}
 input:focus{outline:2px solid #2E75B6;outline-offset:1px}
 button{cursor:pointer;border:none;font-family:inherit}
 .bp{background:#1F4E79;color:#fff;padding:9px 18px;border-radius:8px;font-weight:500;font-size:13px}
@@ -45,6 +38,11 @@ button{cursor:pointer;border:none;font-family:inherit}
 @keyframes pu{0%,100%{opacity:1}50%{opacity:.35}}
 .dt{width:6px;height:6px;border-radius:50%;background:#2E75B6;animation:pu 1.2s infinite;display:inline-block;margin:0 2px}
 .dt:nth-child(2){animation-delay:.2s}.dt:nth-child(3){animation-delay:.4s}
+.jcard{background:#fff;border:2px solid rgba(0,0,0,0.1);border-radius:12px;padding:18px 16px;cursor:pointer;transition:all .15s;text-align:left}
+.jcard:hover{border-color:#2E75B6;background:#EBF3FB}
+.jcard.sel{border-color:#1F4E79;background:#EBF3FB}
+.warn{background:#FFF3E0;border:1px solid #FFB74D;border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.warn-r{background:#FFEBEE;border:1px solid #EF5350;border-radius:8px;padding:12px 14px;margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -52,95 +50,128 @@ button{cursor:pointer;border:none;font-family:inherit}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script>
-// ============================================================
-// 【必須設定】GAS デプロイURLをここに貼り付けてください
-// ============================================================
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxAnKg8UrLoPSSUFD0hWt4DfK65buCs7pzRkrQFFHqn80sI6VKBIGcG8sCd6OF7-0sKcA/exec';
-// 例: 'https://script.google.com/macros/s/AKfycbxXXXXXXXXX/exec'
-// ============================================================
-
-const PW = 'sensei2026'; // 講師ログインパスワード
-
+const PW = 'sensei2026';
 const {useState,useEffect}=React;
 const h=React.createElement;
 
-// ── GAS API 呼び出し ─────────────────────────────────────────
-async function gasGet(params) {
-  const url = GAS_URL + '?' + new URLSearchParams(params).toString();
-  const res = await fetch(url);
-  return res.json();
-}
-
-// 回答データのエンコード (O=○, D=△, X=×, _=空)
-function encodeAnswers(answers) {
-  return Object.entries(answers).map(([k,vals]) => {
-    const s = (vals||[]).map(v=>v==='○'?'O':v==='△'?'D':v==='×'?'X':'_').join('');
-    return `${k}:${s}`;
-  }).join(',');
-}
+// ── 職種データ ────────────────────────────────────────────────
+const JOBS=[
+  {
+    id:"web",label:"Webデザイン・グラフィックデザイン",icon:"ti-palette",color:"#7F77DD",bg:"#EEEDFE",
+    reality:[
+      "デザインセンスだけでなく、IllustratorやPhotoshopを実務レベルで使いこなすことが前提です。",
+      "WebデザインはHTML・CSSのコーディング知識も必要です。訓練で学んだだけでは実務レベルに達しておらず、独学での継続学習が必要です。",
+      "ポートフォリオ（作品集）がなければ採用面接まで進めません。自分で作品を作り続けることが必須です。",
+      "クライアントの要望に合わせる仕事なので、自分の好みは後回しになります。修正依頼が何度も来ることが当たり前です。",
+      "採用は20〜30代が中心です。40代以上の未経験者採用は非常に少なく、採用されても給与が低いケースが多いのが現実です。",
+      "事務職など、これまでの経験を活かせる職種も並行して検討することをおすすめします。"
+    ],
+    items:[
+      "IllustratorとPhotoshopを使って、一からデザインを完成させた経験がある",
+      "HTMLとCSSを使って、自分でWebページを作ったことがある",
+      "訓練以外でも、自主的にデザインの練習をしている",
+      "フォント・色・レイアウトなど、デザインの基礎理論を説明できる",
+      "他のデザイナーの作品を見て、どこがよいか悪いかを言葉で説明できる",
+      "ポートフォリオ（作品集）がなければ採用面接まで進めないことを知っている",
+      "今すぐ見せられる自分の作品が3点以上ある",
+      "クライアントの要望に合わせる仕事なので、自分の好みは後回しになることを理解している",
+      "修正依頼が何度も来ることが当たり前の仕事であることを理解している",
+      "納期が厳しく、残業が多い職場もあることを理解している",
+      "デザイン職の採用は20〜30代が中心であることを知っている",
+      "40代以上の未経験デザイナーの採用は非常に少ないことを知っている",
+      "訓練で学んだだけでは実務レベルに達しておらず、独学での継続学習が必要であることを理解している",
+      "最初は給与が低いアルバイト・契約社員からスタートするケースが多いことを知っている",
+      "デザイン職が難しい場合、これまでの経験を活かせる別の職種も並行して考えている"
+    ]
+  },
+  {
+    id:"jimu",label:"事務職（一般事務・経理事務・医療事務・営業事務）",icon:"ti-file-text",color:"#185FA5",bg:"#E6F1FB",
+    reality:[
+      "毎日の主な仕事はExcel・Wordを使ったデータ入力・書類作成です。同じ作業を正確に繰り返す集中力が求められます。",
+      "電話対応・来客対応など、人と接する場面も多い仕事です。コミュニケーション能力も必要です。",
+      "事務職には一般事務・経理事務・医療事務・営業事務など種類があります。どの事務職を目指すかは講師と面談で絞り込んでいきます。",
+      "事務職は人気が高く、1つの求人に多数の応募が集まります。未経験者の採用は競争が激しいのが現実です。",
+      "35歳以上の未経験者採用は非常に少ないです。ExcelやWordのスキルに加えて、資格（サーティファイ等）で差をつける必要があります。"
+    ],
+    items:[
+      "ExcelとWordを使って、実際に書類やデータ集計を作ったことがある",
+      "Excel関数（SUM・AVERAGE・VLOOKUPなど）を使いこなせる",
+      "正確さとスピードを両立させながらデータ入力ができる",
+      "ビジネスメールの書き方・マナーを理解している",
+      "同じ作業を正確に繰り返すことが苦にならない",
+      "電話対応・来客対応など、人と接する場面が多いことを理解している",
+      "長時間座ってパソコン作業を続けられる体力・集中力がある",
+      "事務職には一般事務・経理事務・医療事務・営業事務など種類があることを知っている",
+      "事務職は人気が高く、1つの求人に多数の応募が集まることを知っている",
+      "35歳以上の未経験者採用は非常に少なく、資格やスキルで差をつける必要があることを理解している"
+    ]
+  },
+  {
+    id:"seizo",label:"製造・軽作業",icon:"ti-building-factory",color:"#3B6D11",bg:"#EAF3DE",
+    reality:[
+      "製造・軽作業は同じ動作を正確に繰り返す仕事です。集中力と体力が必要です。",
+      "立ち仕事・体を使う仕事が中心です。シフト勤務・早朝・夜間勤務がある職場も多いです。",
+      "品質管理が厳しく、ミスが許されない場面があります。チームで連携して作業を進めることが多いです。",
+      "年齢・経験不問の求人が比較的多いですが、体力が重要な条件です。自分の健康状態を踏まえて選ぶ必要があります。"
+    ],
+    items:[
+      "製造・軽作業は同じ動作を正確に繰り返す仕事であることを理解している",
+      "立ち仕事・体を使う仕事が中心であることを理解している",
+      "ライン作業など、チームで連携して作業を進めることが多いことを理解している",
+      "シフト勤務・早朝・夜間勤務がある職場が多いことを理解している",
+      "細かい作業・繰り返し作業が長時間続いても苦にならない",
+      "体力的に続けられるか、自分の健康状態を考えた上で選んでいる",
+      "製造業では品質管理が厳しく、ミスが許されない場面があることを理解している",
+      "年齢・経験不問の求人が比較的多いが、体力が重要な条件であることを知っている"
+    ]
+  },
+  {
+    id:"hanbai",label:"接客・販売",icon:"ti-shopping-cart",color:"#854F0B",bg:"#FAEEDA",
+    reality:[
+      "接客・販売は人と直接関わることが仕事の中心です。明るさ・コミュニケーション能力が必須です。",
+      "立ち仕事が多く体力が必要です。土日祝日・年末年始など世間の休日に働くことが多いです。",
+      "クレーム対応など理不尽な場面でも冷静に対応することが求められます。",
+      "給与水準は他の職種より低いケースが多いです。これまでの経験があれば採用されやすい職種です。"
+    ],
+    items:[
+      "接客・販売は人と直接関わることが仕事の中心であることを理解している",
+      "立ち仕事が多く、体力が必要な仕事であることを理解している",
+      "土日祝日・年末年始など、世間の休日に働くことが多いことを理解している",
+      "レジ操作・在庫管理・売り場づくりなど、接客以外の業務も多いことを理解している",
+      "クレーム対応など、理不尽な場面でも冷静に対応できる自信がある",
+      "シフト勤務・早朝・夜間勤務がある職場が多いことを理解している",
+      "給与水準は他の職種より低いケースが多いことを知っている",
+      "接客・販売はこれまでの経験があれば採用されやすいが、未経験でも比較的採用されやすい職種であることを知っている"
+    ]
+  },
+  {
+    id:"other",label:"その他・まだ決まっていない",icon:"ti-help-circle",color:"#5F5E5A",bg:"#F1EFE8",
+    reality:[
+      "職種がまだ決まっていない状態は珍しくありません。まず自分の強み・経験・スキルを整理することが大切です。",
+      "ハローワークや求人サイトで実際の求人を検索して、どんな仕事があるか確認してみましょう。",
+      "職種が決まっていない場合、これまでの経験を活かせる仕事を優先して考えることが現実的です。",
+      "講師やキャリア支援担当者に相談しながら、一緒に絞り込んでいきましょう。"
+    ],
+    items:[
+      "希望職種がまだ決まっていないが、自分の強み・経験・スキルをもとに考えようとしている",
+      "ハローワークや求人サイトで実際の求人を検索して、どんな仕事があるか確認したことがある",
+      "自分の年齢・職歴・スキルで応募できる求人がどのくらいあるか調べたことがある",
+      "職種が決まっていない場合、これまでの経験を活かせる仕事を優先して考えることが現実的であることを理解している",
+      "講師やキャリア支援担当者に相談して、職種を一緒に絞り込もうとしている"
+    ]
+  }
+];
 
 // ── チェックリストデータ ──────────────────────────────────────
 const SEC=[
- {k:"A",t:"A. 興味・関心の確認",ch:"第3章 自己理解",it:[
-  "自分が興味を持っている仕事・職種を具体的に言える",
-  "「なぜその仕事に興味があるのか」を自分の言葉で説明できる",
-  "仕事のよい面だけでなく、地道な作業や大変な面があることも理解しようとしている",
-  "憧れやイメージだけで職種を選んでいない（実際の業務内容を確認している）",
-  "過去に楽しく・集中して取り組めた作業や活動を思い出せる",
-  "長く続けられそうな作業内容（繰り返し・対人・創作など）を言える",
-  "興味はあるが努力が続かなさそうな分野があれば、それも把握している"]},
- {k:"B",t:"B. 強み・できることの確認",ch:"第3章 自己理解",it:[
-  "自分の強みを3つ以上、具体的なエピソードとともに挙げられる",
-  "パソコン・事務・接客・コミュニケーションなど、自分の得意分野を整理している",
-  "人から褒められたこと・感謝されたことを具体的に思い出せる",
-  "訓練で身につけたスキル（Word・Excel・Illustrator等）を仕事でどう活かせるか説明できる",
-  "「今できること」と「これから伸ばしたいこと」を分けて考えられる",
-  "未経験でも、学びながら成長する姿勢がある",
-  "自己PRとして伝えたいことを、1〜2分で話せる（または書ける）"]},
- {k:"C",t:"C. 苦手・注意点の確認",ch:"第3章 自己理解",it:[
-  "自分の苦手な作業や環境を具体的に把握している",
-  "急な変更・同時進行・電話対応・接客などへの得意・不得意を理解している",
-  "長時間の立ち仕事・座り仕事・細かい作業など、身体的に続けられるか考えている",
-  "スピード重視の職場が合うか、正確性重視の職場が合うかを理解している",
-  "人間関係でストレスを感じやすい場面や職場環境を把握している",
-  "苦手なことに対して、回避するだけでなく対策も考えている",
-  "面接で事前に伝えるべき配慮事項（体調・育児・介護・通院等）を整理している"]},
- {k:"D",t:"D. 続けられる働き方の確認",ch:"第4章 働き方条件",it:[
-  "希望する雇用形態（正社員・契約・パート等）を明確にし、それぞれの違いを理解している",
-  "希望する勤務時間・勤務日数を明確にしている",
-  "残業についてどの程度まで対応可能か（週◯時間目安）を考えている",
-  "通勤時間・交通手段の許容範囲（最大◯分・利用できる手段）を決めている",
-  "土日祝勤務・シフト勤務への対応可否を考えている",
-  "給与・休日・諸手当について、希望と許容できる下限を整理している",
-  "テレワーク・在宅勤務への対応可否と、自分の希望を整理している",
-  "「絶対に譲れない条件」と「調整できる条件」を分けて整理している"]},
- {k:"E",t:"E. 仕事内容の理解",ch:"第5章 仕事理解",it:[
-  "希望職種の主な仕事内容を、業務レベルで具体的に説明できる",
-  "その仕事で毎日行うルーティン業務（日常的な作業の流れ）を把握している",
-  "求人票の仕事内容を読んで、実際に働く場面を具体的にイメージできる",
-  "その仕事に必要なスキル・資格・知識を調べている",
-  "未経験者に求められる基本姿勢（報連相・正確性・学ぶ意欲等）を理解している",
-  "仕事の大変な面・ミスが起こりやすい場面を事前に調べている",
-  "job tag（厚生労働省）で職業内容・求められるスキル・賃金相場を確認している",
-  "AIやデジタルツールが業務に活用されていることを理解し積極的に活用しようとする姿勢がある",
-  "応募先企業のIT活用・DX推進状況を採用ページや企業サイトで確認している"]},
- {k:"F",t:"F. 求人市場との照らし合わせ",ch:"第5章 仕事理解",it:[
-  "希望職種の求人数を、複数の求人サイト・ハローワークで確認している",
-  "希望地域で実際に求人があるか確認している",
-  "「未経験可」の求人でも、実際に求められるスキルや条件を丁寧に読んでいる",
-  "同じ職種でも、会社の規模・業種によって仕事内容が異なることを理解している",
-  "給与だけでなく、仕事内容・勤務時間・休日・教育体制も比較している",
-  "応募したい職種に対して、自分に不足しているスキルを具体的に把握している",
-  "不足しているスキルをいつまでにどのように補うか、計画を立てている",
-  "求人票に記載されていない情報（社風・職場の雰囲気等）を企業サイト等で調べている"]},
- {k:"G",t:"G. ミスマッチ防止の最終確認",ch:"第6章 応募前確認",it:[
-  "この仕事を選ぶ理由を、自分の言葉で具体的に説明できる",
-  "自分の強みがこの仕事でどう活かせるか、具体的に説明できる",
-  "入社後に苦労しそうな点を予想できている",
-  "苦労しそうな点に対して、どう対応するかを具体的に考えている",
-  "面接で確認したい質問（業務内容・教育体制・評価基準等）を3つ以上準備している",
-  "家族・講師・キャリア支援担当者など、第三者に相談している",
-  "「この仕事なら、困難があっても続けられそう」と思える理由がある"]}
+ {k:"A",t:"A. 興味・関心の確認",ch:"第3章 自己理解",it:["自分が興味を持っている仕事・職種を具体的に言える","「なぜその仕事に興味があるのか」を自分の言葉で説明できる","仕事のよい面だけでなく、地道な作業や大変な面があることも理解しようとしている","憧れやイメージだけで職種を選んでいない（実際の業務内容を確認している）","過去に楽しく・集中して取り組めた作業や活動を思い出せる","長く続けられそうな作業内容（繰り返し・対人・創作など）を言える","興味はあるが努力が続かなさそうな分野があれば、それも把握している"]},
+ {k:"B",t:"B. 強み・できることの確認",ch:"第3章 自己理解",it:["自分の強みを3つ以上、具体的なエピソードとともに挙げられる","パソコン・事務・接客・コミュニケーションなど、自分の得意分野を整理している","人から褒められたこと・感謝されたことを具体的に思い出せる","訓練で身につけたスキル（Word・Excel・Illustrator等）を仕事でどう活かせるか説明できる","「今できること」と「これから伸ばしたいこと」を分けて考えられる","未経験でも、学びながら成長する姿勢がある","自己PRとして伝えたいことを、1〜2分で話せる（または書ける）"]},
+ {k:"C",t:"C. 苦手・注意点の確認",ch:"第3章 自己理解",it:["自分の苦手な作業や環境を具体的に把握している","急な変更・同時進行・電話対応・接客などへの得意・不得意を理解している","長時間の立ち仕事・座り仕事・細かい作業など、身体的に続けられるか考えている","スピード重視の職場が合うか、正確性重視の職場が合うかを理解している","人間関係でストレスを感じやすい場面や職場環境を把握している","苦手なことに対して、回避するだけでなく対策も考えている","面接で事前に伝えるべき配慮事項（体調・育児・介護・通院等）を整理している"]},
+ {k:"D",t:"D. 続けられる働き方の確認",ch:"第4章 働き方条件",it:["希望する雇用形態（正社員・契約・パート等）を明確にし、それぞれの違いを理解している","希望する勤務時間・勤務日数を明確にしている","残業についてどの程度まで対応可能か（週◯時間目安）を考えている","通勤時間・交通手段の許容範囲（最大◯分・利用できる手段）を決めている","土日祝勤務・シフト勤務への対応可否を考えている","給与・休日・諸手当について、希望と許容できる下限を整理している","テレワーク・在宅勤務への対応可否と、自分の希望を整理している","「絶対に譲れない条件」と「調整できる条件」を分けて整理している"]},
+ {k:"E",t:"E. 仕事内容の理解",ch:"第5章 仕事理解",it:["希望職種の主な仕事内容を、業務レベルで具体的に説明できる","その仕事で毎日行うルーティン業務（日常的な作業の流れ）を把握している","求人票の仕事内容を読んで、実際に働く場面を具体的にイメージできる","その仕事に必要なスキル・資格・知識を調べている","未経験者に求められる基本姿勢（報連相・正確性・学ぶ意欲等）を理解している","仕事の大変な面・ミスが起こりやすい場面を事前に調べている","job tag（厚生労働省）で職業内容・求められるスキル・賃金相場を確認している","AIやデジタルツールが業務に活用されていることを理解し積極的に活用しようとする姿勢がある","応募先企業のIT活用・DX推進状況を採用ページや企業サイトで確認している"]},
+ {k:"F",t:"F. 求人市場との照らし合わせ",ch:"第5章 仕事理解",it:["希望職種の求人数を、複数の求人サイト・ハローワークで確認している","希望地域で実際に求人があるか確認している","「未経験可」の求人でも、実際に求められるスキルや条件を丁寧に読んでいる","同じ職種でも、会社の規模・業種によって仕事内容が異なることを理解している","給与だけでなく、仕事内容・勤務時間・休日・教育体制も比較している","応募したい職種に対して、自分に不足しているスキルを具体的に把握している","不足しているスキルをいつまでにどのように補うか、計画を立てている","求人票に記載されていない情報（社風・職場の雰囲気等）を企業サイト等で調べている"]},
+ {k:"G",t:"G. ミスマッチ防止の最終確認",ch:"第6章 応募前確認",it:["この仕事を選ぶ理由を、自分の言葉で具体的に説明できる","自分の強みがこの仕事でどう活かせるか、具体的に説明できる","入社後に苦労しそうな点を予想できている","苦労しそうな点に対して、どう対応するかを具体的に考えている","面接で確認したい質問（業務内容・教育体制・評価基準等）を3つ以上準備している","家族・講師・キャリア支援担当者など、第三者に相談している","「この仕事なら、困難があっても続けられそう」と思える理由がある"]}
 ];
 const MX={A:14,B:14,C:14,D:16,E:18,F:16,G:14},TOTAL=53,MAX=106;
 const VM={"○":2,"△":1,"×":0,"":0};
@@ -149,57 +180,58 @@ const jg=sc=>sc>=85?{l:"準備が整っている",c:"#2E7D32",bg:"#E8F5E9",bd:"#
             :sc>=64?{l:"方向性は見えている",c:"#795548",bg:"#FFF8E1",bd:"#FFC107"}
             :sc>=43?{l:"ミスマッチの可能性",c:"#E65100",bg:"#FFF3E0",bd:"#FF9800"}
                    :{l:"判断材料が不足",c:"#C62828",bg:"#FFEBEE",bd:"#EF5350"};
+const jgJ=sc=>sc>=80?{l:"理解度：高",c:"#2E7D32",bg:"#E8F5E9"}
+             :sc>=60?{l:"理解度：中",c:"#795548",bg:"#FFF8E1"}
+                    :{l:"理解度：低",c:"#C62828",bg:"#FFEBEE"};
 const cT=a=>SEC.reduce((s,sec)=>s+(a[sec.k]||[]).reduce((x,v)=>x+(VM[v]||0),0),0);
 const cS=(a,k)=>(a[k]||[]).reduce((s,v)=>s+(VM[v]||0),0);
 const cF=a=>SEC.reduce((s,sec)=>s+(a[sec.k]||[]).filter(v=>v!=="").length,0);
 const iA=()=>Object.fromEntries(SEC.map(s=>[s.k,new Array(s.it.length).fill("")]));
 
-// ── パターン分析 ─────────────────────────────────────────────
+async function gasGet(params){
+  const url=GAS_URL+'?'+new URLSearchParams(params).toString();
+  const res=await fetch(url);return res.json();
+}
+function encodeAnswers(answers){
+  return Object.entries(answers).map(([k,vals])=>{
+    const s=(vals||[]).map(v=>v==='○'?'O':v==='△'?'D':v==='×'?'X':'_').join('');
+    return `${k}:${s}`;
+  }).join(',');
+}
+
 function pattern(tot,ss){
-  const pA=p_(ss,"A"),pB=p_(ss,"B"),pC=p_(ss,"C"),pF=p_(ss,"F");
-  if(pC>=0.85&&pB<0.5&&pA<0.7)return[
-    "苦手の自覚は高い一方、強みと興味がまだ言語化できていない状態です。",
-    "このままでは消去法で仕事を選んでしまうリスクがあります。強みが見えないまま就職すると早期離職につながりやすいパターンです。",
-    "B章（強み）に戻り、人から感謝・評価された場面を3つ書き出してください。エピソードで言える強みが1つ見つかれば、自己PRの軸が整います。"];
-  if(pA>=0.8&&pB<0.4&&pF>=0.85)return[
-    "興味・市場感覚は高水準ですが、自分の強みの言語化が大きく不足しています。「やりたい仕事」はあるのに「採用される理由」がまだ言葉になっていない状態です。",
-    "面接で自分を効果的にアピールできず選考が通らないリスクがあります。市場は見えているのに自分を売り込む言葉がない状態です。",
-    "B章の強み整理を最優先にしてください。訓練で身につけたスキルをどの業務でどう活かすかを一文で話せるよう練習し、面接での質問も3つ準備してください。"];
+  const pA=p_(ss,"A"),pB=p_(ss,"B"),pC=p_(ss,"C");
+  if(pC>=0.85&&pB<0.5&&pA<0.7)return["苦手の自覚は高い一方、強みと興味がまだ言語化できていない状態です。","このままでは消去法で仕事を選んでしまうリスクがあります。","B章（強み）に戻り、人から感謝・評価された場面を3つ書き出してください。"];
+  if(pA>=0.8&&pB<0.4)return["興味は高水準ですが、自分の強みの言語化が大きく不足しています。","「やりたい仕事」はあるのに「採用される理由」がまだ言葉になっていない状態です。","B章の強み整理を最優先にしてください。"];
   const lk=Object.keys(MX).sort((a,b)=>p_(ss,a)-p_(ss,b))[0];
   const ln=SEC.find(s=>s.k===lk)?.t||"";
-  return[
-    `合計${tot}点（${Math.round(tot/MAX*100)}%）です。`,
-    `特に${ln}の点数が低い状態です。この章の×が多い項目は、就職後のミスマッチにつながりやすい部分です。`,
-    `${ln}の中で最も気になった項目を1つ選んで、今週中に具体的なアクションを1つ実行してください。`];
+  return[`合計${tot}点（${Math.round(tot/MAX*100)}%）です。`,`特に${ln}の点数が低い状態です。`,`${ln}の中で最も気になった項目を1つ選んで、今週中に具体的なアクションを1つ実行してください。`];
 }
 
-// ── メール関係 ───────────────────────────────────────────────
-function makeBody(name,sid,total,ss,paras){
+function makeBody(name,sid,job,total,jobScore,jobMax,ss,paras){
   const j=jg(total),dt=new Date().toLocaleString("ja-JP");
-  const secLines=SEC.map(s=>{
-    const sc=ss[s.k]||0,mx=MX[s.k],pt=Math.round(sc/mx*100);
-    return `${s.t}: ${sc}/${mx}点 (${pt}%)${pt<50?" ★要確認":""}`;
-  }).join("\n");
+  const jobInfo=job?`\n希望職種: ${job.label}\n職種理解度: ${jobScore}/${jobMax}点 (${Math.round(jobScore/jobMax*100)}%)`:"";
+  const secLines=SEC.map(s=>{const sc=ss[s.k]||0,mx=MX[s.k],pt=Math.round(sc/mx*100);return `${s.t}: ${sc}/${mx}点 (${pt}%)${pt<50?" ★要確認":""}`;}).join("\n");
   const ana=(paras||[]).map((p,i)=>`[${i+1}] ${p}`).join("\n\n");
-  return `訓練生: ${name}${sid?` (ID:${sid})`:""}\n提出日時: ${dt}\n合計点: ${total}/106点（${j.l}）\n\n■ セクション別スコア\n${secLines}\n\n■ 自動分析\n${ana}\n\n---\nITビジネス・Webデザイン養成科 チェックリストシステム`;
+  return `訓練生: ${name}${sid?` (ID:${sid})`:""}\n提出日時: ${dt}\n合計点: ${total}/106点（${j.l}）${jobInfo}\n\n■ セクション別スコア\n${secLines}\n\n■ 自動分析\n${ana}\n\n---\nITビジネス・Webデザイン養成科 チェックリストシステム`;
 }
-function makeMailto(email,name,total,ss,paras){
+function makeMailto(email,name,total,job,jobScore,jobMax,ss,paras){
   const j=jg(total);
-  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(`【チェックリスト提出】${name} ${total}/106点（${j.l}）`)}&body=${encodeURIComponent(makeBody(name,"",total,ss,paras))}`;
+  const jobTxt=job?` [${job.label}: ${jobScore}/${jobMax}]`:"";
+  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(`【チェックリスト提出】${name} ${total}/106点（${j.l}）${jobTxt}`)}&body=${encodeURIComponent(makeBody(name,"",job,total,jobScore,jobMax,ss,paras))}`;
 }
 
-// ── UI コンポーネント ─────────────────────────────────────────
-function Gauge({score,size=80}){
-  const r=size/2-7,ci=2*Math.PI*r,j=jg(score),da=score/MAX*ci;
+// ── ゲージ ────────────────────────────────────────────────────
+function Gauge({score,max,size=80,color="#2E75B6"}){
+  const r=size/2-7,ci=2*Math.PI*r,da=score/max*ci;
   return h("div",{style:{position:"relative",width:size,height:size,flexShrink:0}},
     h("svg",{width:size,height:size},
       h("circle",{cx:size/2,cy:size/2,r,fill:"none",stroke:"#e0e0e0",strokeWidth:5}),
-      h("circle",{cx:size/2,cy:size/2,r,fill:"none",stroke:j.bd,strokeWidth:5,
-        strokeDasharray:`${da} ${ci-da}`,strokeLinecap:"round",
-        transform:`rotate(-90 ${size/2} ${size/2})`})),
+      h("circle",{cx:size/2,cy:size/2,r,fill:"none",stroke:color,strokeWidth:5,
+        strokeDasharray:`${da} ${ci-da}`,strokeLinecap:"round",transform:`rotate(-90 ${size/2} ${size/2})`})),
     h("div",{style:{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}},
-      h("span",{style:{fontSize:size>70?20:14,fontWeight:500,color:j.c}},score),
-      h("span",{style:{fontSize:9,color:"#888"}},["/",MAX]))
+      h("span",{style:{fontSize:size>70?20:14,fontWeight:500,color}},[score]),
+      h("span",{style:{fontSize:9,color:"#888"}},["/",max]))
   );
 }
 function Mkb({val,active,onClick}){
@@ -207,22 +239,109 @@ function Mkb({val,active,onClick}){
   return h("button",{className:`mb ${active===val?cl:""}`,onClick:()=>onClick(active===val?"":val)},val);
 }
 
+// ── 職種選択画面 ─────────────────────────────────────────────
+function JobSelect({onSelect}){
+  const [sel,setSel]=useState(null);
+  return h("div",{style:{padding:"16px 16px 32px"}},
+    h("div",{className:"card",style:{marginBottom:16,background:"#1F4E79",color:"#fff",padding:"20px 16px"}},
+      h("div",{style:{fontSize:10,opacity:.7,marginBottom:4}},"ITビジネス・Webデザイン養成科"),
+      h("div",{style:{fontSize:16,fontWeight:500,marginBottom:8}},"自己理解・仕事理解チェックリスト"),
+      h("div",{style:{fontSize:13,opacity:.85}},"まず希望する職種を選んでください。選んだ職種の「仕事の現実」を確認してからチェックリストに進みます。")
+    ),
+    h("div",{style:{display:"grid",gap:10,marginBottom:16}},
+      JOBS.map(job=>h("button",{key:job.id,className:`jcard${sel?.id===job.id?" sel":""}`,
+        onClick:()=>setSel(job),style:{borderColor:sel?.id===job.id?job.color:"rgba(0,0,0,0.1)"}},
+        h("div",{style:{display:"flex",alignItems:"center",gap:12}},
+          h("div",{style:{width:40,height:40,borderRadius:8,background:job.bg,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
+            h("i",{className:`ti ${job.icon}`,style:{fontSize:20,color:job.color},"aria-hidden":"true"})),
+          h("div",{style:{fontSize:14,fontWeight:500,color:"#1a1a1a",textAlign:"left"}},job.label)
+        )
+      ))
+    ),
+    h("button",{className:"bp",onClick:()=>sel&&onSelect(sel),disabled:!sel,style:{width:"100%",padding:"12px",fontSize:14}},
+      sel?"この職種で進む →":"職種を選んでください")
+  );
+}
+
+// ── 職種現実説明画面 ──────────────────────────────────────────
+function JobReality({job,onNext}){
+  const [checked,setChecked]=useState(false);
+  return h("div",{style:{padding:"16px 16px 32px"}},
+    h("div",{style:{background:job.color,color:"#fff",padding:"12px 16px",borderRadius:10,marginBottom:14}},
+      h("div",{style:{fontSize:11,opacity:.8,marginBottom:4}},"仕事の現実を確認してください"),
+      h("div",{style:{fontSize:16,fontWeight:500}},job.label)
+    ),
+    h("div",{className:"card",style:{marginBottom:14}},
+      h("div",{style:{fontSize:13,fontWeight:500,color:"#C62828",marginBottom:12,display:"flex",alignItems:"center",gap:6}},
+        h("i",{className:"ti ti-alert-triangle",style:{fontSize:16},"aria-hidden":"true"}),"チェックリストを始める前に、必ず読んでください"
+      ),
+      job.reality.map((r,i)=>h("div",{key:i,className:"warn",style:{background:i===job.reality.length-1?"#E8F5E9":"#FFF3E0",borderColor:i===job.reality.length-1?"#4CAF50":"#FFB74D"}},
+        h("div",{style:{fontSize:13,lineHeight:1.8,color:"#1a1a1a"}},r)
+      ))
+    ),
+    h("div",{className:"card",style:{marginBottom:14,background:"#f5f5f5"}},
+      h("label",{style:{display:"flex",alignItems:"flex-start",gap:10,cursor:"pointer"}},
+        h("input",{type:"checkbox",checked,onChange:e=>setChecked(e.target.checked),style:{marginTop:3,width:18,height:18,cursor:"pointer"}}),
+        h("span",{style:{fontSize:14,lineHeight:1.7}},"上記の内容を読み、理解した上でチェックリストに進みます")
+      )
+    ),
+    h("div",{style:{display:"flex",gap:8}},
+      h("button",{className:"bg",onClick:()=>onNext("back")},"← 職種を選び直す"),
+      h("button",{className:"bp",onClick:()=>checked&&onNext("next"),disabled:!checked,style:{flex:1,padding:"12px",fontSize:14}},
+        "理解しました　チェックを始める →")
+    )
+  );
+}
+
+// ── 職種別チェック ────────────────────────────────────────────
+function JobCheck({job,onNext}){
+  const [ans,setAns]=useState(new Array(job.items.length).fill(""));
+  const filled=ans.filter(v=>v!=="").length;
+  const score=ans.reduce((s,v)=>s+(VM[v]||0),0);
+  const max=job.items.length*2;
+  const pct=Math.round(score/max*100);
+  const jj=jgJ(pct);
+  return h("div",{style:{padding:"16px 16px 32px"}},
+    h("div",{style:{background:job.color,color:"#fff",padding:"10px 16px",borderRadius:10,marginBottom:14}},
+      h("div",{style:{fontSize:11,opacity:.8}},"職種別　仕事理解チェック"),
+      h("div",{style:{fontSize:15,fontWeight:500}},job.label)
+    ),
+    h("div",{style:{display:"flex",gap:10,marginBottom:14}},
+      h("div",{className:"card",style:{flex:1}},
+        h("div",{style:{fontSize:11,color:"#595959",marginBottom:6}},"進捗"),
+        h("div",{className:"pb"},h("div",{className:"pf",style:{width:`${filled/job.items.length*100}%`}})),
+        h("div",{style:{fontSize:12,fontWeight:500,marginTop:5}},[filled," / ",job.items.length," 項目"])),
+      h("div",{className:"card",style:{display:"flex",alignItems:"center",gap:10}},
+        h(Gauge,{score,max,size:72,color:job.color}),
+        h("div",{style:{fontSize:11,color:"#595959"}},"理解度",h("br"),"スコア"))
+    ),
+    h("div",{className:"card",style:{marginBottom:14}},
+      h("div",{style:{fontSize:12,color:"#595959",marginBottom:12}},"○できている　△少しできている　×できていない／わからない"),
+      job.items.map((item,i)=>h("div",{key:i,className:"ir"},
+        h("div",{className:"in",style:{background:ans[i]?"#1F4E79":"#e0e0e0",color:ans[i]?"#fff":"#888",fontSize:10}},i+1),
+        h("div",{style:{flex:1,fontSize:13,lineHeight:1.6}},item),
+        h("div",{style:{display:"flex",gap:4,flexShrink:0}},
+          ["○","△","×"].map(val=>h(Mkb,{key:val,val,active:ans[i],onClick:nv=>{const a=[...ans];a[i]=nv;setAns(a);}}))
+        )
+      ))
+    ),
+    h("div",{style:{display:"flex",justifyContent:"flex-end"}},
+      h("button",{className:"bp",onClick:()=>onNext({ans,score,max}),style:{padding:"10px 24px",fontSize:14}},
+        filled<job.items.length?"未回答があります（このまま進む）":"次へ：自己理解チェックへ →")
+    )
+  );
+}
+
 // ── 分析ボックス ─────────────────────────────────────────────
 function AnalysisBox({tot,ss,onParas}){
   const [paras,setParas]=useState(null);
-  useEffect(()=>{
-    const p=pattern(tot,ss);
-    setParas(p);
-    if(onParas)onParas(p);
-  },[]);
+  useEffect(()=>{const p=pattern(tot,ss);setParas(p);if(onParas)onParas(p);},[]);
   const heads=["① スコアが示すこと","② ミスマッチリスク","③ 今すぐ取り組むこと"];
   const cols=["#2E75B6","#FF9800","#4CAF50"];
   if(!paras)return null;
   return h("div",{className:"card",style:{marginBottom:12}},
     h("div",{style:{fontSize:12,fontWeight:500,color:"#1F4E79",marginBottom:12,paddingBottom:8,borderBottom:"0.5px solid rgba(0,0,0,0.1)"}},
-      h("i",{"aria-hidden":"true",className:"ti ti-chart-bar",style:{marginRight:4,fontSize:14}}),
-      "スコアパターン分析"
-    ),
+      h("i",{"aria-hidden":"true",className:"ti ti-chart-bar",style:{marginRight:4,fontSize:14}}),"スコアパターン分析"),
     paras.map((p,i)=>h("div",{key:i,className:"aib",style:{borderLeftColor:cols[i],marginBottom:i<2?8:0}},
       h("div",{style:{fontSize:11,fontWeight:500,color:cols[i],marginBottom:4}},heads[i]),
       h("div",{style:{fontSize:13,lineHeight:1.8,color:"#1a1a1a"}},p)
@@ -230,25 +349,24 @@ function AnalysisBox({tot,ss,onParas}){
   );
 }
 
-// ── メール送信ボックス ────────────────────────────────────────
-function EmailBox({name,sid,total,ss,paras}){
-  const [email,setEmail]=useState(""),[sending,setSending]=useState(false),[status,setStatus]=useState(null);
+// ── メールボックス ────────────────────────────────────────────
+function EmailBox({name,sid,job,total,jobScore,jobMax,ss,paras}){
+  const [email,setEmail]=useState(""),[status,setStatus]=useState(null);
   useEffect(()=>{
-    if(GAS_URL!=='https://script.google.com/macros/s/AKfycbxAnKg8UrLoPSSUFD0hWt4DfK65buCs7pzRkrQFFHqn80sI6VKBIGcG8sCd6OF7-0sKcA/exec')
+    if(GAS_URL!=='YOUR_GAS_URL_HERE')
       gasGet({action:'getEmail'}).then(d=>{if(d.email)setEmail(d.email);}).catch(()=>{});
   },[]);
   const send=()=>{
     if(!email.trim()){alert("メールアドレスを入力してください");return}
-    setSending(true);
-    window.open(makeMailto(email.trim(),name,total,ss,paras));
-    setStatus("ok");setSending(false);
+    window.open(makeMailto(email.trim(),name,total,job,jobScore,jobMax,ss,paras));
+    setStatus("ok");
   };
   return h("div",{className:"eml",style:{marginBottom:12}},
     h("div",{style:{fontSize:13,fontWeight:500,color:"#E65100",marginBottom:10}},
       h("i",{"aria-hidden":"true",className:"ti ti-mail",style:{marginRight:6,fontSize:14}}),"講師にメールで通知する"),
     h("div",{style:{display:"flex",gap:8}},
       h("input",{type:"email",value:email,onChange:ev=>setEmail(ev.target.value),placeholder:"講師のメールアドレス",style:{flex:1}}),
-      h("button",{className:"bm",onClick:send,disabled:sending||!email},"メール作成")
+      h("button",{className:"bm",onClick:send,disabled:!email},"メール作成")
     ),
     status==="ok"&&h("div",{style:{marginTop:8,fontSize:12,color:"#2E7D32",background:"#E8F5E9",padding:"6px 10px",borderRadius:6}},
       "✓ メールクライアントが開きました。内容を確認して送信してください。")
@@ -259,18 +377,34 @@ function EmailBox({name,sid,total,ss,paras}){
 function Result({r}){
   const [paras,setParas]=useState(null);
   const j=jg(r.total);
+  const jj=r.job?jgJ(Math.round(r.jobScore/r.jobMax*100)):null;
   return h("div",{style:{padding:"16px 16px 32px"}},
     h("div",{className:"card",style:{textAlign:"center",marginBottom:12,padding:"24px 16px"}},
       h("div",{style:{fontSize:12,color:"#595959",marginBottom:8}},[r.name," さんのチェックリスト結果"]),
-      h(Gauge,{score:r.total,size:110}),
+      h(Gauge,{score:r.total,max:MAX,size:110}),
       h("div",{style:{marginTop:14,padding:"10px 20px",background:j.bg,border:`1.5px solid ${j.bd}`,borderRadius:8,display:"inline-block"}},
         h("div",{style:{fontSize:17,fontWeight:500,color:j.c}},j.l)),
       h("div",{style:{marginTop:8,fontSize:12,color:"#595959"}},[r.filled," / ",TOTAL," 項目回答済み"])
     ),
+    r.job&&h("div",{className:"card",style:{marginBottom:12}},
+      h("div",{style:{fontSize:12,fontWeight:500,color:r.job.color,marginBottom:12,paddingBottom:8,borderBottom:`1px solid ${r.job.bg}`}},
+        h("i",{"aria-hidden":"true",className:`ti ${r.job.icon}`,style:{marginRight:6,fontSize:14}}),
+        `職種別チェック結果：${r.job.label}`
+      ),
+      h("div",{style:{display:"flex",alignItems:"center",gap:16}},
+        h(Gauge,{score:r.jobScore,max:r.jobMax,size:80,color:r.job.color}),
+        h("div",{style:{flex:1}},
+          h("div",{style:{fontSize:14,fontWeight:500,color:r.job.color,marginBottom:6}},[Math.round(r.jobScore/r.jobMax*100),"% 理解度"]),
+          h("div",{style:{padding:"4px 10px",borderRadius:4,fontSize:12,fontWeight:500,background:jj.bg,color:jj.c,display:"inline-block",marginBottom:8}},jj.l),
+          r.jobScore/r.jobMax<0.6&&h("div",{style:{fontSize:12,color:"#C62828",background:"#FFEBEE",padding:"8px 10px",borderRadius:6}},
+            "この職種についての理解をさらに深めることをおすすめします。講師と一緒に確認しましょう。")
+        )
+      )
+    ),
     h(AnalysisBox,{tot:r.total,ss:r.ss,onParas:setParas}),
-    paras&&h(EmailBox,{name:r.name,sid:r.sid||"",total:r.total,ss:r.ss,paras}),
+    paras&&h(EmailBox,{name:r.name,sid:r.sid||"",job:r.job,total:r.total,jobScore:r.jobScore,jobMax:r.jobMax,ss:r.ss,paras}),
     h("div",{className:"card"},
-      h("div",{style:{fontSize:12,fontWeight:500,color:"#1F4E79",marginBottom:12}},"セクション別スコア"),
+      h("div",{style:{fontSize:12,fontWeight:500,color:"#1F4E79",marginBottom:12}},"セクション別スコア（自己理解・仕事理解）"),
       SEC.map(s=>{
         const sc=r.ss[s.k]||0,mx=MX[s.k],pt=sc/mx*100;
         const fc=pt>=80?"#4CAF50":pt>=60?"#FFC107":"#EF5350";
@@ -286,10 +420,18 @@ function Result({r}){
   );
 }
 
-// ── 訓練生画面 ───────────────────────────────────────────────
+// ── 訓練生メイン ─────────────────────────────────────────────
 function Student({onDone}){
+  const [phase,setPhase]=useState("jobSelect"); // jobSelect→jobReality→jobCheck→main
+  const [job,setJob]=useState(null);
+  const [jobResult,setJobResult]=useState(null);
   const [nm,setNm]=useState(""),[sd,setSd]=useState(""),[ans,setAns]=useState(iA()),
         [idx,setIdx]=useState(0),[sv,setSv]=useState(false);
+
+  if(phase==="jobSelect")return h(JobSelect,{onSelect:j=>{setJob(j);setPhase("jobReality");}});
+  if(phase==="jobReality")return h(JobReality,{job,onNext:d=>{if(d==="back")setPhase("jobSelect");else setPhase("jobCheck");}});
+  if(phase==="jobCheck")return h(JobCheck,{job,onNext:r=>{setJobResult(r);setPhase("main");}});
+
   const tot=cT(ans),fil=cF(ans),sec=SEC[idx];
   const ns=SEC.slice(0,idx).reduce((s,x)=>s+x.it.length,0)+1;
   const sa=(k,i,v)=>setAns(prev=>{const a=[...(prev[k]||[])];a[i]=v;return{...prev,[k]:a}});
@@ -304,20 +446,26 @@ function Student({onDone}){
         action:'save',name:nm.trim(),sid:sd,
         score:tot,...ss,answered:fil,
         date:new Date().toISOString(),
-        answers:encodeAnswers(ans)
+        answers:encodeAnswers(ans),
+        job:job?.id||"",jobLabel:job?.label||"",
+        jobScore:jobResult?.score||0,jobMax:jobResult?.max||0
       });
     }catch(e){console.warn('GAS保存失敗:',e);}
     setSv(false);
-    onDone({name:nm.trim(),sid:sd,total:tot,ss,filled:fil});
+    onDone({name:nm.trim(),sid:sd,total:tot,ss,filled:fil,job,jobScore:jobResult?.score||0,jobMax:jobResult?.max||0});
   };
 
   return h("div",{style:{padding:"16px 16px 32px"}},
+    job&&h("div",{style:{background:job.bg,border:`1px solid ${job.color}`,borderRadius:8,padding:"8px 12px",marginBottom:12,display:"flex",alignItems:"center",gap:8}},
+      h("i",{"aria-hidden":"true",className:`ti ${job.icon}`,style:{fontSize:16,color:job.color}}),
+      h("span",{style:{fontSize:13,color:job.color,fontWeight:500}},job.label),
+      h("span",{style:{fontSize:12,color:"#595959",marginLeft:"auto"}},[`職種チェック: ${jobResult?.score||0}/${jobResult?.max||0}点`])
+    ),
     h("div",{className:"card",style:{marginBottom:12}},
       h("div",{style:{fontSize:12,color:"#595959",marginBottom:8}},"受講生情報"),
       h("div",{style:{display:"flex",gap:10}},
         h("div",{style:{flex:2}},
-          h("label",{style:{fontSize:11,color:"#595959"}},"名前 "),
-          h("span",{style:{color:"#E53935"}},"*"),
+          h("label",{style:{fontSize:11,color:"#595959"}},"名前 "),h("span",{style:{color:"#E53935"}},"*"),
           h("input",{type:"text",value:nm,onChange:ev=>setNm(ev.target.value),placeholder:"山田 太郎",style:{marginTop:4}})),
         h("div",{style:{flex:1}},
           h("label",{style:{fontSize:11,color:"#595959"}},"受講生ID"),
@@ -330,14 +478,13 @@ function Student({onDone}){
         h("div",{className:"pb"},h("div",{className:"pf",style:{width:`${fil/TOTAL*100}%`}})),
         h("div",{style:{fontSize:12,fontWeight:500,marginTop:5}},[fil," / ",TOTAL," 項目"])),
       h("div",{className:"card",style:{display:"flex",alignItems:"center",gap:10}},
-        h(Gauge,{score:tot,size:72}),
+        h(Gauge,{score:cT(ans),max:MAX,size:72}),
         h("div",{style:{fontSize:11,color:"#595959"}},"現在の",h("br"),"スコア"))
     ),
     h("div",{style:{display:"flex",flexWrap:"wrap",gap:4,marginBottom:10}},
       SEC.map((s,i)=>{
         const f=(ans[s.k]||[]).filter(v=>v!=="").length===s.it.length;
-        return h("button",{key:s.k,className:`tb${i===idx?" on":f?" ok":""}`,onClick:()=>setIdx(i)},
-          [s.k,f?" ✓":""]);
+        return h("button",{key:s.k,className:`tb${i===idx?" on":f?" ok":""}`,onClick:()=>setIdx(i)},[s.k,f?" ✓":""]);
       })
     ),
     h("div",{className:"card",style:{marginBottom:12}},
@@ -370,57 +517,29 @@ function Teacher(){
   const [pw,setPw]=useState(""),[at,setAt]=useState(false),
         [sb,setSb]=useState([]),[ld,setLd]=useState(false),
         [sl,setSl]=useState(null),[instEmail,setIE]=useState(""),[saved,setSaved]=useState(false);
-
-  useEffect(()=>{
-    if(at&&GAS_URL!=='https://script.google.com/macros/s/AKfycbxAnKg8UrLoPSSUFD0hWt4DfK65buCs7pzRkrQFFHqn80sI6VKBIGcG8sCd6OF7-0sKcA/exec')
-      gasGet({action:'getEmail'}).then(d=>{if(d.email)setIE(d.email);}).catch(()=>{});
-  },[at]);
-
-  const saveEmail=async()=>{
-    await gasGet({action:'setEmail',email:instEmail.trim()}).catch(()=>{});
-    setSaved(true);setTimeout(()=>setSaved(false),2000);
-  };
-
-  const load=async()=>{
-    setLd(true);
-    try{const d=await gasGet({action:'load'});if(Array.isArray(d))setSb(d);}
-    catch(e){alert("読み込み失敗。GAS URLを確認してください。\n"+e.message);}
-    setLd(false);
-  };
-
-  const del=async(s)=>{
-    if(!window.confirm("削除しますか？"))return;
-    await gasGet({action:'delete',row:s.rowIndex}).catch(()=>{});
-    setSb(p=>p.filter(x=>x.rowIndex!==s.rowIndex));
-    if(sl?.rowIndex===s.rowIndex)setSl(null);
-  };
-
+  useEffect(()=>{if(at)gasGet({action:'getEmail'}).then(d=>{if(d.email)setIE(d.email);}).catch(()=>{});},[at]);
+  const saveEmail=async()=>{await gasGet({action:'setEmail',email:instEmail.trim()}).catch(()=>{});setSaved(true);setTimeout(()=>setSaved(false),2000);};
+  const load=async()=>{setLd(true);try{const d=await gasGet({action:'load'});if(Array.isArray(d))setSb(d);}catch(e){alert("読み込み失敗。GAS URLを確認してください。\n"+e.message);}setLd(false);};
+  const del=async(s)=>{if(!window.confirm("削除しますか？"))return;await gasGet({action:'delete',row:s.rowIndex}).catch(()=>{});setSb(p=>p.filter(x=>x.rowIndex!==s.rowIndex));if(sl?.rowIndex===s.rowIndex)setSl(null);};
   const sendOne=(s)=>{
     if(!instEmail){alert("メールアドレスを設定してください");return}
-    const ss=s.sectionScores||{};
-    const paras=pattern(s.totalScore,ss);
-    window.open(makeMailto(instEmail,s.name,s.totalScore,ss,paras));
+    const ss=s.sectionScores||{};const paras=pattern(s.totalScore,ss);
+    const job=JOBS.find(j=>j.id===s.jobId)||null;
+    window.open(makeMailto(instEmail,s.name,s.totalScore,job,s.jobScore||0,s.jobMax||0,ss,paras));
   };
-
   const csv=()=>{
-    const heads=["名前","ID","日時","合計","判定","A","B","C","D","E","F","G","回答数"];
-    const rows=sb.map(s=>[s.name,s.studentId||"",
-      new Date(s.date).toLocaleString("ja-JP"),s.totalScore,s.judgment,
-      ...["A","B","C","D","E","F","G"].map(k=>s.sectionScores?.[k]??0),s.answered??""]);
+    const heads=["名前","ID","日時","合計","判定","希望職種","職種スコア","職種Max","A","B","C","D","E","F","G","回答数"];
+    const rows=sb.map(s=>[s.name,s.studentId||"",new Date(s.date).toLocaleString("ja-JP"),s.totalScore,s.judgment,s.jobLabel||"",s.jobScore||0,s.jobMax||0,...["A","B","C","D","E","F","G"].map(k=>s.sectionScores?.[k]??0),s.answered??""]);
     const c=[heads,...rows].map(r=>r.map(v=>`"${v}"`).join(",")).join("\n");
     const blob=new Blob(["\uFEFF"+c],{type:"text/csv;charset=utf-8"});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");a.href=url;
-    a.download=`checklist_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+    const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`checklist_${new Date().toISOString().slice(0,10)}.csv`;a.click();
   };
 
   if(!at)return h("div",{style:{maxWidth:320,margin:"60px auto",padding:"0 16px"}},
     h("div",{className:"card",style:{textAlign:"center",padding:"32px 24px"}},
       h("i",{"aria-hidden":"true",className:"ti ti-lock",style:{fontSize:36,color:"#1F4E79",display:"block",marginBottom:16}}),
       h("div",{style:{fontSize:16,fontWeight:500,marginBottom:20}},"講師ログイン"),
-      h("input",{type:"password",value:pw,onChange:ev=>setPw(ev.target.value),
-        onKeyDown:ev=>ev.key==="Enter"&&(pw===PW?(setAt(true),load()):alert("パスワードが違います")),
-        placeholder:"パスワードを入力",style:{marginBottom:12,textAlign:"center",fontSize:15}}),
+      h("input",{type:"password",value:pw,onChange:ev=>setPw(ev.target.value),onKeyDown:ev=>ev.key==="Enter"&&(pw===PW?(setAt(true),load()):alert("パスワードが違います")),placeholder:"パスワードを入力",style:{marginBottom:12,textAlign:"center",fontSize:15}}),
       h("button",{className:"bp",onClick:()=>pw===PW?(setAt(true),load()):alert("パスワードが違います"),style:{width:"100%",padding:12,fontSize:14}},"ログイン"),
       h("div",{style:{marginTop:12,fontSize:11,color:"#888"}},"初期PW: sensei2026")
     )
@@ -428,57 +547,49 @@ function Teacher(){
 
   return h("div",{style:{padding:"16px 16px 32px"}},
     h("div",{className:"card",style:{marginBottom:14,background:"#FFF3E0",border:"1px solid #FFB74D"}},
-      h("div",{style:{fontSize:12,fontWeight:500,color:"#E65100",marginBottom:10}},
-        h("i",{"aria-hidden":"true",className:"ti ti-mail",style:{marginRight:4}}),"メール通知設定"),
+      h("div",{style:{fontSize:12,fontWeight:500,color:"#E65100",marginBottom:10}},h("i",{"aria-hidden":"true",className:"ti ti-mail",style:{marginRight:4}}),"メール通知設定"),
       h("div",{style:{display:"flex",gap:8}},
-        h("input",{type:"email",value:instEmail,onChange:ev=>setIE(ev.target.value),
-          placeholder:"講師のメールアドレス",style:{flex:1}}),
+        h("input",{type:"email",value:instEmail,onChange:ev=>setIE(ev.target.value),placeholder:"講師のメールアドレス",style:{flex:1}}),
         h("button",{className:"bm",onClick:saveEmail},saved?"✓ 保存済み":"保存")
-      ),
-      h("div",{style:{fontSize:11,color:"#595959",marginTop:6}},"※ 登録すると訓練生の結果画面にこのアドレスが自動入力されます")
+      )
     ),
     h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
-      h("div",null,
-        h("div",{style:{fontSize:15,fontWeight:500}},"講師ダッシュボード"),
-        h("div",{style:{fontSize:12,color:"#595959"}},[sb.length," 件の提出"])),
+      h("div",null,h("div",{style:{fontSize:15,fontWeight:500}},"講師ダッシュボード"),h("div",{style:{fontSize:12,color:"#595959"}},[sb.length," 件の提出"])),
       h("div",{style:{display:"flex",gap:8}},
-        h("button",{className:"bg",onClick:load,style:{fontSize:12}},
-          h("i",{"aria-hidden":"true",className:"ti ti-refresh",style:{marginRight:4}}),"更新"),
-        h("button",{className:"bg",onClick:csv,disabled:sb.length===0,style:{fontSize:12}},
-          h("i",{"aria-hidden":"true",className:"ti ti-download",style:{marginRight:4}}),"CSV")
+        h("button",{className:"bg",onClick:load,style:{fontSize:12}},h("i",{"aria-hidden":"true",className:"ti ti-refresh",style:{marginRight:4}}),"更新"),
+        h("button",{className:"bg",onClick:csv,disabled:sb.length===0,style:{fontSize:12}},h("i",{"aria-hidden":"true",className:"ti ti-download",style:{marginRight:4}}),"CSV")
       )
     ),
     ld?h("div",{style:{textAlign:"center",padding:40,color:"#595959"}},"読み込み中…")
     :sb.length===0?h("div",{className:"card",style:{textAlign:"center",padding:40,color:"#595959"}},"まだ提出がありません")
     :h("div",{className:"card",style:{padding:0,overflow:"hidden"}},
-      h("div",{style:{display:"grid",gridTemplateColumns:"1fr 60px 108px 48px 32px 24px",gap:6,
-        padding:"8px 14px",background:"#1F4E79",fontSize:11,fontWeight:500,color:"rgba(255,255,255,0.9)"}},
-        h("div",null,"名前 / 提出日時"),h("div",{style:{textAlign:"center"}},"合計"),
-        h("div",{style:{textAlign:"center"}},"判定"),h("div",{style:{textAlign:"center"}},"回答"),
-        h("div",{style:{textAlign:"center"}},"メール"),h("div",null)
+      h("div",{style:{display:"grid",gridTemplateColumns:"1fr 100px 60px 108px 48px 32px 24px",gap:4,padding:"8px 14px",background:"#1F4E79",fontSize:11,fontWeight:500,color:"rgba(255,255,255,0.9)"}},
+        h("div",null,"名前 / 提出日時"),h("div",{style:{textAlign:"center"}},"希望職種"),h("div",{style:{textAlign:"center"}},"合計"),h("div",{style:{textAlign:"center"}},"判定"),h("div",{style:{textAlign:"center"}},"回答"),h("div",null),h("div",null)
       ),
       sb.flatMap((s,i)=>{
         const j2=jg(s.totalScore),isSel=sl?.rowIndex===s.rowIndex;
-        const rows=[h("div",{key:s.rowIndex,
-          className:`sb${isSel?" sel":""}`,onClick:()=>setSl(isSel?null:s),
-          style:{background:isSel?"#EEF5FF":i%2===0?"#fff":"#f5f5f5"}},
+        const job=JOBS.find(j=>j.id===s.jobId)||null;
+        const jobPct=s.jobMax>0?Math.round((s.jobScore||0)/s.jobMax*100):null;
+        const rows=[h("div",{key:s.rowIndex,className:`sb${isSel?" sel":""}`,
+          onClick:()=>setSl(isSel?null:s),
+          style:{background:isSel?"#EEF5FF":i%2===0?"#fff":"#f5f5f5",gridTemplateColumns:"1fr 100px 60px 108px 48px 32px 24px"}},
           h("div",null,
             h("div",{style:{fontSize:13,fontWeight:500}},[s.name,s.studentId?` (${s.studentId})`:""]),
-            h("div",{style:{fontSize:10,color:"#888"}},
-              new Date(s.date).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}))),
+            h("div",{style:{fontSize:10,color:"#888"}},new Date(s.date).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}))),
+          h("div",{style:{textAlign:"center"}},job?h("span",{style:{fontSize:10,padding:"2px 6px",borderRadius:4,background:job.bg,color:job.color,fontWeight:500}},job.label.slice(0,6)+"…"):h("span",{style:{fontSize:11,color:"#bbb"}},"―")),
           h("div",{style:{textAlign:"center",fontSize:18,fontWeight:500,color:j2.c}},s.totalScore),
-          h("div",{style:{textAlign:"center"}},
-            h("span",{style:{padding:"2px 6px",borderRadius:4,fontSize:11,fontWeight:500,background:j2.bg,color:j2.c}},j2.l)),
+          h("div",{style:{textAlign:"center"}},h("span",{style:{padding:"2px 6px",borderRadius:4,fontSize:11,fontWeight:500,background:j2.bg,color:j2.c}},j2.l)),
           h("div",{style:{textAlign:"center",fontSize:12,color:"#888"}},[s.answered??"-","/",TOTAL]),
-          h("button",{onClick:ev=>{ev.stopPropagation();sendOne(s);},
-            style:{background:"none",border:"none",color:"#C55A11",fontSize:16,padding:2,cursor:"pointer"},
-            title:"メール送信"},h("i",{"aria-hidden":"true",className:"ti ti-mail"})),
-          h("button",{onClick:ev=>{ev.stopPropagation();del(s);},
-            style:{background:"none",border:"none",color:"#bbb",fontSize:15,padding:2}},"×")
+          h("button",{onClick:ev=>{ev.stopPropagation();sendOne(s);},style:{background:"none",border:"none",color:"#C55A11",fontSize:16,padding:2,cursor:"pointer"},title:"メール送信"},h("i",{"aria-hidden":"true",className:"ti ti-mail"})),
+          h("button",{onClick:ev=>{ev.stopPropagation();del(s);},style:{background:"none",border:"none",color:"#bbb",fontSize:15,padding:2}},"×")
         )];
-        if(isSel)rows.push(h("div",{key:s.rowIndex+"_d",
-          style:{padding:"14px 16px",background:"#F0F6FF",borderBottom:"0.5px solid rgba(0,0,0,0.1)"}},
+        if(isSel)rows.push(h("div",{key:s.rowIndex+"_d",style:{padding:"14px 16px",background:"#F0F6FF",borderBottom:"0.5px solid rgba(0,0,0,0.1)",gridColumn:"1/-1"}},
           h("div",{style:{fontSize:12,fontWeight:500,color:"#1F4E79",marginBottom:10}},[s.name," さんの詳細"]),
+          job&&jobPct!==null&&h("div",{style:{marginBottom:12,padding:"10px 12px",background:job.bg,borderRadius:6}},
+            h("div",{style:{fontSize:12,fontWeight:500,color:job.color,marginBottom:4}},[`職種別チェック（${job.label}）：${s.jobScore||0}/${s.jobMax||0}点（${jobPct}%）`]),
+            jobPct<60&&h("div",{style:{fontSize:12,color:"#C62828"}},h("i",{"aria-hidden":"true",className:"ti ti-alert-triangle",style:{marginRight:4}}), "仕事理解が不足しています。面談で確認してください。")
+          ),
+          h("div",{style:{fontSize:12,fontWeight:500,color:"#595959",marginBottom:8}},"自己理解・仕事理解 セクション別"),
           SEC.map(sec=>{
             const sc=cS(s.answers||{},sec.k),mx=MX[sec.k],pt=sc/mx*100;
             const fc=pt>=80?"#4CAF50":pt>=60?"#FFC107":"#EF5350";
@@ -499,23 +610,17 @@ function Teacher(){
 function App(){
   const [mode,setMode]=useState("student"),[res,setRes]=useState(null);
   return h("div",null,
-    h("div",{style:{background:"#1F4E79",color:"#fff",padding:"10px 16px",
-      display:"flex",alignItems:"center",justifyContent:"space-between"}},
+    h("div",{style:{background:"#1F4E79",color:"#fff",padding:"10px 16px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
       h("div",null,
         h("div",{style:{fontSize:10,opacity:.7}},"ITビジネス・Webデザイン養成科"),
         h("div",{style:{fontSize:14,fontWeight:500}},"自己理解・仕事理解チェックリスト")),
       h("div",{style:{display:"flex",gap:6}},
         [{id:"student",label:"訓練生"},{id:"teacher",label:"講師"}].map(({id,label})=>
-          h("button",{key:id,onClick:()=>{setMode(id);setRes(null)},style:{
-            padding:"5px 12px",borderRadius:6,border:"none",fontSize:12,fontWeight:500,cursor:"pointer",
-            background:mode===id?"#fff":"transparent",
-            color:mode===id?"#1F4E79":"rgba(255,255,255,0.8)"}},label)
+          h("button",{key:id,onClick:()=>{setMode(id);setRes(null)},style:{padding:"5px 12px",borderRadius:6,border:"none",fontSize:12,fontWeight:500,cursor:"pointer",background:mode===id?"#fff":"transparent",color:mode===id?"#1F4E79":"rgba(255,255,255,0.8)"}},label)
         )
       )
     ),
-    mode==="student"
-      ?(res?h(Result,{r:res}):h(Student,{onDone:setRes}))
-      :h(Teacher)
+    mode==="student"?(res?h(Result,{r:res}):h(Student,{onDone:setRes})):h(Teacher)
   );
 }
 ReactDOM.render(h(App),document.getElementById("root"));
