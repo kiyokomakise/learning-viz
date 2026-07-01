@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>身だしなみチェックリスト（男女共通版）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Hiragino Kaku Gothic ProN","Meiryo",sans-serif;background:#f5f5f3;color:#1a1a18;padding:1rem}
+.wrap{max-width:680px;margin:0 auto;padding:1.5rem 0}
+h1{font-size:18px;font-weight:600;margin-bottom:4px}
+.sub{font-size:13px;color:#888;margin-bottom:8px}
+.pbar-bg{background:#e8e7e2;border-radius:99px;height:8px;margin:8px 0 4px;border:0.5px solid #d3d1c7}
+.pbar{height:100%;border-radius:99px;background:#378add;transition:width .3s;width:0%}
+.pfoot{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ptxt{font-size:12px;color:#5f5e5a}
+.rbtn{font-size:12px;color:#888;background:none;border:0.5px solid #d3d1c7;border-radius:6px;padding:4px 10px;cursor:pointer}
+.rbtn:hover{background:#f1efe8}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#888;margin-bottom:.8rem}
+.wd{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ef9f27;margin-right:2px;vertical-align:middle}
+.ad{display:inline-block;width:7px;height:7px;border-radius:50%;background:#e24b4a;margin-right:2px;vertical-align:middle}
+.gender-tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.gtab{font-size:12px;padding:4px 12px;border-radius:99px;border:0.5px solid #888;background:none;cursor:pointer;color:#5f5e5a}
+.gtab.active{background:#378add;color:#fff;border-color:#378add}
+.notice{font-size:12px;color:#854f0b;background:#faeeda;border:0.5px solid #ef9f27;border-radius:6px;padding:8px 12px;margin-top:8px;margin-bottom:1.2rem;line-height:1.6}
+.category{margin-bottom:1.4rem}
+.cat-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px;padding-bottom:6px;border-bottom:0.5px solid #d3d1c7}
+.cat-ttl{font-size:14px;font-weight:600;color:#1a1a18}
+.cat-bdg{margin-left:auto;font-size:11px;padding:2px 8px;border-radius:99px;background:#e6f1fb;color:#185fa5}
+.item{display:flex;align-items:flex-start;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer;transition:background .12s;margin-bottom:3px;border:0.5px solid transparent}
+.item:hover{background:#f1efe8}
+.item.checked{background:#eaf3de}
+.item.checked .ilbl{color:#888;text-decoration:line-through}
+.item.is-warn{border-left:3px solid #ef9f27;border-radius:0 6px 6px 0;padding-left:8px}
+.item.is-alert{border-left:3px solid #e24b4a;border-radius:0 6px 6px 0;padding-left:8px}
+.chk{width:18px;height:18px;border-radius:4px;border:1.5px solid #888;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;background:#fff}
+.item.checked .chk{background:#639922;border-color:#639922}
+.itxt{flex:1}
+.ilbl{font-size:13px;color:#1a1a18;line-height:1.5}
+.inote{font-size:11px;color:#888;margin-top:2px;line-height:1.45}
+.ng{display:inline-block;font-size:10px;padding:1px 5px;border-radius:3px;background:#fcebeb;color:#a32d2d;margin-left:5px;font-weight:600;vertical-align:middle}
+.gbadge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;margin-left:5px;font-weight:600;vertical-align:middle}
+.gbadge.m{background:#e6f1fb;color:#185fa5}
+.gbadge.f{background:#eeedfe;color:#534ab7}
+.submit-area{margin-top:1.5rem;padding:1rem 1.2rem;background:#fff;border-radius:8px;border:0.5px solid #d3d1c7}
+.submit-area label{font-size:13px;color:#1a1a18;display:block;margin-bottom:4px;font-weight:600}
+.submit-area input{width:100%;padding:8px 10px;border:0.5px solid #d3d1c7;border-radius:6px;font-size:13px;font-family:inherit;margin-bottom:12px;background:#f9f9f7}
+.submit-btn{width:100%;padding:10px;background:#378add;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.submit-btn:hover{background:#185fa5}
+.submit-btn:disabled{background:#b4b2a9;cursor:not-allowed}
+.done-msg{display:none;text-align:center;padding:12px;background:#eaf3de;border-radius:8px;border:0.5px solid #97c459;color:#3b6d11;font-size:13px;margin-top:12px;line-height:1.6}
+.err-msg{display:none;text-align:center;padding:12px;background:#fcebeb;border-radius:8px;border:0.5px solid #e24b4a;color:#a32d2d;font-size:13px;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>身だしなみチェックリスト（男女共通版）</h1>
+<p class="sub">来客対応・職場での良好な関係を支える毎日の確認リスト</p>
+<div class="pbar-bg"><div class="pbar" id="pbar"></div></div>
+<div class="pfoot">
+  <span class="ptxt" id="ptxt">0 / 0 完了</span>
+  <button class="rbtn" onclick="resetAll()">↺ リセット</button>
+</div>
+<div class="legend">
+  <span><span class="wd"></span>来客前・面談前に必須</span>
+  <span><span class="ad"></span>周囲への影響が特に大きい</span>
+  <span><span class="gbadge m">男性</span>男性のみ</span>
+  <span><span class="gbadge f">女性</span>女性のみ</span>
+</div>
+<div class="gender-tabs">
+  <button class="gtab active" onclick="setGender('all',this)">全項目</button>
+  <button class="gtab" onclick="setGender('m',this)">男性のみ表示</button>
+  <button class="gtab" onclick="setGender('f',this)">女性のみ表示</button>
+</div>
+<div id="lists"></div>
+
+<div class="submit-area">
+  <label for="name">氏名を入力して送信してください</label>
+  <input type="text" id="name" placeholder="例：山田 太郎">
+  <button class="submit-btn" id="submitBtn" onclick="submitForm()">✉ チェック結果を先生に送信する</button>
+</div>
+<div class="done-msg" id="doneMsg">✅ 送信完了しました。先生が確認します。</div>
+<div class="err-msg" id="errMsg">⚠️ 送信に失敗しました。もう一度試してください。</div>
+</div>
+
+<script>
+const GAS_URL='https://script.google.com/macros/s/AKfycby9c4b0bwL1_ImgzCK8ZbYGE1btEFQAlgla36pDzEWkPNFJNhZLSSVAssvTJSHWkW6g/exec';
+
+const cats=[
+{t:"においの管理",icon:"💨",notice:true,items:[
+{l:"毎日入浴し、体をきちんと洗っている",n:"シャワーだけでは皮脂・汗が落ちきらないことがある。特に夏場・運動後はボディソープで丁寧に洗浄する",alert:true},
+{l:"着用済みの衣類を翌日また着回していない",n:"1日着た服には皮脂・汗・雑菌が付着している。シャツ・下着・靴下は毎日洗濯が前提",alert:true,ng:"2〜3日着続けたシャツ"},
+{l:"脇・胸・首まわりに制汗剤（デオドラント）を使用している",n:"入浴後の清潔な肌への塗布が最も効果的。ロールオン・スティックは持続性が高い",alert:true},
+{l:"足・靴のにおい対策をしている",n:"足指の間を丁寧に洗う・靴の中敷きを3〜6か月で交換する・同じ靴を連日履かず1日以上乾燥させる",alert:true,ng:"同じ靴を毎日着用"},
+{l:"口臭対策ができている（歯磨き・舌磨き・フロス）",n:"舌苔は口臭の主な原因のひとつ。コーヒー・ニンニクを食べた後は特に要注意",warn:true,alert:true},
+{l:"朝、自分の口のにおいを確認している",n:"手のひらに息を吐いてすぐ嗅ぐ方法で確認できる。気になる場合はブレスケアを携帯する",warn:true}
+]},
+{t:"頭髪・顔まわり",icon:"👤",items:[
+{l:"清潔に洗髪しており、頭皮のにおい・フケがない",n:"頭皮の皮脂臭は体臭と同様に周囲に届く。毎日シャンプーが基本",alert:true},
+{l:"寝癖がなく、きちんと整髪されている",n:"整髪料のつけすぎは見た目の不自然さとにおいの原因になる",warn:true},
+{l:"髪色が職場の基準・業種のTPOに合っている",n:"明るすぎるカラー・ムラ染めは教育・医療・金融系では特に印象を損ないやすい",ng:"職場基準を超えた明るいカラー"},
+{l:"ひげを清潔に整えている",n:"「清潔に整ったひげ」はOK、「無精ひげ」はNG",warn:true,gender:"m",ng:"数日分の無精ひげ"},
+{l:"鼻毛・耳毛が出ていない",n:"鼻毛カッターを週1〜2回使用するのが目安。来客前に鏡で必ず確認する",warn:true,gender:"m"},
+{l:"眉が整っている",n:"眉間のつながり・眉上の余分な毛は清潔感に影響する。男女ともに最低限の手入れが必要"}
+]},
+{t:"化粧・スキンケア",icon:"✨",items:[
+{l:"ビジネスシーンに適したメイクをしている（ノーメイクは不可）",n:"最低限：日焼け止め・眉・リップ。個人の好みではなく社会人としての礼儀の範囲",warn:true,alert:true,gender:"f",ng:"完全なノーメイクでの来客対応・職場出勤"},
+{l:"メイクがナチュラルメイクの範囲に収まっている",n:"ビジネスの基準は「健康的・清潔に見える」こと。濃いアイライナー・派手なアイシャドウは避ける",warn:true,gender:"f",ng:"舞台メイク・真っ赤なリップ"},
+{l:"口紅・グロスが落ちておらず唇の輪郭が整っている",n:"食後・来客直前にポケットミラーで確認",warn:true,gender:"f"},
+{l:"日焼け止め・下地のムラ・首との色差がない",n:"出社後に自然光での確認が理想",gender:"f"},
+{l:"スキンケアの最低限を行っている（洗顔・保湿）",n:"乾燥・テカリ・肌荒れは清潔感の印象に影響する",gender:"m"}
+]},
+{t:"服装・着こなし",icon:"👔",items:[
+{l:"シャツ・ブラウスにシワ・汗ジミ・黄ばみがない",n:"えり・脇・袖口の黄ばみは漂白剤処置または買い替えを",warn:true,alert:true,ng:"えりの黄ばんだシャツ"},
+{l:"シワが伸びており、清潔な状態で着用している",n:"前夜にアイロン・スチーマーで整えるのが理想",warn:true},
+{l:"ボタン・ファスナーがすべて正しく留まっている",n:"胸元の開きすぎ・ファスナーの閉め忘れは出発前に必ず確認",warn:true,ng:"ファスナー開けっ放し"},
+{l:"服に毛玉・ほこり・抜け毛がついていない",n:"粘着ローラーを玄関・車内に常備する",warn:true},
+{l:"ストッキング・タイツに伝線・穴がない",n:"予備を1足デスクに保管する習慣を",warn:true,gender:"f"},
+{l:"ネクタイのノットが正しく締まっている（着用する場合）",n:"先端の長さはベルトのバックル付近が適正",warn:true,gender:"m"},
+{l:"靴下の色がスーツ・パンツに合っている",n:"スーツスタイルに白ソックスは原則NG。黒・紺・グレーが基本",gender:"m",ng:"スーツに白ソックス"}
+]},
+{t:"靴・小物",icon:"👞",items:[
+{l:"靴が磨かれており、汚れ・傷・かかとの著しい減りがない",n:"週1回の手入れが目安",warn:true,ng:"泥・傷・かかと磨耗"},
+{l:"バッグに汚れ・型崩れがない",n:"底の汚れも定期確認を",ng:"合皮のはがれ・型崩れ"},
+{l:"名刺入れ・手帳など取り出す小物が清潔",n:"半年に1度見直しを",warn:true},
+{l:"アクセサリーが職場のTPOに合った範囲に収まっている",n:"来客対応では揺れる・音の出るアクセサリーは避ける",warn:true,gender:"f",ng:"大ぶりイヤリング・過剰な重ね付け"}
+]},
+{t:"職場・スタッフ間の関係に影響する身だしなみ",icon:"👥",items:[
+{l:"デスク・作業スペースが整頓されている",n:"散らかった机は「仕事が雑」という印象を与えやすい"},
+{l:"食後のにおいが残っていない（ランチ後の確認）",n:"ガム・マウスウォッシュを習慣化する",alert:true},
+{l:"共有スペース（トイレ・給湯室など）を使用後に整えている",n:"次の人が気持ちよく使えるよう整えることが職場内の信頼につながる"},
+{l:"姿勢・立ち居振る舞いに気を配っている",n:"背もたれに沈む・頬杖・足組みは来客にも同僚にも印象が悪い"},
+{l:"身だしなみを指摘されたとき、素直に受け入れられる",n:"「気づかせてくれてありがとうございます」が最善の返し"}
+]}
+];
+
+const CHECK_SVG='<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+let genderFilter='all';
+function setGender(g,btn){genderFilter=g;document.querySelectorAll('.gtab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderItems();}
+function itemVisible(item){if(genderFilter==='all')return true;if(!item.gender||item.gender==='both')return true;return item.gender===genderFilter;}
+function renderItems(){
+  let html='';
+  cats.forEach((cat,ci)=>{
+    const visible=cat.items.filter(it=>itemVisible(it));
+    if(!visible.length)return;
+    html+=`<div class="category"><div class="cat-hd"><span style="font-size:16px">${cat.icon}</span><span class="cat-ttl">${cat.t}</span><span class="cat-bdg" id="b${ci}">- / ${visible.length}</span></div>`;
+    cat.items.forEach((item,ii)=>{
+      const id=`c${ci}_${ii}`;
+      if(!itemVisible(item)){html+=`<div id="${id}" style="display:none"></div>`;return;}
+      const ac=item.alert?' is-alert':item.warn?' is-warn':'';
+      const ng=item.ng?`<span class="ng">NG: ${item.ng}</span>`:'';
+      const gb=item.gender&&item.gender!=='both'?`<span class="gbadge ${item.gender}">${item.gender==='m'?'男性':'女性'}</span>`:'';
+      const prev=document.getElementById(id);
+      const wasChecked=prev&&prev.classList.contains('checked');
+      html+=`<div class="item${ac}${wasChecked?' checked':''}" id="${id}" onclick="tog('${id}',${ci})"><div class="chk">${wasChecked?CHECK_SVG:''}</div><div class="itxt"><div class="ilbl">${item.l}${gb}${ng}</div><div class="inote">${item.n}</div></div></div>`;
+    });
+    if(cat.notice){html+=`<div class="notice">⚠️ においは「自分では気づきにくい」感覚です。慣れによって自分の体臭・口臭は感じなくなります。周囲が不快に感じていても言えないケースがほとんどです。客観的なチェックとして活用してください。</div>`;}
+    html+='</div>';
+  });
+  document.getElementById('lists').innerHTML=html;
+  cats.forEach((_,ci)=>updCat(ci));updProg();
+}
+function tog(id,ci){
+  const el=document.getElementById(id);
+  const on=el.classList.toggle('checked');
+  el.querySelector('.chk').innerHTML=on?CHECK_SVG:'';
+  updCat(ci);updProg();
+}
+function updCat(ci){let tot=0,done=0;cats[ci].items.forEach((_,ii)=>{const el=document.getElementById(`c${ci}_${ii}`);if(!el||el.style.display==='none')return;tot++;if(el.classList.contains('checked'))done++;});const b=document.getElementById(`b${ci}`);if(b)b.textContent=`${done} / ${tot}`;}
+function updProg(){let tot=0,done=0;cats.forEach((cat,ci)=>cat.items.forEach((_,ii)=>{const el=document.getElementById(`c${ci}_${ii}`);if(!el||el.style.display==='none')return;tot++;if(el.classList.contains('checked'))done++;}));const pct=tot?Math.round(done/tot*100):0;document.getElementById('pbar').style.width=pct+'%';document.getElementById('ptxt').textContent=`${done} / ${tot} 完了（${pct}%）`;}
+function resetAll(){document.querySelectorAll('.item').forEach(el=>{el.classList.remove('checked');el.querySelector('.chk').innerHTML='';});cats.forEach((_,ci)=>updCat(ci));updProg();}
+
+function getUnchecked(){
+  const list=[];
+  cats.forEach((cat,ci)=>{
+    cat.items.forEach((item,ii)=>{
+      const el=document.getElementById(`c${ci}_${ii}`);
+      if(!el||el.style.display==='none')return;
+      if(!el.classList.contains('checked'))list.push(item.l);
+    });
+  });
+  return list;
+}
+
+function submitForm(){
+  const name=document.getElementById('name').value.trim();
+  if(!name){alert('氏名を入力してください');return;}
+  const unchecked=getUnchecked();
+  const today=new Date();
+  const dateStr=today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
+  const ngText=unchecked.length===0?'すべてチェック完了':unchecked.join('\n');
+
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;
+  btn.textContent='送信中...';
+
+  fetch(GAS_URL,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      name:name,
+      date:dateStr,
+      unchecked:ngText,
+      uncheckedCount:unchecked.length
+    })
+  })
+  .then(()=>{
+    btn.textContent='✅ 送信済み';
+    document.getElementById('doneMsg').style.display='block';
+  })
+  .catch(()=>{
+    btn.disabled=false;
+    btn.textContent='✉ チェック結果を先生に送信する';
+    document.getElementById('errMsg').style.display='block';
+  });
+}
+
+renderItems();
+</script>
+</body>
+</html>
