@@ -177,7 +177,11 @@ function getResults(){
     cat.items.forEach((item,ii)=>{
       const el=document.getElementById(`c${ci}_${ii}`);
       if(!el||el.style.display==='none')return;
-      if(el.classList.contains('checked')){checked.push(item.l);}else{unchecked.push(item.l);}
+      if(el.classList.contains('checked')){
+        checked.push(item.l);
+      } else {
+        unchecked.push(item.l);
+      }
     });
   });
   return {checked,unchecked};
@@ -201,9 +205,9 @@ function submitForm(){
     body:JSON.stringify({
       name:name,
       date:dateStr,
-      checked:checked.length===0?'なし':checked.join('
-'),checkedCount:checked.length,unchecked:unchecked.length===0?'すべてチェック完了':unchecked.join('
-'),
+      checked:checked.length===0?'なし':checked.join('\n'),
+      checkedCount:checked.length,
+      unchecked:unchecked.length===0?'すべてチェック完了':unchecked.join('\n'),
       uncheckedCount:unchecked.length
     })
   })
