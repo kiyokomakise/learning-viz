@@ -170,7 +170,7 @@ function updCat(ci){let tot=0,done=0;cats[ci].items.forEach((_,ii)=>{const el=do
 function updProg(){let tot=0,done=0;cats.forEach((cat,ci)=>cat.items.forEach((_,ii)=>{const el=document.getElementById(`c${ci}_${ii}`);if(!el||el.style.display==='none')return;tot++;if(el.classList.contains('checked'))done++;}));const pct=tot?Math.round(done/tot*100):0;document.getElementById('pbar').style.width=pct+'%';document.getElementById('ptxt').textContent=`${done} / ${tot} 完了（${pct}%）`;}
 function resetAll(){document.querySelectorAll('.item').forEach(el=>{el.classList.remove('checked');el.querySelector('.chk').innerHTML='';});cats.forEach((_,ci)=>updCat(ci));updProg();}
 
-function getUnchecked(){
+function getResults(){
   const list=[];
   cats.forEach((cat,ci)=>{
     cat.items.forEach((item,ii)=>{
@@ -185,10 +185,9 @@ function getUnchecked(){
 function submitForm(){
   const name=document.getElementById('name').value.trim();
   if(!name){alert('氏名を入力してください');return;}
-  const unchecked=getUnchecked();
+  const {checked,unchecked}=getResults();
   const today=new Date();
   const dateStr=today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
-  const ngText=unchecked.length===0?'すべてチェック完了':unchecked.join('\n');
 
   const btn=document.getElementById('submitBtn');
   btn.disabled=true;
@@ -201,7 +200,9 @@ function submitForm(){
     body:JSON.stringify({
       name:name,
       date:dateStr,
-      unchecked:ngText,
+      checked:checked.length===0?'なし':checked.join('
+'),checkedCount:checked.length,unchecked:unchecked.length===0?'すべてチェック完了':unchecked.join('
+'),
       uncheckedCount:unchecked.length
     })
   })
