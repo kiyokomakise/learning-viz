@@ -171,15 +171,16 @@ function updProg(){let tot=0,done=0;cats.forEach((cat,ci)=>cat.items.forEach((_,
 function resetAll(){document.querySelectorAll('.item').forEach(el=>{el.classList.remove('checked');el.querySelector('.chk').innerHTML='';});cats.forEach((_,ci)=>updCat(ci));updProg();}
 
 function getResults(){
-  const list=[];
+  const checked=[];
+  const unchecked=[];
   cats.forEach((cat,ci)=>{
     cat.items.forEach((item,ii)=>{
       const el=document.getElementById(`c${ci}_${ii}`);
       if(!el||el.style.display==='none')return;
-      if(!el.classList.contains('checked'))list.push(item.l);
+      if(el.classList.contains('checked')){checked.push(item.l);}else{unchecked.push(item.l);}
     });
   });
-  return list;
+  return {checked,unchecked};
 }
 
 function submitForm(){
