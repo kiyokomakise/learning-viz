@@ -860,7 +860,7 @@ async function doLogin() {
   const id   = document.getElementById('sid').value.trim();
   const name = document.getElementById('sname').value.trim();
   if (!id || !name) return;
-  currentUser = id.padStart(2,'0');
+  currentUser = id;
   currentName = name;
   skillData   = lsLoad('skills',  {});
   logHistory  = lsLoad('history', []);
@@ -1977,7 +1977,7 @@ function renderReport() {
     <div class="login-title">学習成長記録システム</div>
     <div class="login-sub">ITビジネス・Webデザイン養成科<br>令和8年度 4月7日〜9月4日</div>
     <label class="login-label">受講生番号</label>
-    <input class="login-input" id="sid" type="text" placeholder="例：01" maxlength="2" inputmode="numeric">
+    <input class="login-input" id="sid" type="text" placeholder="例：260901" maxlength="6" inputmode="numeric">
     <label class="login-label">氏名</label>
     <input class="login-input" id="sname" type="text" placeholder="例：山田 太郎">
     <button class="login-btn" onclick="doLogin()">ログイン</button>
