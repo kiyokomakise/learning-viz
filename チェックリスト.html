@@ -876,6 +876,15 @@ async function doLogin() {
         lsSave('history', logHistory);
       }
     } catch(e){}
+
+    // 社会人基礎力の履歴をGASから取得
+    try {
+      const res2 = await fetch(GAS_URL+'?action=getShakaiHistory&studentId='+currentUser);
+      const data2 = await res2.json();
+      if (data2.status==='ok' && data2.history) {
+        localStorage.setItem('shakai_history_'+currentUser, JSON.stringify(data2.history));
+      }
+    } catch(e){}
   }
 
   document.getElementById('loginScreen').style.display = 'none';
