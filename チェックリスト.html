@@ -860,7 +860,7 @@ async function doLogin() {
   const id   = document.getElementById('sid').value.trim();
   const name = document.getElementById('sname').value.trim();
   if (!id || !name) return;
-  currentUser = id;
+  currentUser = id.padStart(2,'0');
   currentName = name;
   skillData   = lsLoad('skills',  {});
   logHistory  = lsLoad('history', []);
@@ -912,6 +912,7 @@ function swTab(id, btn) {
   btn.classList.add('active');
   if (id==='growth') { renderDashboard(); renderReport(); }
   if (id==='cert')   { renderCertDb(); renderCountdown(); }
+  if (id==='shakai') { initShakai(); }
 }
 
 // ════════════════════════════════════════════════
@@ -1762,6 +1763,145 @@ function subjectPct(subId) {
   return Math.round(items.reduce((a,s)=>a+getLv(s.id),0)/items.length/3*100);
 }
 
+// ─── 社会人基礎力 ────────────────────────────────
+
+const SHAKAI_ITEMS = {
+  sec1: [
+    '指示を待つだけでなく、自分から取り組むことができた',
+    '分からないことがあったとき、自分で調べたり考えたりしてから質問できた',
+    '課題や作業に対して、自分なりの目標を持って取り組めた',
+    '「できない」で終わらず、「どうすればできるか」を考えることができた',
+    '自分の課題に気づき、改善しようと行動できた'
+  ],
+  sec2: [
+    '【Plan】何をするのか、どのように進めるのかを考えてから取り組めた',
+    '【Do】計画したことを実際に行動に移すことができた',
+    '【Check】結果を見て、「できたこと」「うまくいかなかったこと」を確認できた',
+    '【Action】次に変えること・続けることを、具体的な行動として決めることができた'
+  ],
+  sec3: [
+    '「できた・できなかった」だけで終わらず、その理由を考えることができた',
+    '失敗や間違いから、改善点を見つけることができた',
+    '自分の成長した点を言葉にすることができた',
+    '振り返った内容を、次の課題や行動に活かすことができた',
+    '同じ失敗を繰り返さないための工夫を考えることができた'
+  ],
+  sec4: [
+    '相手の話を最後まで聴くことができた',
+    '自分の考えや気持ちを、相手に配慮しながら伝えることができた',
+    '自分と違う意見にも耳を傾けることができた',
+    '必要なときに周囲へ質問したり、助けを求めたりすることができた',
+    '相手の立場や状況を考えて行動することができた',
+    '自分だけでなく、周囲が取り組みやすいように意識することができた'
+  ],
+  sec5: [
+    '「自分が何をしたいか」だけでなく、「相手や会社に何ができるか」を考えられる',
+    '自分の経験や学んだことを、仕事でどう活かせるか説明できる',
+    '自分の強みを、仕事での行動と結びつけて考えられる',
+    '面接で「入社後、どのように貢献したいか」を具体的に話せる',
+    'できることを増やしながら、会社や周囲の役に立とうとする意識がある'
+  ]
+};
+
+const SHAKAI_LEVELS = ['🟢 できている', '🟡 だいたいできている', '⬜ これから意識したい'];
+
+function renderShakaiSection(secId) {
+  const items = SHAKAI_ITEMS[secId];
+  const saved = JSON.parse(localStorage.getItem('shakai_' + secId + '_' + currentUser) || '{}');
+  const el = document.getElementById('shakai-' + secId);
+  if (!el) return;
+  el.innerHTML = items.map((item, i) => {
+    const key = secId + '_' + i;
+    const val = saved[key] || '';
+    return `<div style="padding:10px 0;border-bottom:1px solid #f0f0f0;">
+      <div style="font-size:13px;color:#333;margin-bottom:6px;">${item}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${SHAKAI_LEVELS.map((lv, li) =>
+          `<label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:99px;border:1px solid ${val==lv?'#2E4057':'#D3D1C7'};background:${val==lv?'#EAF0FF':'transparent'};color:${val==lv?'#2E4057':'#666'};">
+            <input type="radio" name="sh_${secId}_${i}" value="${lv}" ${val==lv?'checked':''} style="display:none;" onchange="shSave('${secId}',${i},this.value)">
+            ${lv}
+          </label>`
+        ).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function shSave(secId, idx, val) {
+  const key = 'shakai_' + secId + '_' + currentUser;
+  const saved = JSON.parse(localStorage.getItem(key) || '{}');
+  saved[secId + '_' + idx] = val;
+  localStorage.setItem(key, JSON.stringify(saved));
+  renderShakaiSection(secId);
+}
+
+function initShakai() {
+  ['sec1','sec2','sec3','sec4','sec5'].forEach(renderShakaiSection);
+  const thisMonth = new Date().toISOString().slice(0,7);
+  const lastSaved = localStorage.getItem('shakai_saved_month_' + currentUser);
+  if (lastSaved === thisMonth) {
+    document.getElementById('shakaiAlreadyMsg').style.display = 'block';
+    loadShakaiComments();
+  }
+}
+
+function loadShakaiComments() {
+  const saved = JSON.parse(localStorage.getItem('shakai_comments_' + currentUser) || '{}');
+  ['com1','com2a','com2b','com3','com4','com5a','com5b','action1','action2','action3'].forEach(id => {
+    const el = document.getElementById('shakai-' + id);
+    if (el && saved[id]) el.value = saved[id];
+  });
+}
+
+function getShakaiComments() {
+  const result = {};
+  ['com1','com2a','com2b','com3','com4','com5a','com5b','action1','action2','action3'].forEach(id => {
+    const el = document.getElementById('shakai-' + id);
+    if (el) result[id] = el.value;
+  });
+  return result;
+}
+
+function getShakaiChecks() {
+  const result = {};
+  Object.keys(SHAKAI_ITEMS).forEach(secId => {
+    const saved = JSON.parse(localStorage.getItem('shakai_' + secId + '_' + currentUser) || '{}');
+    SHAKAI_ITEMS[secId].forEach((_, i) => {
+      result[secId + '_' + i] = saved[secId + '_' + i] || '未回答';
+    });
+  });
+  return result;
+}
+
+async function saveShakai() {
+  if (!currentUser) { alert('ログインしてください'); return; }
+  const thisMonth = new Date().toISOString().slice(0,7);
+  const comments = getShakaiComments();
+  const checks = getShakaiChecks();
+  localStorage.setItem('shakai_comments_' + currentUser, JSON.stringify(comments));
+  localStorage.setItem('shakai_saved_month_' + currentUser, thisMonth);
+  const payload = {
+    type: 'shakai',
+    studentId: currentUser,
+    studentName: currentName,
+    savedAt: new Date().toISOString(),
+    month: thisMonth,
+    checks: checks,
+    comments: comments
+  };
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {}
+  document.getElementById('shakaiSavedDate').textContent = thisMonth;
+  document.getElementById('shakaiSavedMsg').style.display = 'block';
+  document.getElementById('shakaiAlreadyMsg').style.display = 'none';
+  window.scrollTo(0, document.getElementById('panel-shakai').offsetTop);
+}
+
 // ─── GAS保存 ───────────────────────────────────
 async function saveToGAS() {
   if (!GAS_URL) return;
@@ -1837,7 +1977,7 @@ function renderReport() {
     <div class="login-title">学習成長記録システム</div>
     <div class="login-sub">ITビジネス・Webデザイン養成科<br>令和8年度 4月7日〜9月4日</div>
     <label class="login-label">受講生番号</label>
-    <input class="login-input" id="sid" type="text" placeholder="例：260901" maxlength="6" inputmode="numeric">
+    <input class="login-input" id="sid" type="text" placeholder="例：01" maxlength="2" inputmode="numeric">
     <label class="login-label">氏名</label>
     <input class="login-input" id="sname" type="text" placeholder="例：山田 太郎">
     <button class="login-btn" onclick="doLogin()">ログイン</button>
@@ -1873,6 +2013,7 @@ function renderReport() {
       <button class="tab active" onclick="swTab('today',this)">📝 今日の記録</button>
       <button class="tab" onclick="swTab('growth',this)">📈 マイ成長</button>
       <button class="tab" onclick="swTab('cert',this)">🏆 検定対策</button>
+      <button class="tab" onclick="swTab('shakai',this)">💪 社会人基礎力</button>
     </div>
 
     <!-- ════ タブ① 今日の記録 ════ -->
@@ -1959,6 +2100,99 @@ function renderReport() {
         <div class="cert-db-tabs" id="certDbTabs" style="margin-bottom:1rem"></div>
         <div id="certDbContent"></div>
       </div>
+
+    </div>
+
+    <!-- ════ タブ④ 社会人基礎力 ════ -->
+    <div class="tab-panel" id="panel-shakai">
+
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title">💪 社会人基礎力 自己チェック</div>
+        <div style="font-size:12px;color:#888;margin-bottom:0.5rem;">月1回、訓練を振り返りながら記入しましょう。</div>
+        <div id="shakaiSavedMsg" style="display:none;background:#EAF3DE;border:1px solid #A0CC70;border-radius:8px;padding:10px 14px;font-size:13px;color:#3B6D11;margin-bottom:1rem;">✅ 保存しました（<span id="shakaiSavedDate"></span>）</div>
+        <div id="shakaiAlreadyMsg" style="display:none;background:#FEF3E2;border:1px solid #F9CB42;border-radius:8px;padding:10px 14px;font-size:13px;color:#633806;margin-bottom:1rem;">📅 今月はすでに記録があります。上書き保存されます。</div>
+      </div>
+
+      <!-- 評価の目安 -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div style="font-size:12px;color:#555;line-height:1.8;">
+          <b>評価の目安：</b>
+          <span style="margin-left:8px;">🟢 できている　</span>
+          <span>🟡 だいたいできている　</span>
+          <span>⬜ これから意識したい</span>
+        </div>
+      </div>
+
+      <!-- 1. 主体性 -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title" style="color:#2E4057;">1．主体性 ― 自分から考え、行動する力</div>
+        <div id="shakai-sec1" style="margin-bottom:1rem;"></div>
+        <div style="margin-top:0.75rem;">
+          <div style="font-size:12px;font-weight:500;color:#555;margin-bottom:4px;">振り返り（できるようになったこと・成長したこと）</div>
+          <textarea id="shakai-com1" rows="3" placeholder="自由に記入してください" style="width:100%;padding:8px 10px;border:1px solid #D3D1C7;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+        </div>
+      </div>
+
+      <!-- 2. PDCA -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title" style="color:#2E4057;">2．PDCA ― 考えて実行し、改善する力</div>
+        <div id="shakai-sec2" style="margin-bottom:1rem;"></div>
+        <div style="margin-top:0.75rem;">
+          <div style="font-size:12px;font-weight:500;color:#555;margin-bottom:4px;">次に変えること</div>
+          <textarea id="shakai-com2a" rows="2" placeholder="例：授業前に今日の目標を決める" style="width:100%;padding:8px 10px;border:1px solid #D3D1C7;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+          <div style="font-size:12px;font-weight:500;color:#555;margin:8px 0 4px;">続けること</div>
+          <textarea id="shakai-com2b" rows="2" placeholder="例：わからないとき自分で調べてから質問する" style="width:100%;padding:8px 10px;border:1px solid #D3D1C7;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+        </div>
+      </div>
+
+      <!-- 3. 振り返り -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title" style="color:#2E4057;">3．振り返り ― 経験を次の成長につなげる力</div>
+        <div id="shakai-sec3" style="margin-bottom:1rem;"></div>
+        <div style="margin-top:0.75rem;">
+          <div style="font-size:12px;font-weight:500;color:#555;margin-bottom:4px;">訓練開始時と比べて、変わったと思うこと</div>
+          <textarea id="shakai-com3" rows="3" placeholder="自由に記入してください" style="width:100%;padding:8px 10px;border:1px solid #D3D1C7;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+        </div>
+      </div>
+
+      <!-- 4. 人との関わり方 -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title" style="color:#2E4057;">4．人との関わり方 ― 相手も自分も大切にする力</div>
+        <div id="shakai-sec4" style="margin-bottom:1rem;"></div>
+        <div style="margin-top:0.75rem;">
+          <div style="font-size:12px;font-weight:500;color:#555;margin-bottom:4px;">これから特に意識したいこと</div>
+          <textarea id="shakai-com4" rows="3" placeholder="自由に記入してください" style="width:100%;padding:8px 10px;border:1px solid #D3D1C7;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+        </div>
+      </div>
+
+      <!-- 5. 仕事への貢献視点 -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title" style="color:#2E4057;">5．仕事への貢献視点 ― 「自分に何ができるか」を考える力</div>
+        <div id="shakai-sec5" style="margin-bottom:1rem;"></div>
+        <div style="margin-top:0.75rem;">
+          <div style="font-size:12px;font-weight:500;color:#555;margin-bottom:4px;">面接に向けて</div>
+          <div style="font-size:12px;color:#888;margin-bottom:6px;">「私はこれまでの訓練で、</div>
+          <textarea id="shakai-com5a" rows="2" placeholder="身につけたことを記入" style="width:100%;padding:8px 10px;border:1px solid #D3D1C7;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;margin-bottom:6px;"></textarea>
+          <div style="font-size:12px;color:#888;margin-bottom:6px;">を身につけました。この力を活かして、仕事では</div>
+          <textarea id="shakai-com5b" rows="2" placeholder="貢献したいことを記入" style="width:100%;padding:8px 10px;border:1px solid #D3D1C7;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;margin-bottom:6px;"></textarea>
+          <div style="font-size:12px;color:#888;">という形で貢献したいです。」</div>
+        </div>
+      </div>
+
+      <!-- 最後のAction -->
+      <div class="card" style="margin-bottom:1rem;border:2px solid #2E4057;">
+        <div class="card-title" style="color:#2E4057;">🎯 最後のAction</div>
+        <div style="font-size:12px;color:#555;margin-bottom:1rem;line-height:1.7;">振り返りは、考えただけでは成長につながりません。<br>これから実際に行うことを1つ決めましょう。</div>
+        <div style="font-size:12px;font-weight:500;color:#555;margin-bottom:4px;">次に変える行動</div>
+        <textarea id="shakai-action1" rows="2" placeholder="具体的な行動を記入" style="width:100%;padding:8px 10px;border:1px solid #D3D1C7;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;margin-bottom:10px;"></textarea>
+        <div style="font-size:12px;font-weight:500;color:#555;margin-bottom:4px;">これからも続ける行動</div>
+        <textarea id="shakai-action2" rows="2" placeholder="具体的な行動を記入" style="width:100%;padding:8px 10px;border:1px solid #D3D1C7;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;margin-bottom:10px;"></textarea>
+        <div style="font-size:12px;font-weight:500;color:#555;margin-bottom:4px;">明日から実行する「最初の一歩」</div>
+        <textarea id="shakai-action3" rows="2" placeholder="具体的な行動を記入" style="width:100%;padding:8px 10px;border:1px solid #D3D1C7;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+      </div>
+
+      <!-- 保存ボタン -->
+      <button onclick="saveShakai()" style="width:100%;padding:14px;background:#2E4057;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:2rem;">💾 保存する</button>
 
     </div>
 
