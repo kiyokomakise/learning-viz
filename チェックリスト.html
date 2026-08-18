@@ -865,6 +865,16 @@ async function doLogin() {
   skillData   = {};
   logHistory  = lsLoad('history', []);
 
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainScreen').style.display  = 'block';
+  document.getElementById('headerName').textContent    = 'No.'+currentUser+'　'+currentName;
+  document.getElementById('dailyMotto').textContent    = MOTTOS[new Date().getDay()];
+
+  const tw = getThisWeekSubjects();
+  if (tw.length > 0) currentSubject = tw[0].id;
+
+  renderAll();
+
   if (GAS_URL) {
     try {
       const res  = await fetch(GAS_URL+'?action=getStudent&studentId='+currentUser);
@@ -874,10 +884,10 @@ async function doLogin() {
         logHistory = data.history || [];
         lsSave('skills',  skillData);
         lsSave('history', logHistory);
+        renderAll();
       }
     } catch(e){}
 
-    // 社会人基礎力の履歴をGASから取得
     try {
       const res2 = await fetch(GAS_URL+'?action=getShakaiHistory&studentId='+currentUser);
       const data2 = await res2.json();
@@ -886,17 +896,6 @@ async function doLogin() {
       }
     } catch(e){}
   }
-
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('mainScreen').style.display  = 'block';
-  document.getElementById('headerName').textContent    = 'No.'+currentUser+'　'+currentName;
-  document.getElementById('dailyMotto').textContent    = MOTTOS[new Date().getDay()];
-
-  // 今週の科目で自動フォーカス
-  const tw = getThisWeekSubjects();
-  if (tw.length > 0) currentSubject = tw[0].id;
-
-  renderAll();
 }
 
 function doLogout() {
