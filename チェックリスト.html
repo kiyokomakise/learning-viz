@@ -305,7 +305,7 @@ body { font-family:'Hiragino Sans','Meiryo',sans-serif; background:#F5F5F2; colo
 <body>
 
 <script>
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyMTNu8mPVpJ4wS6fMGGm9yCDRoP3qUSA3trOtXNZAvv3YIMXV520m9IQ_PNSHXNiwX/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxyMRHZiuiAkCDX8GEOwp6GAx7zpnP2mI4H2mYgtmOut8qv2MxqjQR52Nq4UzDmQ9Ma/exec';
 
 // ════════════════════════════════════════════════
 //  訓練スケジュール定義（令和8年度）
@@ -861,8 +861,6 @@ async function doLogin() {
   const name = document.getElementById('sname').value.trim();
   if (!id || !name) return;
   currentUser = id;
-  currentName = name;
-  skillData   = lsLoad('skills',  {});
   logHistory  = lsLoad('history', []);
 
   if (GAS_URL) {
