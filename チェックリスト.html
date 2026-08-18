@@ -1835,6 +1835,82 @@ function shSave(secId, idx, val) {
   renderShakaiSection(secId);
 }
 
+// ─── 社会人基礎力スコア計算 ───────────────────
+function calcShakaiScore(secId) {
+  const items = SHAKAI_ITEMS[secId];
+  const saved = JSON.parse(localStorage.getItem('shakai_' + secId + '_' + currentUser) || '{}');
+  let total = 0, count = 0;
+  items.forEach((_, i) => {
+    const val = saved[secId + '_' + i] || '';
+    if (val === '\uD83D\uDFE2 できている') { total += 3; count++; }
+    else if (val === '\uD83D\uDFE1 だいたいできている') { total += 2; count++; }
+    else if (val === '\u2B1C これから意識したい') { total += 1; count++; }
+  });
+  return count > 0 ? Math.round(total / count * 100 / 3) : 0;
+}
+
+function getShakaiHistory() {
+  return JSON.parse(localStorage.getItem('shakai_history_' + currentUser) || '[]');
+}
+
+let shakaiChart = null;
+
+function renderShakaiChart() {
+  const canvas = document.getElementById('shakaiRadarChart');
+  if (!canvas) return;
+  const history = getShakaiHistory();
+  const currentScores = ['sec1','sec2','sec3','sec4','sec5'].map(s => calcShakaiScore(s));
+  const labels = ['\u4e3b\u4f53\u6027','PDCA','\u632f\u308a\u8fd4\u308a','\u4eba\u3068\u306e\u95a2\u308f\u308a','\u8ca2\u732e\u8996\u70b9'];
+  const datasets = [];
+  history.forEach((h, i) => {
+    datasets.push({
+      label: h.month + '\uff08\u7b2c' + (i+1) + '\u56de\uff09',
+      data: h.scores,
+      borderColor: 'rgba(180,180,180,0.7)',
+      backgroundColor: 'rgba(180,180,180,0.05)',
+      borderWidth: 1.5,
+      borderDash: [4,4],
+      pointRadius: 2,
+    });
+  });
+  if (currentScores.some(s => s > 0)) {
+    datasets.push({
+      label: '\u73fe\u5728',
+      data: currentScores,
+      borderColor: '#2E4057',
+      backgroundColor: 'rgba(46,64,87,0.12)',
+      borderWidth: 2.5,
+      pointBackgroundColor: '#2E4057',
+      pointRadius: 4,
+    });
+  }
+  if (shakaiChart) shakaiChart.destroy();
+  shakaiChart = new Chart(canvas, {
+    type: 'radar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      scales: { r: { min: 0, max: 100, ticks: { stepSize: 25, font: { size: 10 } }, pointLabels: { font: { size: 12 } } } },
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 20 } } }
+    }
+  });
+  const scoreEl = document.getElementById('shakaiScoreList');
+  if (scoreEl) {
+    const secNames = ['\u4e3b\u4f53\u6027','PDCA','\u632f\u308a\u8fd4\u308a','\u4eba\u3068\u306e\u95a2\u308f\u308a','\u8ca2\u732e\u8996\u70b9'];
+    scoreEl.innerHTML = ['sec1','sec2','sec3','sec4','sec5'].map((s, i) => {
+      const score = calcShakaiScore(s);
+      const color = score >= 80 ? '#3B6D11' : score >= 50 ? '#BA7517' : '#888';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0f0;">' +
+        '<span style="font-size:13px;color:#333">' + secNames[i] + '</span>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+        '<div style="width:80px;background:#E0DED6;border-radius:99px;height:6px;overflow:hidden;">' +
+        '<div style="width:' + score + '%;background:' + color + ';height:100%;border-radius:99px;"></div></div>' +
+        '<span style="font-size:13px;font-weight:700;color:' + color + ';min-width:36px;text-align:right">' + score + '%</span>' +
+        '</div></div>';
+    }).join('');
+  }
+}
+
 function initShakai() {
   ['sec1','sec2','sec3','sec4','sec5'].forEach(renderShakaiSection);
   const thisMonth = new Date().toISOString().slice(0,7);
@@ -1843,6 +1919,7 @@ function initShakai() {
     document.getElementById('shakaiAlreadyMsg').style.display = 'block';
     loadShakaiComments();
   }
+  renderShakaiChart();
 }
 
 function loadShakaiComments() {
@@ -1880,6 +1957,14 @@ async function saveShakai() {
   const checks = getShakaiChecks();
   localStorage.setItem('shakai_comments_' + currentUser, JSON.stringify(comments));
   localStorage.setItem('shakai_saved_month_' + currentUser, thisMonth);
+  // 履歴に今回のスコアを保存
+  const currentScores = ['sec1','sec2','sec3','sec4','sec5'].map(s => calcShakaiScore(s));
+  const history = getShakaiHistory();
+  const existIdx = history.findIndex(h => h.month === thisMonth);
+  if (existIdx >= 0) { history[existIdx] = { month: thisMonth, scores: currentScores }; }
+  else { history.push({ month: thisMonth, scores: currentScores }); }
+  history.sort((a,b) => a.month.localeCompare(b.month));
+  localStorage.setItem('shakai_history_' + currentUser, JSON.stringify(history));
   const payload = {
     type: 'shakai',
     studentId: currentUser,
@@ -2105,6 +2190,14 @@ function renderReport() {
 
     <!-- ════ タブ④ 社会人基礎力 ════ -->
     <div class="tab-panel" id="panel-shakai">
+
+      <!-- 成長グラフ -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title">📈 社会人基礎力 成長グラフ</div>
+        <div style="font-size:12px;color:#888;margin-bottom:0.75rem;">5回の記録が重なって表示されます。灰色の線が過去の記録、濃い線が現在です。</div>
+        <canvas id="shakaiRadarChart" height="220"></canvas>
+        <div style="margin-top:1rem;" id="shakaiScoreList"></div>
+      </div>
 
       <div class="card" style="margin-bottom:1rem;">
         <div class="card-title">💪 社会人基礎力 自己チェック</div>
